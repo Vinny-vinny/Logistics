@@ -24,7 +24,8 @@ export default new Vuex.Store({
         parts:{},
         categories:{},
         mechanics:{},
-        users:{}
+        users:{},
+        job_type:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -86,6 +87,9 @@ export default new Vuex.Store({
         },
         updateMechanic(state,mechanic){
          state.mechanics = mechanic;
+        },
+        updateJobType(state,job_type){
+         state.job_type = job_type;
         }
     },
     actions:{
@@ -148,6 +152,9 @@ export default new Vuex.Store({
         },
         updateMechanic({commit},mechanic){
         commit('updateMechanic',mechanic);
+        },
+        updateJobType({commit},job_type){
+        commit('updateJobType',job_type);
         }
     }
 })

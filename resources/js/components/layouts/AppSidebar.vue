@@ -70,6 +70,7 @@
                         <li><router-link to="/customers">Customers</router-link></li>
                         <li><router-link to="/mechanics">Mechanics</router-link></li>
                         <li><router-link to="/categories">Categories</router-link></li>
+                        <li><router-link to="/job-type">Job types</router-link></li>
                     </ul>
                 </li>
             </ul>

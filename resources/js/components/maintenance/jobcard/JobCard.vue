@@ -36,6 +36,18 @@
                                         <option :value="category.id" v-for="category in job_categories" :key="category.id">{{category.name}}</option>
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label>Job Type</label>
+                                    <select class="form-control" required v-model="form.job_type_id">
+                                        <option :value="job_type.id" v-for="job_type in job_types" :key="job_type.id">{{job_type.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mechanic</label>
+                                    <select class="form-control" required v-model="form.mechanic_id">
+                                        <option :value="mechanic.id" v-for="mechanic in mechanics" :key="mechanic.id">{{mechanic.name}}</option>
+                                    </select>
+                                </div>
 
                                 <div class="cool">
                                     <div class="form-group">
@@ -270,6 +282,7 @@
                     track_by_id: '',
                     service_type_id: '',
                     jobcard_category_id:'',
+                    mechanic_id:'',
                     actual_date: '',
                     completion_date: '',
                     time_in: '',
@@ -280,6 +293,7 @@
                     current_readings: '',
                     service_type: 'internal',
                     project_id:'',
+                    job_type_id:'',
                     labour: '',
                     cost: '',
                     cost_code:'',
@@ -313,7 +327,9 @@
                 status: 1,
                 storage_path: '',
                 projects:{},
-                job_categories:{}
+                job_categories:{},
+                mechanics:{},
+                job_types:{}
             }
         },
         watch: {
@@ -365,6 +381,8 @@
             this.getCategories();
             this.getProjects();
             this.getJobCategories();
+            this.getMechanics();
+            this.getJobtypes();
 
         },
         filters: {
@@ -386,6 +404,18 @@
             }
         },
         methods: {
+            getJobtypes(){
+              axios.get('job-types')
+                  .then(res => {
+                      this.job_types = res.data;
+                  })
+            },
+            getMechanics(){
+              axios.get('mechanics')
+                  .then(res => {
+                      this.mechanics = res.data;
+                  })
+            },
             getJobCategories(){
               axios.get('jobcard-category')
                   .then(category => {

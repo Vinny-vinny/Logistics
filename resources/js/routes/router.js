@@ -24,6 +24,7 @@ import Users from "../components/users/Index";
 import projects from "../components/projects/Index";
 import customers from "../components/customers/Index";
 import Mechanics from "../components/mechanics/Index";
+import JobType from "../components/maintenance/jobtypes/Index";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -57,7 +58,8 @@ const routes = [
     {path:'/categories',component:Category, beforeEnter: guard},
     {path:'/projects',component:projects, beforeEnter: guard},
     {path:'/customers',component:customers, beforeEnter: guard},
-    {path:'/mechanics',component:Mechanics, beforeEnter: guard}
+    {path:'/mechanics',component:Mechanics, beforeEnter: guard},
+    {path:'/job-type',component:JobType, beforeEnter: guard},
 ];
 
 export default new VueRouter({

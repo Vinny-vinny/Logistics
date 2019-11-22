@@ -23,6 +23,8 @@ class JobcardResource extends JsonResource
             'cost' => $this->cost,
             'track_by_id' => $this->track_by_id,
             'service_type_id' => $this->service_type_id,
+            'mechanic_id' => $this->mechanic_id,
+            'jobcard_category_id' => $this->jobcard_category_id,
             'service_type' => $this->service_type,
             'next_readings' => $this->next_readings,
             'current_readings' => $this->current_readings,

@@ -42,6 +42,8 @@ class CreateJobcardsTable extends Migration
             $table->dateTime('closed_at')->nullable();
             $table->string('status')->nullable()->default(1);
             $table->integer('jobcard_category_id')->nullable();
+            $table->integer('mechanic_id')->nullable();
+            $table->integer('job_type_id')->nullable();
             $table->timestamps();
         });
     }
