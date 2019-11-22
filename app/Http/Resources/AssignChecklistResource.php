@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class AssignChecklistResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'checklist' => $this->checklist->name,
+            'vehicle' => $this->vehicle->code,
+            'vehicle_id' => $this->vehicle_id,
+            'checklist_id' => $this->checklist_id,
+            'start_date' => $this->start_date,
+            'reminder_before' => $this->reminder_before,
+            'date_type' => $this->checklist->expirytype->name,
+            'counter' => $this->checklist->duration_no
+        ];
+    }
+}

@@ -1,0 +1,104 @@
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+//// Bootstrap
+//@import '~bootstrap/scss/bootstrap';
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+.btn-outline-primary {
+    background: transparent;
+    border: 2px solid #51cbce !important;
+    color: #51cbce;
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active,
+.btn-outline-primary:focus:active,
+.btn-outline-primary.active,
+.open>.btn-outline-primary.dropdown-toggle {
+    background-color: #51cbce !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-color: #51cbce !important;
+}
+.btn-outline-success {
+    background: transparent;
+    border: 2px solid #6bd098 !important;
+    color: #6bd098;
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.btn-outline-success:hover,
+.btn-outline-success:focus,
+.btn-outline-success:active,
+.btn-outline-success:focus:active,
+.btn-outline-success.active,
+.open>.btn-outline-success.dropdown-toggle {
+    background-color: #6bd098 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-color: #6bd098 !important;
+}
+.btn-outline-info {
+    background: transparent;
+    border: 2px solid #51bcda !important;
+    color: #51bcda;
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.btn-outline-info:hover,
+.btn-outline-info:focus,
+.btn-outline-info:active,
+.btn-outline-info:focus:active,
+.btn-outline-info.active,
+.open>.btn-outline-info.dropdown-toggle {
+    background-color: #51bcda !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-color: #51bcda !important;
+}
+.btn-outline-warning {
+    background: transparent;
+    border: 2px solid #fbc658 !important;
+    color: #fbc658;
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.btn-outline-warning:hover,
+.btn-outline-warning:focus,
+.btn-outline-warning:active,
+.btn-outline-warning:focus:active,
+.btn-outline-warning.active,
+.open>.btn-outline-warning.dropdown-toggle {
+    background-color: #fbc658 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-color: #fbc658 !important;
+}
+.btn-outline-danger {
+    background: transparent;
+    border: 2px solid #ef8157 !important;
+    color: #ef8157;
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.btn-outline-danger:hover,
+.btn-outline-danger:focus,
+.btn-outline-danger:active,
+.btn-outline-danger:focus:active,
+.btn-outline-danger.active,
+.open>.btn-outline-danger.dropdown-toggle {
+    background-color: #ef8157 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    border-color: #ef8157 !important;
+}
