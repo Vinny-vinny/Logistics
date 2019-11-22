@@ -39,7 +39,7 @@
                                 <div class="form-group">
                                     <label>Job Type</label>
                                     <select class="form-control" required v-model="form.job_type_id">
-                                        <option :value="job_type.id" v-for="job_type in job_types" :key="job_type.id">{{job_type.name}}</option>
+                                        <option :value="job_type.id" v-for="job_type in job_types" :key="job_type.id">{{job_type.name}} - {{job_type.currency}} {{job_type.hourly_rate}}</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -49,7 +49,6 @@
                                     </select>
                                 </div>
 
-                                <div class="cool">
                                     <div class="form-group">
                                     <label>Expenses</label>
                                     <table style="width: 100%">
@@ -78,22 +77,6 @@
                                         </tr>
                                     </table>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Labour</label>
-                                            <input type="text" class="form-control" v-model="form.labour">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Labour Cost</label>
-                                            <input type="number" step="0.001" class="form-control" v-model="form.cost">
-                                        </div>
-                                    </div>
-                                </div>
-                                </div>
-
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -294,8 +277,6 @@
                     service_type: 'internal',
                     project_id:'',
                     job_type_id:'',
-                    labour: '',
-                    cost: '',
                     cost_code:'',
                     id: '',
                     item_cost_qty: [{part: '', quantity: ''}],

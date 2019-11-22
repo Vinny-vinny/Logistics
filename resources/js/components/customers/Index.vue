@@ -1,12 +1,14 @@
 <template>
     <div>
+        <customers v-if="add_customer" :edit="editing"></customers>
         <!-- Main content -->
-        <section class="content">
+        <section class="content" v-if="!add_customer">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Customers</h3>
                     <button class="btn btn-success pull-right" @click="importCustomers()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
+                    <button class="btn btn-primary pull-right" @click="add_customer=true">Add Customer</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
@@ -17,6 +19,8 @@
                             <th>Account</th>
                             <th>Contact Person</th>
                             <th>Email</th>
+                            <th>Type</th>
+                            <th>Actions</th>
 
                         </tr>
                         </thead>
@@ -27,6 +31,10 @@
                             <td>{{customer.account}}</td>
                             <td>{{customer.contact_person}}</td>
                             <td>{{customer.email}}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" @click="editCustomer(customer)"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="deleteCustomer(customer.id)"><i class="fa fa-trash"></i></button>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -36,13 +44,13 @@
     </div>
 </template>
 <script>
-
+    import Customers from "./Customers";
     export default {
         data(){
             return {
                 tableData: [],
                 importing:false,
-
+                add_customer:false
             }
         },
         created(){
@@ -58,6 +66,24 @@
                         this.tableData = res.data
                     })
             },
+            editCustomer(customer){
+                this.$store.dispatch('updateCustomer',customer)
+                    .then(() =>{
+                        this.editing=true;
+                        this.add_customer=true;
+                    })
+            },
+            deleteCustomer(id){
+                axios.delete(`customers/${id}`)
+                    .then(res => {
+                        for (let i=0;i<this.tableData.length;i++){
+                            if (this.tableData[i].id == res.data){
+                                this.tableData.splice(i,1);
+                            }
+                        }
+                    })
+                    .catch(error => Exception.handle(error))
+            },
             importCustomers(){
                 this.importing = true;
                 axios.get(`import-customers`)
@@ -67,7 +93,29 @@
                         this.$router.go();
                     })
             },
-
+            listen(){
+                eventBus.$on('listCustomers',(customer) =>{
+                    this.tableData.unshift(customer);
+                    this.add_customer =false;
+                    this.initDatable();
+                });
+                eventBus.$on('cancel',()=>{
+                    this.add_customer = false;
+                    this.editing = false;
+                    this.initDatable();
+                });
+                eventBus.$on('updateCustomer',(customer)=>{
+                    this.add_customer = false;
+                    this.editing = false;
+                    for (let i=0;i<this.tableData.length;i++){
+                        if (this.tableData[i].id == customer.id){
+                            this.tableData.splice(i,1);
+                        }
+                    }
+                    this.tableData.unshift(customer);
+                    this.initDatable();
+                });
+            },
             initDatable(){
                 setTimeout(()=>{
                     $('.dt').DataTable({
@@ -87,7 +135,9 @@
                 },1000)
             },
         },
-
+    components:{
+            Customers
+    }
     }
 </script>
 

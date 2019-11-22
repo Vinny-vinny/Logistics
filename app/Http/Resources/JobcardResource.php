@@ -19,8 +19,6 @@ class JobcardResource extends JsonResource
             'machine_id' => $this->machine_id,
             'item_cost_qty' => $this->item_cost_qty,
             'service_required' => $this->service_required,
-            'labour' => $this->labour,
-            'cost' => $this->cost,
             'track_by_id' => $this->track_by_id,
             'service_type_id' => $this->service_type_id,
             'mechanic_id' => $this->mechanic_id,

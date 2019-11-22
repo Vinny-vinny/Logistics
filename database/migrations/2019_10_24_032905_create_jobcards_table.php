@@ -21,8 +21,6 @@ class CreateJobcardsTable extends Migration
             $table->string('service_provider_id')->nullable();
             $table->text('item_cost_qty')->nullable();
             $table->text('service_required')->nullable();
-            $table->string('labour')->nullable();
-            $table->string('cost')->nullable();
             $table->string('supplier_id')->nullable();
             $table->integer('service_type_id')->nullable();
             $table->string('service_type')->nullable();

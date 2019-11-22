@@ -19,8 +19,7 @@
                 <li class="header"></li>
                 <!-- Optionally, you can add icons to the links -->
                 <li><router-link to="/machines"><i class="fa fa-shopping-basket angle-left"></i> <span>Assets</span></router-link></li>
-                <li class="active"><router-link to="/suppliers"><i class="fa fa-users"></i> <span>Suppliers</span></router-link></li>
-                    <li class="treeview">
+                   <li class="treeview">
                     <router-link to="/job-card"><i class="fa fa-tag"></i> <span>Job Card</span>
                         <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
@@ -59,7 +58,6 @@
               </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li style="display: none"><router-link to="/service-provider-types">Service Provider Types</router-link></li>
                         <li><router-link to="/users">Users</router-link></li>
                         <li><router-link to="/fuel-balance">Fuel Balance</router-link></li>
                         <li><router-link to="/track-by">Track By</router-link></li>

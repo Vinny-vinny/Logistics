@@ -25,7 +25,8 @@ export default new Vuex.Store({
         categories:{},
         mechanics:{},
         users:{},
-        job_type:{}
+        job_type:{},
+        customers:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -90,6 +91,9 @@ export default new Vuex.Store({
         },
         updateJobType(state,job_type){
          state.job_type = job_type;
+        },
+        updateCustomer(state,customer){
+         state.customers = customer;
         }
     },
     actions:{
@@ -155,6 +159,9 @@ export default new Vuex.Store({
         },
         updateJobType({commit},job_type){
         commit('updateJobType',job_type);
+        },
+        updateCustomer({commit},customer){
+        commit('updateCustomer',customer);
         }
     }
 })
