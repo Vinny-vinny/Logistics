@@ -14,7 +14,7 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Vehicle</th>
+                            <th>Jobcard #</th>
                             <th>Checklist</th>
                             <th>Start Date</th>
                             <th>Reminder Before</th>
@@ -24,7 +24,7 @@
                         <tbody>
                         <tr v-for="checklist in tableData">
                             <td>{{checklist.id}}</td>
-                            <td>{{checklist.vehicle}}</td>
+                            <td>{{checklist.card}}</td>
                             <td>{{checklist.checklist}}</td>
                             <td>{{checklist.start_date}}</td>
                             <td>{{checklist.reminder_before}} days</td>

@@ -15,7 +15,7 @@ class CreateAssignChecklistsTable extends Migration
     {
         Schema::create('assign_checklists', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('vehicle_id');
+            $table->integer('jobcard_id');
             $table->integer('checklist_id');
             $table->date('start_date');
             $table->integer('reminder_before');

@@ -8,7 +8,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Customers</h3>
                     <button class="btn btn-success pull-right" @click="importCustomers()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
-                    <button class="btn btn-primary pull-right" @click="add_customer=true">Add Customer</button>
+                    <button class="btn btn-primary pull-right mr" @click="add_customer=true">Add Customer</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
@@ -18,8 +18,6 @@
                             <th>Name</th>
                             <th>Account</th>
                             <th>Contact Person</th>
-                            <th>Email</th>
-                            <th>Type</th>
                             <th>Actions</th>
 
                         </tr>
@@ -30,7 +28,6 @@
                             <td>{{customer.name}}</td>
                             <td>{{customer.account}}</td>
                             <td>{{customer.contact_person}}</td>
-                            <td>{{customer.email}}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editCustomer(customer)"><i class="fa fa-edit"></i></button>
                                 <button class="btn btn-danger btn-sm" @click="deleteCustomer(customer.id)"><i class="fa fa-trash"></i></button>
@@ -50,11 +47,13 @@
             return {
                 tableData: [],
                 importing:false,
-                add_customer:false
+                add_customer:false,
+                editing: false
             }
         },
         created(){
             this.getCustomers();
+            this.listen();
         },
         mounted(){
             this.initDatable();

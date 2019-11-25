@@ -12,15 +12,6 @@ class Jobcard extends Model
     {
         return $this->belongsTo(Machine::class);
     }
-
-    public function internal_supplier()
-    {
-       return $this->belongsTo(FuelSupplier::class,'supplier_id');
-    }
-    public function external_supplier()
-    {
-        return $this->belongsTo(ServiceProvider::class,'service_provider_id');
-    }
     public function trackby()
     {
         return $this->belongsTo(TrackBy::class,'track_by_id');
@@ -36,5 +27,19 @@ class Jobcard extends Model
         return $this->belongsTo(FuelBalance::class,'fuel_balance_id');
     }
 
+    public function customer()
+    {
+     return $this->belongsTo(Customer::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(JobcardCategory::class,'jobcard_category_id');
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 
 }

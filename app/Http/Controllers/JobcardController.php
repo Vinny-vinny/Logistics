@@ -36,8 +36,8 @@ class JobcardController extends Controller
         $request['time_in'] = Carbon::parse($request->time_in)->format('H:i');
         $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
 
-        $jobcard = Jobcard::create($request->except('files'));
-        $jobcard->update(['card_no' => substr('ESL-' . $jobcard->id . '-' . Machine::find($jobcard->machine_id)->code, 0, 20)]);
+        $jobcard = Jobcard::create($request->except(['files']));
+        $jobcard->update(['card_no' => substr('LEWA-' . $jobcard->id . '-' . Machine::find($jobcard->machine_id)->code, 0, 20)]);
         Machine::find($jobcard->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),
@@ -68,10 +68,10 @@ class JobcardController extends Controller
     {
         $request['time_in'] = Carbon::parse($request->time_in)->format('H:i');
         $request['time_out'] = Carbon::parse($request->time_out)->format('H:i');
-        $request['card_no'] = substr('ESL-' . $id . '-' . Machine::find($request->machine_id)->code, 0, 20);
+        $request['card_no'] = substr('LEWA-' . $id . '-' . Machine::find($request->machine_id)->code, 0, 20);
 
         $jobcard = Jobcard::find($id);
-        $jobcard->update($request->except(['service_types','files','driver','machine','make','supplier','track_name']));
+        $jobcard->update($request->except(['service_types','files','driver','machine','make','customer_type','track_name','category','previous_readings']));
         Machine::find($request->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),

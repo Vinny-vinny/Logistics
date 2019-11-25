@@ -58,7 +58,8 @@ class CustomerController extends Controller
                 'account' => $customer->Account ? $customer->Account : $faker->word,
                 'name' => $customer->Name ? $customer->Name : $faker->name,
                 'contact_person' => $customer->Contact_Person ?  $customer->Contact_Person : $faker->name,
-                'email' => $customer->EMail ? $customer->EMail : $faker->email
+                'email' => $customer->EMail ? $customer->EMail : $faker->email,
+                'type' => 'Internal'
             ]);
 
         }
@@ -72,7 +73,8 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $customers = Customer::create($request->all());
+        return response()->json($customers);
     }
 
     /**
@@ -86,16 +88,7 @@ class CustomerController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.
@@ -106,7 +99,8 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        Customer::find($id)->update($request->all());
+        return response()->json(Customer::find($id));
     }
 
     /**
@@ -117,6 +111,7 @@ class CustomerController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Customer::destroy($id);
+        return response()->json($id);
     }
 }

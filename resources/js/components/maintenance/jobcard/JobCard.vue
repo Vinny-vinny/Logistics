@@ -43,39 +43,23 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
+                                    <label>Customer Type</label>
+                                    <select class="form-control" v-model="customer_type" required @change="customerType()">
+                                        <option value="Internal">Internal</option>
+                                        <option value="External">External</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" v-if="show_customers">
+                                    <label>Customer</label>
+                                    <select class="form-control" required v-model="form.customer_id">
+                                        <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label>Mechanic</label>
                                     <select class="form-control" required v-model="form.mechanic_id">
                                         <option :value="mechanic.id" v-for="mechanic in mechanics" :key="mechanic.id">{{mechanic.name}}</option>
                                     </select>
-                                </div>
-
-                                    <div class="form-group">
-                                    <label>Expenses</label>
-                                    <table style="width: 100%">
-                                        <tr>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                        <tr v-for="(item,k) in form.item_cost_qty" :key="k">
-                                            <td><select class="form-control" v-model="item.part">
-                                                <option selected disabled>Select Part</option>
-                                                <option :value="part.id" v-for="part in parts" :key="part.id">
-                                                    {{part.code}} - {{part.description}}
-                                                </option>
-                                            </select>
-                                            </td>
-                                            <td><input type="number" class="form-control qty" v-model="item.quantity"
-                                                       placeholder="Qty">
-                                            </td>
-                                            <td>
-                                                <i class="fa fa-minus-circle remove" @click="removeparts(k)"
-                                                   v-show="k || ( !k && form.item_cost_qty.length > 1)"></i>
-                                                <i class="fa fa-plus-circle add" @click="addparts(k)"
-                                                   v-show="k == form.item_cost_qty.length-1"></i>
-                                            </td>
-                                        </tr>
-                                    </table>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -157,6 +141,38 @@
                                 <div class="form-group">
                                     <label>Cost Code</label>
                                     <input type="text" class="form-control" v-model="form.cost_code" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Expenses</label>
+                                    <table style="width: 100%">
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                        <tr v-for="(item,k) in form.item_cost_qty" :key="k">
+                                            <td><select class="form-control" v-model="item.part">
+                                                <option selected disabled>Select Part</option>
+                                                <option :value="part.id" v-for="part in parts" :key="part.id">
+                                                    {{part.code}} - {{part.description}}
+                                                </option>
+                                            </select>
+                                            </td>
+                                            <td><input type="number" class="form-control qty" v-model="item.quantity"
+                                                       placeholder="Qty">
+                                            </td>
+                                            <td>
+                                                <i class="fa fa-minus-circle remove" @click="removeparts(k)"
+                                                   v-show="k || ( !k && form.item_cost_qty.length > 1)"></i>
+                                                <i class="fa fa-plus-circle add" @click="addparts(k)"
+                                                   v-show="k == form.item_cost_qty.length-1"></i>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -278,6 +294,7 @@
                     project_id:'',
                     job_type_id:'',
                     cost_code:'',
+                    customer_id:'',
                     id: '',
                     item_cost_qty: [{part: '', quantity: ''}],
                     maintenance: [{category: '', description: '', root_cause: ''}],
@@ -306,11 +323,14 @@
                 parts: {},
                 categories: {},
                 status: 1,
-                storage_path: '',
                 projects:{},
                 job_categories:{},
                 mechanics:{},
-                job_types:{}
+                job_types:{},
+                customer_type:'',
+                customers:{},
+                filtered_customers:[],
+                show_customers:false
             }
         },
         watch: {
@@ -364,6 +384,7 @@
             this.getJobCategories();
             this.getMechanics();
             this.getJobtypes();
+            this.getCustomers();
 
         },
         filters: {
@@ -385,6 +406,30 @@
             }
         },
         methods: {
+            customerType(){
+                this.show_customers = true;
+                this.filtered_customers = [];
+              if (this.customer_type ==='Internal'){
+                  for (let i=0; i<this.customers.length; i++){
+                      if (this.customers[i]['type'] === 'Internal'){
+                          this.filtered_customers.push(this.customers[i]);
+                      }
+                  }
+              }
+              else if (this.customer_type === 'External'){
+                  for (let j=0; j<this.customers.length; j++){
+                      if (this.customers[j]['type'] === 'External'){
+                          this.filtered_customers.push(this.customers[j]);
+                      }
+                  }
+              }
+            },
+            getCustomers(){
+              axios.get('customers')
+                  .then(customers => {
+                      this.customers = customers.data;
+                  })
+            },
             getJobtypes(){
               axios.get('job-types')
                   .then(res => {
@@ -490,17 +535,14 @@
                 })
             },
             saveJobcard() {
-                this.machines.forEach(machine => {
-                    if (machine.id === this.form.machine_id) {
-                        if (machine.next_readings > this.form.next_readings) {
-                            return this.$toastr.e(`Sorry, Next ${this.track_name} readings cannot be less than previous readings.`);
-                        }
-                        if (machine.current_readings > this.form.current_readings) {
+                for (let i=0;i<this.machines.length;i++){
+                    if (this.machines[i]['id'] === this.form.machine_id){
+                        console.log(`current ${this.machines[i]['current_readings']}  entered  ${this.form.current_readings}`)
+                        if (this.machines[i]['current_readings'] > this.form.current_readings){
                             return this.$toastr.e(`Sorry, Current ${this.track_name} readings cannot be less than previous readings.`);
                         }
                     }
-                });
-
+                }
                 if (parseFloat(this.form.current_readings) > parseFloat(this.form.next_readings)) {
                     return this.$toastr.e(`Sorry, Current ${this.track_name} readings cannot be greater than next readings.`);
                 }
@@ -611,19 +653,54 @@
                     this.form.service_type = this.$store.state.job_card.service_type;
                     this.show_track_by = true;
                     this.track_name = this.$store.state.job_card.track_name;
-                    this.previous_readings = this.$store.state.job_card.current_readings;
+                    this.previous_readings = this.$store.state.job_card.previous_readings;
                     this.make = this.$store.state.job_card.make;
                     this.driver = this.$store.state.job_card.driver;
                     this.service_types = this.form.service_types;
                     this.form.item_cost_qty = JSON.parse(this.$store.state.job_card.item_cost_qty);
                     this.form.maintenance = JSON.parse(this.$store.state.job_card.maintenance);
                     this.form.service_required = JSON.parse(this.$store.state.job_card.service_required);
-                    this.storage_path = this.$store.state.job_card.storage_path;
 
                     console.log(this.$store.state.job_card);
                     this.status = this.$store.state.job_card.status;
+                    this.customer_type = this.$store.state.job_card.customer_type;
+                    this.show_customers = true;
+                    this.filtered_customers = [];
+                    this.Customers();
+                    this.ServiceTypes();
                 }
             },
+            ServiceTypes(){
+                axios.get('service-types')
+                    .then(res => {
+                        for (let i=0;i<res.data.length;i++){
+                            if (res.data[i]['id'] === this.form.service_type_id){
+                                this.service_after = res.data[i]['service_after'];
+                                this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
+                            }
+                        }
+                    });
+            },
+            Customers(){
+                axios.get('customers')
+                    .then(res => {
+                        this.customers =res.data;
+                        if (this.customer_type ==='Internal'){
+                            for (let i=0; i<this.customers.length; i++){
+                                if (this.customers[i]['type'] === 'Internal'){
+                                    this.filtered_customers.push(this.customers[i]);
+                                }
+                            }
+                        }
+                        else if (this.customer_type === 'External'){
+                            for (let j=0; j<this.customers.length; j++){
+                                if (this.customers[j]['type'] === 'External'){
+                                    this.filtered_customers.push(this.customers[j]);
+                                }
+                            }
+                        }
+                    })
+            }
         },
         components: {
             datepicker

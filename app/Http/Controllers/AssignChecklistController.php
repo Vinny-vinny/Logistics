@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AssignChecklist;
 use App\Http\Resources\AssignChecklistResource;
+use App\Jobcard;
 use Illuminate\Http\Request;
 
 class AssignChecklistController extends Controller
@@ -26,6 +27,7 @@ class AssignChecklistController extends Controller
     public function store(Request $request)
     {
         $checklist = AssignChecklist::create($request->all());
+        Jobcard::find($request->jobcard_id)->update(['checklist_assigned' => 1]);
         return response()->json(new AssignChecklistResource($checklist));
     }
 
@@ -48,7 +50,7 @@ class AssignChecklistController extends Controller
      */
     public function update(Request $request, $id)
     {
-        AssignChecklist::find($id)->update($request->except(['checklist','vehicle','date_type','counter']));
+        AssignChecklist::find($id)->update($request->except(['checklist','card','date_type','counter']));
         return response()->json(new AssignChecklistResource(AssignChecklist::find($id)));
     }
 

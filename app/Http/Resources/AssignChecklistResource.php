@@ -17,8 +17,8 @@ class AssignChecklistResource extends JsonResource
         return [
             'id' => $this->id,
             'checklist' => $this->checklist->name,
-            'vehicle' => $this->vehicle->code,
-            'vehicle_id' => $this->vehicle_id,
+            'card' => $this->jobcard->card_no,
+            'jobcard_id' => $this->jobcard_id,
             'checklist_id' => $this->checklist_id,
             'start_date' => $this->start_date,
             'reminder_before' => $this->reminder_before,

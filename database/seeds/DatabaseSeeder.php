@@ -14,7 +14,6 @@ class DatabaseSeeder extends Seeder
          $this->call(UsersSeeder::class);
          $this->call(TrackBySeeder::class);
          $this->call(ServiceTypeSeeder::class);
-         $this->call(ServiceProviderTypeSeeder::class);
          $this->call(FuelBalanceSeeder::class);
          $this->call(ExpensesSeeder::class);
          $this->call(FuelTypeSeeder::class);
@@ -23,6 +22,7 @@ class DatabaseSeeder extends Seeder
          $this->call(CategorySeeder::class);
          $this->call(JobcardCategorySeeder::class);
          $this->call(MechanicSeeder::class);
+         $this->call(JobTypeSeeder::class);
 
 
     }

@@ -18,16 +18,6 @@ class JobcardCategoryController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -35,29 +25,8 @@ class JobcardCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        $category = JobcardCategory::create($request->all());
+        return response()->json($category);
     }
 
     /**
@@ -69,7 +38,8 @@ class JobcardCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        JobcardCategory::find($id)->update($request->all());
+        return response()->json(JobcardCategory::find($id));
     }
 
     /**
@@ -80,6 +50,7 @@ class JobcardCategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        JobcardCategory::destroy($id);
+        return response()->json($id);
     }
 }

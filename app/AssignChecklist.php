@@ -13,8 +13,8 @@ class AssignChecklist extends Model
      return $this->belongsTo(CheckList::class);
     }
 
-    public function vehicle()
+    public function jobcard()
     {
-       return $this->belongsTo(Machine::class,'vehicle_id');
+       return $this->belongsTo(Jobcard::class);
     }
 }

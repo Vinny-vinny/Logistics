@@ -1,35 +1,33 @@
 <template>
     <div>
-        <job-card v-if="add_jobcard" :edit="editing"></job-card>
+        <category v-if="add_category" :edit="editing"></category>
         <!-- Main content -->
-        <section class="content" v-if="!add_jobcard">
+        <section class="content" v-if="!add_category">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Job Card</h3>
-                    <button class="btn btn-primary pull-right" @click="add_jobcard=true">Add Job Card</button>
+                    <h3 class="box-title">Jobcard Categories</h3>
+                    <button class="btn btn-primary pull-right" @click="add_category=true">Add Category</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Card #</th>
-                            <th>Machine</th>
-                            <th>Driver</th>
+                            <th>Name</th>
+                            <th style="display: none">Name</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="job in tableData">
-                            <td>{{job.id}}</td>
-                            <td>{{job.card_no}}</td>
-                            <td>{{job.machine}}</td>
-                            <td>{{job.driver}}</td>
-                              <td>
-                                <button class="btn btn-success btn-sm" @click="editJobcard(job)"><i class="fa fa-edit"></i></button>
-                                <router-link :to="{path:'/job-card/'+job.id}" class="btn btn-info btn-sm"><i class=" fa fa-eye"></i></router-link>
-                                 </td>
+                        <tr v-for="category in tableData">
+                            <td>{{category.id}}</td>
+                            <td>{{category.name}}</td>
+                            <td style="display: none">{{category.name}}</td>
+                            <td>
+                                <button class="btn btn-success btn-sm" @click="editCategory(category)"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="deleteCategory(category.id)"><i class="fa fa-trash"></i></button>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -39,39 +37,37 @@
     </div>
 </template>
 <script>
-    import JobCard from "./JobCard";
+   import Category from "./Category";
     export default {
         data(){
             return {
                 tableData: [],
-                add_jobcard: false,
+                add_category: false,
                 editing: false
             }
         },
         created(){
             this.listen();
-            this.getJobs();
-            console.log(moment('6.00pm','h:mm A').format('HH:mm') > moment('5:00pm','h:mm A').format('HH:mm'))
+            this.getCategories();
         },
         mounted(){
             this.initDatable();
         },
         methods:{
-            getJobs(){
-                axios.get('job-card')
+            getCategories(){
+                axios.get('jobcard-category')
                     .then(res => this.tableData = res.data)
                     .catch(error => Exception.handle(error))
             },
-            editJobcard(job){
-                this.$store.dispatch('updateJobcard',job)
+            editCategory(category){
+                this.$store.dispatch('updateJobcardCategory',category)
                     .then(() =>{
                         this.editing=true;
-                        this.add_jobcard=true;
+                        this.add_category=true;
                     })
-
             },
-            deleteJobcard(id){
-                axios.delete(`job-card/${id}`)
+            deleteCategory(id){
+                axios.delete(`jobcard-category/${id}`)
                     .then(res => {
                         for (let i=0;i<this.tableData.length;i++){
                             if (this.tableData[i].id == res.data){
@@ -82,28 +78,25 @@
                     .catch(error => Exception.handle(error))
             },
             listen(){
-                eventBus.$on('listJobcards',(job) =>{
-                    this.tableData.unshift(job);
-                    this.add_jobcard =false;
+                eventBus.$on('listJobcardCategories',(category) =>{
+                    this.tableData.unshift(category);
+                    this.add_category =false;
                     this.initDatable();
-                    this.getJobs();
                 });
                 eventBus.$on('cancel',()=>{
-                    this.add_jobcard = false;
+                    this.add_category = false;
                     this.editing = false;
                     this.initDatable();
-                    this.getJobs();
                 });
-                eventBus.$on('updateJobcard',(job)=>{
-                    this.add_jobcard = false;
+                eventBus.$on('updateJobcardCategory',(category)=>{
+                    this.add_category = false;
                     this.editing = false;
                     for (let i=0;i<this.tableData.length;i++){
-                        if (this.tableData[i].id == job.id){
+                        if (this.tableData[i].id == category.id){
                             this.tableData.splice(i,1);
                         }
                     }
-                    console.log(job);
-                    this.tableData.unshift(job);
+                    this.tableData.unshift(category);
                     this.initDatable();
                 });
             },
@@ -127,7 +120,7 @@
             },
         },
         components:{
-            JobCard
+            Category
         }
     }
 </script>

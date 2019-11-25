@@ -26,7 +26,8 @@ export default new Vuex.Store({
         mechanics:{},
         users:{},
         job_type:{},
-        customers:{}
+        customers:{},
+        jobcard_categories:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -94,6 +95,9 @@ export default new Vuex.Store({
         },
         updateCustomer(state,customer){
          state.customers = customer;
+        },
+        updateJobcardCategory(state,category){
+         state.jobcard_categories = category;
         }
     },
     actions:{
@@ -162,6 +166,9 @@ export default new Vuex.Store({
         },
         updateCustomer({commit},customer){
         commit('updateCustomer',customer);
+        },
+        updateJobcardCategory({commit},category){
+        commit('updateJobcardCategory',category);
         }
     }
 })

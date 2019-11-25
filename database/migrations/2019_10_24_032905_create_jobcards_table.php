@@ -17,11 +17,8 @@ class CreateJobcardsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('machine_id');
             $table->integer('track_by_id');
-            $table->integer('service_provider_type_id');
-            $table->string('service_provider_id')->nullable();
-            $table->text('item_cost_qty')->nullable();
+             $table->text('item_cost_qty')->nullable();
             $table->text('service_required')->nullable();
-            $table->string('supplier_id')->nullable();
             $table->integer('service_type_id')->nullable();
             $table->string('service_type')->nullable();
             $table->float('next_readings')->nullable()->default(0);
@@ -42,10 +39,11 @@ class CreateJobcardsTable extends Migration
             $table->integer('jobcard_category_id')->nullable();
             $table->integer('mechanic_id')->nullable();
             $table->integer('job_type_id')->nullable();
+            $table->integer('customer_id')->nullable();
+            $table->integer('checklist_assigned')->nullable()->default(0);
             $table->timestamps();
         });
     }
-
     /**
      * Reverse the migrations.
      *

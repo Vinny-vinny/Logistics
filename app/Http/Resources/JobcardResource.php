@@ -21,11 +21,17 @@ class JobcardResource extends JsonResource
             'service_required' => $this->service_required,
             'track_by_id' => $this->track_by_id,
             'service_type_id' => $this->service_type_id,
+            'job_type_id' => $this->job_type_id,
+            'customer_id' => $this->customer_id,
             'mechanic_id' => $this->mechanic_id,
+            'project_id' => $this->project_id,
             'jobcard_category_id' => $this->jobcard_category_id,
+            'category' => $this->category->name,
             'service_type' => $this->service_type,
+            'customer_type' => $this->customer->type,
             'next_readings' => $this->next_readings,
             'current_readings' => $this->current_readings,
+            'previous_readings' => $this->machine->current_readings,
             'next_service_date' => $this->next_service_date,
             'fuel_balance_id' => $this->fuel_balance_id,
             'actual_date' => $this->actual_date,
@@ -40,6 +46,7 @@ class JobcardResource extends JsonResource
             'make' => $this->machine->make,
             'status' => $this->status,
             'cost_code' => $this->cost_code,
+            'checklist_assigned' => $this->checklist_assigned,
             'service_types' => $this->machine->service_types
         ];
     }

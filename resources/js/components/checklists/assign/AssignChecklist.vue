@@ -10,9 +10,9 @@
                 <div class="box-body">
                     <form @submit.prevent="assignChecklist()">
                         <div class="form-group">
-                            <label>Vehicle</label>
-                            <select name="vehicle_id" v-model="form.vehicle_id" class="form-control" required>
-                                <option :value="vehicle.id" v-for="vehicle in vehicles" :key="vehicle.id">{{vehicle.code}}</option>
+                            <label>Job Card</label>
+                            <select  v-model="form.jobcard_id" class="form-control" required :disabled="edit">
+                                <option :value="job.id" v-for="job in jobcards" :key="job.id">{{job.card_no}}</option>
                             </select>
                             </div>
                         <div class="form-group">
@@ -25,7 +25,6 @@
                             <label>Start Date</label>
                             <datepicker v-model="form.start_date" required></datepicker>
                         </div>
-
                         <div class="form-group">
                             <label>Reminder before(No. of days)</label>
                             <input type="number" class="form-control" v-model="form.reminder_before" required>
@@ -47,7 +46,7 @@
            data(){
             return {
                 form:{
-                    vehicle_id:'',
+                    jobcard_id:'',
                     start_date:'',
                     reminder_before:'',
                     checklist_id:'',
@@ -60,6 +59,7 @@
                 show_expiry_duration:false,
                 edit_checklist: this.edit,
                 counter:0,
+                jobcards:[],
             }
         },
         created(){
@@ -67,8 +67,20 @@
             this.getVehicles();
             this.getChecklists();
             this.getExpiryTypes();
+            this.getJobs();
         },
         methods:{
+            getJobs(){
+               axios.get('job-card')
+                   .then(res => {
+                   for (let i=0; i<res.data.length; i++){
+                       if (res.data[i]['category'].toLowerCase() === 'workshop' && res.data[i]['checklist_assigned'] ===0){
+                           this.jobcards.push(res.data[i]);
+                       }
+                   }
+                   });
+            },
+
             getDuration(){
            this.checklists.forEach(checklist => {
               if (checklist.id === this.form.checklist_id){
@@ -137,8 +149,23 @@
                     this.form = this.$store.state.assign_checklists;
                     this.show_expiry_duration = true;
                     this.counter = this.$store.state.assign_checklists.counter;
-                    this.date_type = this.$store.state.assign_checklists.date_type
+                    this.date_type = this.$store.state.assign_checklists.date_type;
+                    this.jobcards = [];
+                    this.getJobsEdited();
                 }
+            },
+            getJobsEdited(){
+                axios.get('job-card')
+                    .then(res => {
+                        for (let i=0; i<res.data.length; i++){
+                            if (res.data[i]['category'].toLowerCase() === 'workshop'){
+                                this.jobcards.push(res.data[i]);
+                                if (res.data[i]['id'] === this.form.jobcard_id){
+                                    this.jobcards.splice(res.data[i],1);
+                                }
+                            }
+                        }
+                    });
             },
         },
         components:{
