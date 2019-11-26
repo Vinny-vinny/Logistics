@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\FuelType;
+use App\Http\Resources\RequisitionResource;
+use App\Requisition;
 use Illuminate\Http\Request;
 
-class FuelTypeController extends Controller
+class RequisitionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +15,7 @@ class FuelTypeController extends Controller
      */
     public function index()
     {
-        return response()->json(FuelType::all());
+        return response()->json(RequisitionResource::collection(Requisition::all()));
     }
 
     /**
@@ -25,8 +26,8 @@ class FuelTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $type = FuelType::create($request->all());
-        return response()->json($type);
+        $requisition = Requisition::create($request->all());
+        return response()->json($requisition);
     }
 
     /**
@@ -40,6 +41,7 @@ class FuelTypeController extends Controller
         //
     }
 
+
     /**
      * Update the specified resource in storage.
      *
@@ -49,8 +51,8 @@ class FuelTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        FuelType::find($id)->update($request->all());
-        return response()->json(FuelType::find($id));
+        Requisition::find($id)->update($request->except(['date_requested','project','person_requested']));
+        return response()->json(new RequisitionResource(Requisition::find($id)));
     }
 
     /**
@@ -61,7 +63,6 @@ class FuelTypeController extends Controller
      */
     public function destroy($id)
     {
-        FuelType::destroy($id);
-        return response()->json($id);
+        Requisition::destroy($id);
     }
 }

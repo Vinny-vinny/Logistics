@@ -121,7 +121,7 @@
                                         <option :value="user.id" v-for="user in users" :key="user.id">{{user.name}}
                                         </option>
                                     </select>
-                                </div>
+                                 </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">{{edit_machine ? 'Update' : 'Save'}}</button>

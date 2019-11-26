@@ -155,7 +155,7 @@
                                             <th></th>
                                         </tr>
                                         <tr v-for="(item,k) in form.item_cost_qty" :key="k">
-                                            <td><select class="form-control" v-model="item.part">
+                                            <td><select class="form-control i_p" v-model="item.part" @change="exp_id =item.part">
                                                 <option selected disabled>Select Part</option>
                                                 <option :value="part.id" v-for="part in parts" :key="part.id">
                                                     {{part.code}} - {{part.description}}
@@ -163,8 +163,12 @@
                                             </select>
                                             </td>
                                             <td><input type="number" class="form-control qty" v-model="item.quantity"
-                                                       placeholder="Qty">
+                                                       placeholder="Qty"  @keyup="exp_qty = item.quantity">
                                             </td>
+                                            <td><input type="number" class="form-control p_in" step="0.001" v-model="item.price_inclusive"
+                                                       placeholder="Price Inclusive VAT" disabled></td>
+                                            <td><input type="number" step="0.001" class="form-control p_ex" v-model="item.price_exclusive"
+                                                       placeholder="Price Exclusive VAT" disabled></td>
                                             <td>
                                                 <i class="fa fa-minus-circle remove" @click="removeparts(k)"
                                                    v-show="k || ( !k && form.item_cost_qty.length > 1)"></i>
@@ -188,7 +192,7 @@
                                             <th></th>
                                         </tr>
                                         <tr v-for="(m,i) in form.maintenance">
-                                            <td><select class="form-control" v-model="m.category"
+                                            <td><select class="form-control i_p" v-model="m.category"
                                                         placeholder="Category">
                                                 <option selected disabled>Select Category</option>
                                                 <option :value="cat.id" v-for="cat in categories" :key="cat.id">
@@ -226,14 +230,14 @@
 
                                         </tr>
                                         <tr v-for="(s,i) in form.service_required">
-                                            <td><select class="form-control" v-model="s.category"
+                                            <td><select class="form-control i_p" v-model="s.category"
                                                         placeholder="Category">
                                                 <option selected disabled>Select Category</option>
                                                 <option :value="cat.id" v-for="cat in categories" :key="cat.id">
                                                     {{cat.name}}
                                                 </option>
                                             </select></td>
-                                            <td><select class="form-control s_part" v-model="s.part">
+                                            <td><select class="form-control s_part" v-model="s.part" @change="part_id =s.part">
                                                 <option selected disabled>Select Part</option>
                                                 <option :value="part.id" v-for="part in parts" :key="part.id">
                                                     {{part.code}} - {{part.description}}
@@ -241,10 +245,13 @@
                                             </select>
                                             </td>
                                             <td><input type="number" class="form-control s_qty" v-model="s.qty"
-                                                       placeholder="Quantity"></td>
+                                                       placeholder="Quantity" @keyup="part_qty = s.qty"></td>
+                                            <td><input type="number" class="form-control p_in_2" step="0.001" v-model="s.price_inclusive"
+                                                       placeholder="Price Inclusive VAT" disabled></td>
+                                            <td><input type="number" step="0.001" class="form-control p_ex_2" v-model="s.price_exclusive"
+                                                       placeholder="Price Exclusive VAT" disabled></td>
                                             <td><input type="text" class="form-control s_descr" v-model="s.description"
                                                        placeholder="Description"></td>
-
                                             <td>
                                                 <i class="fa fa-minus-circle s_add" @click="removeService(i)"
                                                    v-show="i || (!i && form.service_required.length > 1)"></i>
@@ -296,9 +303,9 @@
                     cost_code:'',
                     customer_id:'',
                     id: '',
-                    item_cost_qty: [{part: '', quantity: ''}],
+                    item_cost_qty: [{part: '', quantity: '',price_inclusive:'',price_exclusive:''}],
                     maintenance: [{category: '', description: '', root_cause: ''}],
-                    service_required: [{category: '', part: '', qty: '', description: ''}]
+                    service_required: [{category: '', part: '', qty: '', description: '',price_inclusive:'',price_exclusive:''}]
 
                 },
                 checklist: '',
@@ -330,10 +337,39 @@
                 customer_type:'',
                 customers:{},
                 filtered_customers:[],
-                show_customers:false
+                show_customers:false,
+                part_qty:'',
+                part_id:'',
+                exp_qty:'',
+                exp_id:''
             }
         },
         watch: {
+            computeExpenses(){
+                for (let p=0; p < this.parts.length; p++){
+                    for (let i=0; i < this.form.item_cost_qty.length; i++){
+                        if (this.form.item_cost_qty[i]['quantity'] !=='' && this.form.item_cost_qty[i]['part'] !==''){
+                            if (this.form.item_cost_qty[i]['part'] === this.parts[p]['id']){
+                                this.form.item_cost_qty[i]['price_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.item_cost_qty[i]['quantity']).toFixed(2);
+                                this.form.item_cost_qty[i]['price_exclusive'] = (this.parts[p]['cost'] * this.form.item_cost_qty[i]['quantity']).toFixed(2);
+                            }
+                        }
+                    }
+                }
+            },
+            getCost(){
+                for (let p=0; p < this.parts.length; p++){
+                    for (let i=0; i < this.form.service_required.length; i++){
+                        if (this.form.service_required[i]['qty'] !=='' && this.form.service_required[i]['part'] !==''){
+                            if (this.form.service_required[i]['part'] === this.parts[p]['id']){
+                                this.form.service_required[i]['price_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.service_required[i]['qty']).toFixed(2);
+                                this.form.service_required[i]['price_exclusive'] = (this.parts[p]['cost'] * this.form.service_required[i]['qty']).toFixed(2);
+                            }
+                        }
+                    }
+                }
+
+            },
             'form.current_readings'() {
                     this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
                     this.show_next_readings = false;
@@ -393,6 +429,9 @@
             }
         },
         computed: {
+            partItems(){
+                return this.service_required;
+            },
             actualMileage() {
                 if (this.form.current_readings > this.previous_readings) {
                     return this.form.current_readings - this.previous_readings;
@@ -403,9 +442,17 @@
             },
             timeframe() {
                 return [this.form.actual_date, this.form.time_in, this.form.completion_date, this.form.time_out, this.form.next_service_date].join();
+            },
+            getCost(){
+               return [this.part_qty, this.part_id,this.form.service_required].join();
+            },
+            computeExpenses(){
+                return [this.exp_qty, this.exp_id,this.form.item_cost_qty].join();
             }
+
         },
         methods: {
+
             customerType(){
                 this.show_customers = true;
                 this.filtered_customers = [];
@@ -455,7 +502,7 @@
                   })
             },
             addService(i) {
-                this.form.service_required.push({category: '', part: '', qty: '', description: ''});
+                this.form.service_required.push({category: '', part: '', qty: '', description: '',price_inclusive:'',price_exclusive:''});
             },
             removeService(i) {
                 this.form.service_required.splice(i, 1);
@@ -505,7 +552,7 @@
                 })
             },
             addparts() {
-                this.form.item_cost_qty.push({part: '', quantity: ''});
+                this.form.item_cost_qty.push({part: '', quantity: '',price_inclusive:'',price_exclusive:''});
             },
             removeparts(i) {
                 this.form.item_cost_qty.splice(i, 1);
@@ -709,47 +756,64 @@
 </script>
 
 <style>
-    .part {
-        margin-bottom: 5px
-    }
-
+     .i_p{
+         margin-bottom: 8px;
+     }
     .qty, .cost {
-        margin-bottom: 5px;
-        margin-left: 5px
+        margin-left: 5px;
+        margin-bottom: 8px;
     }
 
     .cost {
-        margin-bottom: 5px;
-        margin-left: 10px
+        margin-left: 8px;
+        margin-bottom: 8px;
     }
 
     .remove, .add {
-        margin-left: 20px
+        margin-left: 20px;
+        margin-bottom: 8px;
     }
 
     .cause {
         margin-left: 15px;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
     }
 
     .s_add {
-        margin-left: 10px;
-        margin-bottom: 5px;
+        margin-left: 15px;
+        margin-bottom: 8px;
     }
 
     .s_descr {
-        margin-left: 7px;
-        margin-bottom: 5px;
+        margin-left: 12px;
+        margin-bottom: 8px;
     }
 
     .s_qty {
         margin-left: 5px;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
     }
 
     .s_part {
         margin-left: 2px;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
+    }
+    .p_in{
+     margin-left:10px;
+     margin-bottom: 8px;
+
+    }
+    .p_ex{
+        margin-left:15px;
+        margin-bottom: 8px;
+    }
+    .p_in_2{
+        margin-left:8px;
+        margin-bottom: 8px;
+    }
+    .p_ex_2{
+        margin-left:10px;
+        margin-bottom: 8px;
     }
 
     .vdp-datepicker input {

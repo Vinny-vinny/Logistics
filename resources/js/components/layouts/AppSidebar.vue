@@ -19,17 +19,8 @@
                 <li class="header"></li>
                 <!-- Optionally, you can add icons to the links -->
                 <li><router-link to="/machines"><i class="fa fa-shopping-basket angle-left"></i> <span>Assets</span></router-link></li>
-                   <li class="treeview">
-                    <router-link to="/job-card"><i class="fa fa-tag"></i> <span>Job Card</span>
-                        <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
-                    </router-link>
-                    <ul class="treeview-menu">
-                        <li><router-link to="/external-service">External Services</router-link></li>
-                        </ul>
-                </li>
-                <li class="treeview">
+                <li><router-link to="/job-card"><i class="fa fa-tag"></i> <span>Job Card</span></router-link></li>
+                     <li class="treeview">
                     <router-link to="/checklists"><i class="fa fa-check-square-o"></i> <span>Checklists</span>
                         <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
@@ -60,6 +51,7 @@
                     <ul class="treeview-menu">
                         <li><router-link to="/users">Users</router-link></li>
                         <li><router-link to="/fuel-balance">Fuel Balance</router-link></li>
+                        <li><router-link to="/fuel-types">Fuel Types</router-link></li>
                         <li><router-link to="/track-by">Track By</router-link></li>
                         <li><router-link to="/service-types">Service Types</router-link></li>
                         <li><router-link to="/expense">Expenses</router-link></li>

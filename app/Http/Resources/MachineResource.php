@@ -37,7 +37,8 @@ class MachineResource extends JsonResource
             'service_types' => $this->service_types,
             'start_date' => $this->start_date,
             'expiry_date' => $this->expiry_date,
-            'plate_no' => $this->plate_no
+            'plate_no' => $this->plate_no,
+            'type' => $this->type,
              ];
     }
 }

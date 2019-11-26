@@ -55,8 +55,9 @@ class FuelController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $request->get('other_expenses') ? $request['other_expenses'] = json_encode($request->get('other_expenses')) : '';
-        Fuel::find($id)->update($request->except(['vehicle','fuel_type','price','previous_odometer']));
+        Fuel::find($id)->update($request->except(['vehicle','fuel_type','previous_odometer','customer_type','asset_type']));
         Machine::find($request->get('vehicle_id'))->update(['odometer_readings' => $request->get('odometer_readings')]);
         return response()->json(new FuelResource(Fuel::find($id)));
     }

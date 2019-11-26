@@ -11,7 +11,7 @@
                     <form @submit.prevent="saveFuel()">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group" v-if="company">
+                                <div class="form-group">
                                     <label>Vehicle</label>
                                     <select name="vehicle_id" class="form-control" v-model="form.vehicle_id"
                                             @change="getFuelType()">
@@ -19,10 +19,6 @@
                                           {{vehicle.code}}
                                         </option>
                                     </select>
-                                </div>
-                                <div class="form-group" v-if="other">
-                                    <label>Vehicle</label>
-                                    <input type="text" v-model="form.vehicle_name" class="form-control" required>
                                 </div>
                                 <div class="form-group">
                                     <label>Fuel On</label>
@@ -38,49 +34,14 @@
                                     <input type="number" step="0.001" class="form-control" v-model="form.litres"
                                            required>
                                 </div>
-                                <div class="form-group" v-if="other">
+                                <div class="form-group">
                                     <label>Fuel Type</label>
-                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control">
+                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control" required>
                                         <option :value="fuel.id" v-for="fuel in fuel_types" :key="fuel.id">
                                             {{fuel.name}}
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="radio-inline"><input type="radio" name="supplier_type"
-                                                                       value="supplier"
-                                                                       v-model="form.supplier_type">Supplier</label>
-                                    <label class="radio-inline"><input type="radio" name="supplier_type"
-                                                                       value="cash_purchase" v-model="form.supplier_type">Cash
-                                        Purchase</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-
-                                <div class="form-group" style="margin-left:100px;">
-                                    <table width="100%">
-                                        <tr>
-                                            <td style="font-size:18px"><b>Fuel Type: </b>{{fuel_type}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="font-size:18px"><b>Previous Odometer Readings: </b>{{previous_odometer | number}}
-                                            </td>
-                                          </tr>
-                                        <tr>
-                                            <td style="font-size:18px"><b>Fuel Rate: </b>{{form.rate | number}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="font-size:18px"><b>Total Fuel Cost: </b>{{totalAmount | number}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="font-size:18px"><b>Total Expense: </b>{{(totalExpense + genExpenses()) | number}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="font-size:18px"><b>Grand Total: </b>{{grandTotal}}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-
                                 <div class="form-group">
                                     <label>Expenses</label>
                                     <select name="expense_id" class="form-control" v-model="form.expense_id" @change="genExpenses()">
@@ -89,7 +50,48 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group" v-if="company">
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="form-group" style="margin-left:100px;">
+                                    <table width="100%">
+                                        <tr>
+                                            <td style="font-size:16px"><b>Fuel Type: </b>{{fuel_type}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:16px"><b>Previous Odometer Readings: </b>{{previous_odometer | number}}
+                                            </td>
+                                          </tr>
+                                        <tr>
+                                            <td style="font-size:16px"><b>Fuel Rate: </b>{{form.rate | number}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:16px"><b>Total Fuel Cost: </b>{{totalAmount | number}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:16px"><b>Total Expense: </b>{{(totalExpense + genExpenses()) | number}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-size:16px"><b>Grand Total: </b>{{grandTotal}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Customer Type</label>
+                                    <select class="form-control" v-model="form.customer_type" required @change="customerTypes()">
+                                        <option value="Internal">Internal</option>
+                                        <option value="External">External</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" v-if="show_customer">
+                                    <label>Customers</label>
+                                    <select class="form-control" v-model="form.customer_id" required>
+                                        <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" v-if="!other">
                                     <label>Driver</label>
                                     <select name="driver_id" class="form-control" v-model="form.driver_id">
                                         <option :value="driver.id" v-for="driver in drivers" :key="driver.id">
@@ -97,66 +99,18 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group" v-if="other">
+                                <div class="form-group">
+                                    <label>Invoice No</label>
+                                    <input type="text" class="form-control" v-model="form.invoice_no">
+                                </div>
+                                <div class="form-group" v-if="other ==true">
                                     <label>Driver</label>
-                                    <input type="text" class="form-control" v-model="form.driver_name">
+                                    <input type="text" class="form-control" v-model="form.driver_name" placeholder="Driver Name">
                                 </div>
                             </div>
                         </div>
-                        <div class="row" v-if="supplier">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Supplier</label>
-                                            <select name="supplier_id" class="form-control" v-model="form.supplier_id"
-                                                    @change="getRate()">
-                                                <option :value="supplier.id" v-for="supplier in suppliers"
-                                                        :key="supplier.id">
-                                                    {{supplier.name}}
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Invoice No</label>
-                                            <input type="text" class="form-control" v-model="form.invoice_no">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row" v-if="cashPurchase">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Supplier</label>
-                                            <input type="text" class="form-control" v-model="form.supplier_name">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Currency</label>
-                                            <select name="currency" class="form-control" v-model="form.currency">
-                                                <option value="USD">USD</option>
-                                                <option value="KSH">KSH</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Rate</label>
-                                            <input type="number" step="0.001" v-model="form.rate" class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Cash Sale No</label>
-                                            <input type="text" class="form-control" v-model="form.cash_sale_no">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
+
+                             <div class="row">
                             <div class="col-md-12">
 
                                 <div class="form-group">
@@ -205,25 +159,22 @@
                     litres: '',
                     vehicle_id: '',
                     fuel_on: '',
-                    supplier_id: '',
+                    customer_id: '',
                     invoice_no: '',
                     expense_id: '',
                     fuel_type_id: '',
-                    vehicle_name: '',
                     driver_name: '',
                     driver_id: '',
-                    currency: '',
-                    cash_sale_no: '',
                     odometer_readings: '',
+                    customer_type:'',
+                    asset_type:'',
                     rate:0,
-                    supplier_name: '',
                     other_expenses: [{name: '', qty: ''}],
-                    supplier_type: 'supplier',
                     id: ''
                 },
                 edit_fuel: this.edit,
                 other_fuel_asset: this.other_fuel,
-                suppliers: {},
+                customers: {},
                 vehicles: {},
                 drivers: {},
                 expenses: {},
@@ -237,12 +188,15 @@
                 previous_odometer: 0,
                 parts: {},
                 total_expenses:0,
-                pa:{}
+                pa:{},
+                filtered_customers:[],
+                show_customer:false
             }
         },
         created() {
+
             this.listen();
-            this.getSuppliers();
+            this.getCustomers();
             this.getVehicles();
             this.getDrivers();
             this.getExpenses();
@@ -252,7 +206,6 @@
 
         },
         mounted: function () {
-
             var self = this;
             $('#datepicker').datepicker({
                 onSelect: function (selectedDate, datePicker) {
@@ -262,17 +215,7 @@
         },
         computed: {
             totalAmount() {
-                let total = 0;
-                if (this.form.supplier_type ==='supplier') {
-                    if (this.form.rate !== 0 && this.form.litres !== '') {
-                        total += parseFloat(this.form.rate) * parseFloat(this.form.litres);
-                    }
-                }
-                else {
-                    if (this.form.rate !=='' && this.form.litres !==''){
-                        total+= parseFloat(this.form.rate) * parseFloat(this.form.litres);
-                    }
-                }
+                let total = this.form.rate * this.form.litres;
                 return this.total = total;
             },
             totalExpense(){
@@ -290,12 +233,6 @@
                  }
                 return total;
             },
-            supplier() {
-                return this.form.supplier_type === 'supplier';
-            },
-            cashPurchase() {
-                return this.form.supplier_type === 'cash_purchase';
-            },
             grandTotal(){
                 let total = 0;
                 if (this.totalAmount > 0 || this.totalExpense > 0 || this.genExpenses() > 0){
@@ -305,6 +242,22 @@
             }
         },
         methods: {
+            getRate(){
+           for (let i=0; i < this.fuel_types.length; i++){
+               if (this.fuel_types[i]['id'] === this.form.fuel_type_id){
+                   this.form.rate = this.fuel_types[i]['rate'];
+               }
+           }
+            },
+            customerTypes(){
+                this.show_customer = true;
+                this.filtered_customers = [];
+              for (let i =0; i < this.customers.length; i++){
+                  if (this.customers[i]['type'] === this.form.customer_type){
+                      this.filtered_customers.push(this.customers[i]);
+                  }
+              }
+            },
             genExpenses(){
                 let total = 0;
                 if (this.form.expense_id !=='') {
@@ -335,6 +288,7 @@
                         this.fuel_types.forEach(fuel => {
                             if (fuel.id === vehicle.fuel_type_id) {
                                 this.fuel_type = fuel.name;
+                                this.form.rate = fuel.rate
                                 this.form.fuel_type_id = fuel.id;
                                 this.show_fuel_type = true;
                                 this.previous_odometer = vehicle.odometer_readings;
@@ -343,15 +297,7 @@
                     }
                 })
             },
-            getRate() {
-                this.suppliers.forEach(supplier => {
-                    if (supplier.id === this.form.supplier_id) {
-                        this.form.rate = supplier.price;
-                        this.show_rate = true;
-                        return;
-                    }
-                })
-            },
+
             assetType() {
                 this.other_fuel_asset ? this.other = true : this.company = true;
             },
@@ -361,10 +307,10 @@
                         this.fuel_types = types.data;
                     })
             },
-            getSuppliers() {
-                axios.get('fuel-supplier')
-                    .then(supplier => {
-                        this.suppliers = supplier.data;
+            getCustomers() {
+                axios.get('customers')
+                    .then(customer => {
+                        this.customers = customer.data;
                     })
             },
             getVehicles() {
@@ -424,7 +370,9 @@
                 if (this.other && this.form.fuel_type_id ===''){
                     return this.$toastr.e('Select Fuel Type.');
                 }
-                     this.edit_fuel ? this.update() : this.save();
+                this.other_fuel_asset ? this.form.asset_type = 'other' : this.form.asset_type = 'company';
+
+              this.edit_fuel ? this.update() : this.save();
             },
             save() {
                 delete this.form.id;
@@ -445,17 +393,33 @@
                 eventBus.$emit('cancel')
             },
             listen() {
+
                 if (this.edit) {
                     this.form = this.$store.state.fuels;
                     this.form.other_expenses = JSON.parse(this.$store.state.fuels.other_expenses);
                     this.show_fuel_type = true;
                     this.fuel_type = this.$store.state.fuels.fuel_type;
-                    this.form.rate = this.$store.state.fuels.price;
+                    this.form.rate = this.$store.state.fuels.rate;
                     this.previous_odometer = this.$store.state.fuels.previous_odometer;
                     this.show_rate = true;
+                    this.show_customer = true;
+                    this.editedCustomers();
+                    this.form.asset_type ==='other' ? this.other =true : this.company = true;
+
 
                 }
             },
+            editedCustomers(){
+                axios.get('customers')
+                    .then(customers => {
+                        this.filtered_customers = [];
+                        for (let i =0; i < customers.data.length; i++){
+                            if (customers.data[i]['type'] === this.form.customer_type){
+                                this.filtered_customers.push(customers.data[i]);
+                            }
+                        }
+                    })
+            }
         },
         components: {
             datepicker

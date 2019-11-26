@@ -16,6 +16,8 @@ class CreateFuelTypesTable extends Migration
         Schema::create('fuel_types', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
+            $table->float('rate');
+            $table->string('currency');
             $table->timestamps();
         });
     }

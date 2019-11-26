@@ -5,28 +5,26 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">{{edit_customer ? 'Update Customer' : 'New Customer'}}</h3>
+                    <h3 class="box-title">{{edit_type ? 'Update Fuel Type' : 'New Fuel Type'}}</h3>
                 </div>
                 <div class="box-body">
-                    <form @submit.prevent="saveCustomer()">
+                    <form @submit.prevent="saveFuelype()">
                         <div class="form-group">
                             <label>Name</label>
                             <input type="text" class="form-control" v-model="form.name" required>
                         </div>
                         <div class="form-group">
-                            <label>Account</label>
-                            <input type="text" class="form-control" v-model="form.account" required>
+                            <label>Pump Price</label>
+                            <input type="number" step="0.001" class="form-control" v-model="form.rate" required>
                         </div>
                         <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" class="form-control" v-model="form.email" required>
+                            <label>Currency</label>
+                            <select name="currency" class="form-control" v-model="form.currency">
+                                <option value="USD">USD</option>
+                                <option value="KSH">KSH</option>
+                            </select>
                         </div>
-                        <div class="form-group">
-                            <label>Contact Person</label>
-                            <input type="text" class="form-control" v-model="form.contact_person" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">{{edit_customer ? 'Update' : 'Save'}}</button>
+                        <button type="submit" class="btn btn-primary">{{edit_type ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
                     </form>
                 </div>
@@ -43,32 +41,31 @@
             return {
                 form:{
                     name:'',
-                    email:'',
-                    account:'',
-                    contact_person:'',
+                    rate:'',
+                    currency:'',
                     id:''
                 },
-                edit_customer: this.edit
+                edit_type: this.edit
             }
         },
         created(){
             this.listen();
         },
         methods:{
-            saveCustomer(){
-                this.edit_customer ? this.update() : this.save();
+            saveFuelype(){
+                this.edit_type ? this.update() : this.save();
             },
             save(){
                 delete this.form.id;
-                axios.post('customers',this.form)
-                    .then(res => eventBus.$emit('listCustomers',res.data))
+                axios.post('fuel-types',this.form)
+                    .then(res => eventBus.$emit('listFuelTypes',res.data))
                     .catch(error => error.response)
             },
             update(){
-                axios.patch(`customers/${this.form.id}`,this.form)
+                axios.patch(`fuel-types/${this.form.id}`,this.form)
                     .then(res => {
-                        this.edit_customer = false;
-                        eventBus.$emit('updateCustomer',res.data);
+                        this.edit_type = false;
+                        eventBus.$emit('updateFuelTypes',res.data);
                     })
                     .catch(error => error.response)
             },
@@ -77,7 +74,7 @@
             },
             listen(){
                 if (this.edit){
-                    this.form = this.$store.state.customers
+                    this.form = this.$store.state.fuel_types
                 }
             },
         }

@@ -30,7 +30,7 @@
                             <td>{{fuel.vehicle}}</td>
                             <td>{{fuel.litres}}</td>
                             <td>{{fuel.fuel_type}}</td>
-                            <td>{{fuel.price}}</td>
+                            <td>{{fuel.rate}}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
                                     class="fa fa-edit"></i></button>

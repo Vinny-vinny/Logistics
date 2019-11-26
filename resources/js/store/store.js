@@ -27,7 +27,9 @@ export default new Vuex.Store({
         users:{},
         job_type:{},
         customers:{},
-        jobcard_categories:{}
+        jobcard_categories:{},
+        fuel_types:{},
+        requisitions:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -98,6 +100,12 @@ export default new Vuex.Store({
         },
         updateJobcardCategory(state,category){
          state.jobcard_categories = category;
+        },
+        updateFuelType(state,type){
+         state.fuel_types = type;
+        },
+        updateRequisition(state,rq){
+         state.requisitions = rq;
         }
     },
     actions:{
@@ -169,6 +177,12 @@ export default new Vuex.Store({
         },
         updateJobcardCategory({commit},category){
         commit('updateJobcardCategory',category);
+        },
+        updateFuelType({commit},type){
+        commit('updateFuelType',type);
+        },
+        updateRequisition({commit},rq){
+        commit('updateRequisition',rq);
         }
     }
 })

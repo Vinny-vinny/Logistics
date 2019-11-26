@@ -7,7 +7,7 @@ import TrackBy from "../components/maintenance/trackby/Index";
 import FuelBalance from "../components/maintenance/fuelbalance/Index";
 import Machines from "../components/maintenance/machines/Index";
 import JobCard from "../components/maintenance/jobcard/Index";
-import Fuel from "../components/fuels/Fuel";
+import Fuel from "../components/fuels/Index";
 import Expense from "../components/expenses/Index";
 import Checklist from "../components/checklists/Index";
 import AssignChecklist from "../components/checklists/assign/Index";
@@ -24,6 +24,8 @@ import projects from "../components/projects/Index";
 import customers from "../components/customers/Index";
 import Mechanics from "../components/mechanics/Index";
 import JobType from "../components/maintenance/jobtypes/Index";
+import Types from "../components/fuels/types/Index";
+import Requisition from "../components/requisitions/Index";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -57,7 +59,9 @@ const routes = [
     {path:'/customers',component:customers, beforeEnter: guard},
     {path:'/mechanics',component:Mechanics, beforeEnter: guard},
     {path:'/job-type',component:JobType, beforeEnter: guard},
+    {path:'/fuel-types',component:Types, beforeEnter: guard},
     {path:'/jobcard-category',component:JobCategory, beforeEnter: guard},
+    {path:'/requisitions',component:Requisition, beforeEnter: guard},
 ];
 
 export default new VueRouter({

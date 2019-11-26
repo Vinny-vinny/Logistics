@@ -34,6 +34,7 @@ class MachineController extends Controller
     {
 
         $request['asset_no'] = Machine::count()+1;
+        $request['type'] = 'Internal';
         $request['warranty'] = Carbon::parse($request->warranty)->format('Y-m-d');
         $m = Machine::create($request->except(['service_type_id','service_types']));
         $m->service_types()->attach(json_decode($request->get('service_type_id')));
@@ -131,6 +132,7 @@ class MachineController extends Controller
                 'next_service_date' => Carbon::now()->addMonths(5)->format('Y-m-d'),
                 'track_by_id' => TrackBy::all()->random()->id,
                 'fuel_type_id' => FuelType::all()->random()->id,
+                'type' => 'External',
                 'fuel_balance_id' => FuelBalance::all()->random()->id,
                  'plate_no' => $asset->cSerialNo ? $asset->cSerialNo : $faker->word
             ]);

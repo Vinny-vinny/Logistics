@@ -59,7 +59,7 @@ class CustomerController extends Controller
                 'name' => $customer->Name ? $customer->Name : $faker->name,
                 'contact_person' => $customer->Contact_Person ?  $customer->Contact_Person : $faker->name,
                 'email' => $customer->EMail ? $customer->EMail : $faker->email,
-                'type' => 'Internal'
+                'type' => 'External'
             ]);
 
         }
@@ -72,9 +72,9 @@ class CustomerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $customers = Customer::create($request->all());
-        return response()->json($customers);
+    {    $request['type'] = 'Internal';
+         $customers = Customer::create($request->all());
+         return response()->json($customers);
     }
 
     /**

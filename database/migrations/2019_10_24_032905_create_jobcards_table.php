@@ -41,6 +41,7 @@ class CreateJobcardsTable extends Migration
             $table->integer('job_type_id')->nullable();
             $table->integer('customer_id')->nullable();
             $table->integer('checklist_assigned')->nullable()->default(0);
+            $table->integer('requisition_id')->nullable();
             $table->timestamps();
         });
     }

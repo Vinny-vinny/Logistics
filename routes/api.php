@@ -44,6 +44,7 @@ Route::apiResource('projects','ProjectController');
 Route::apiResource('customers','CustomerController');
 Route::apiResource('jobcard-category','JobcardCategoryController');
 Route::apiResource('mechanics','MechanicsController');
+Route::apiResource('requisitions','RequisitionController');
 Route::apiResource('job-types','JobTypesController');
 Route::get('import-projects','ProjectController@importProjects');
 Route::get('import-customers','CustomerController@importCustomers');
