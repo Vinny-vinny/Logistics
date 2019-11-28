@@ -17,8 +17,6 @@ class CreateJobcardsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('machine_id');
             $table->integer('track_by_id');
-             $table->text('item_cost_qty')->nullable();
-            $table->text('service_required')->nullable();
             $table->integer('service_type_id')->nullable();
             $table->string('service_type')->nullable();
             $table->float('next_readings')->nullable()->default(0);

@@ -72,22 +72,22 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group" v-if="selected_next_maintenance">
-                                            <label>Next {{track_type}} Maintenance</label>
-                                            <input type="number" step="0.001" class="form-control" v-model="form.next_readings"
-                                                   required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
+<!--                                <div class="row">-->
+<!--                                    <div class="col-md-6">-->
+<!--                                        <div class="form-group" v-if="selected_next_maintenance">-->
+<!--                                            <label>Next {{track_type}} Maintenance</label>-->
+<!--                                            <input type="number" step="0.001" class="form-control" v-model="form.next_readings"-->
+<!--                                                   required disabled>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                    <div class="col-md-6">-->
                                         <div class="form-group" v-if="selected_next_maintenance">
                                             <label>Remind before (No. of {{track_type}})</label>
                                             <input type="number" class="form-control" v-model="form.reminder_before"
                                                    required>
                                         </div>
-                                    </div>
-                                </div>
+<!--                                    </div>-->
+<!--                                </div>-->
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -122,6 +122,14 @@
                                         </option>
                                     </select>
                                  </div>
+                                <div class="form-group">
+                                    <label>Fuel Type</label>
+                                    <select v-model="form.fuel_type_id"
+                                            class="form-control" required>
+                                        <option :value="type.id" v-for="type in fuel_types" :key="type.id">{{type.name}}
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">{{edit_machine ? 'Update' : 'Save'}}</button>
@@ -159,6 +167,7 @@
                     expiry_date: '',
                     reminder_before:'',
                     service_type_id:[],
+                    fuel_type_id:'',
                     id: ''
                 },
                 value:[],
@@ -172,6 +181,7 @@
                 service_types:[],
                 services:[],
                 show_service:false,
+                fuel_types:{}
             }
         },
 
@@ -180,6 +190,7 @@
             this.getTracks();
             this.getUsers();
             this.getServiceTypes();
+            this.getFuelTypes();
         },
         watch:{
             insurance(){
@@ -191,12 +202,12 @@
                }
             },
             readings(){
-                    if (this.form.next_readings !=='' && this.form.reminder_before !==''){
-                    if (parseInt(this.form.next_readings) < parseInt(this.form.reminder_before)){
-                        this.form.reminder_before = '';
-                        return this.$toastr.e('Reminder before readings cannot be greater next readings');
-                    }
-                };
+                //     if (this.form.next_readings !=='' && this.form.reminder_before !==''){
+                //     if (parseInt(this.form.next_readings) < parseInt(this.form.reminder_before)){
+                //         this.form.reminder_before = '';
+                //         return this.$toastr.e('Reminder before readings cannot be greater next readings');
+                //     }
+                // };
             },
         },
     computed:{
@@ -208,6 +219,12 @@
         },
     },
         methods: {
+            getFuelTypes(){
+              axios.get('fuel-types')
+                  .then(fuel => {
+                      this.fuel_types = fuel.data
+                  })
+            },
             customLabel (option) {
                 return `${option.name} - ${option.service_after}`
             },
@@ -267,7 +284,8 @@
                 formData.append('chasis_no', this.form.chasis_no);
                 formData.append('plate_no', this.form.plate_no);
                 formData.append('assign_to', this.form.assign_to);
-                formData.append('next_readings', this.form.next_readings);
+                formData.append('fuel_type_id', this.form.fuel_type_id);
+              //  formData.append('next_readings', this.form.next_readings);
                 formData.append('reminder_before', this.form.reminder_before);
                 formData.append('warranty', this.form.warranty !=='' ? this.convertDate(this.form.warranty) : '');
                 formData.append('service_type_id', (this.form.service_type_id !=='' && this.form.service_type_id !==null) ? JSON.stringify(this.form.service_type_id) :'');
@@ -299,8 +317,9 @@
                 formData.append('chasis_no', this.form.chasis_no);
                 formData.append('plate_no', this.form.plate_no);
                 formData.append('assign_to', this.form.assign_to);
+                formData.append('fuel_type_id', this.form.fuel_type_id);
                 formData.append('reminder_before', this.form.reminder_before);
-                formData.append('next_readings', this.form.next_readings);
+              //  formData.append('next_readings', this.form.next_readings);
                 formData.append('warranty', (this.form.warranty !=='' && this.form.warranty !==null) ? this.convertDate(this.form.warranty) :'');
                 formData.append('service_type_id', (this.form.service_type_id !=='' && this.form.service_type_id !=='undefined') ? JSON.stringify(this.form.service_type_id) :'');
                 formData.append('status', this.form.status);
@@ -332,6 +351,7 @@
                         this.selected_next_maintenance = true;
                       for (let i=0;i<this.services.length;i++){
                           if (this.services[i]['track_by_id'] === track.id){
+                          //this.form.next_readings = this.services[i]['service_after'];
                               this.service_types.push(this.services[i]);
                           }
                       }

@@ -17,8 +17,6 @@ class JobcardResource extends JsonResource
         return [
             'id' => $this->id,
             'machine_id' => $this->machine_id,
-            'item_cost_qty' => $this->item_cost_qty,
-            'service_required' => $this->service_required,
             'track_by_id' => $this->track_by_id,
             'service_type_id' => $this->service_type_id,
             'job_type_id' => $this->job_type_id,
@@ -28,7 +26,7 @@ class JobcardResource extends JsonResource
             'jobcard_category_id' => $this->jobcard_category_id,
             'category' => $this->category->name,
             'service_type' => $this->service_type,
-            'customer_type' => $this->customer->type,
+            'customer_type' => $this->customer ? $this->customer->type : 'Internal',
             'next_readings' => $this->next_readings,
             'current_readings' => $this->current_readings,
             'previous_readings' => $this->machine->current_readings,
@@ -46,6 +44,8 @@ class JobcardResource extends JsonResource
             'make' => $this->machine->make,
             'status' => $this->status,
             'cost_code' => $this->cost_code,
+            'requisition_id' => $this->requisition_id,
+            'inventory_items' => $this->requisition_id ? $this->requisition->inventory_items : '',
             'checklist_assigned' => $this->checklist_assigned,
             'service_types' => $this->machine->service_types
         ];

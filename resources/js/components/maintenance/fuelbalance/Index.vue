@@ -14,16 +14,16 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Name</th>
-                            <th style="display:none">Name</th>
+                            <th>Litres</th>
+                            <th style="display:none">Litres</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="fuel in tableData">
                             <td>{{fuel.id}}</td>
-                            <td>{{fuel.name}}</td>
-                            <td style="display:none">{{fuel.name}}</td>
+                            <td>{{fuel.litres}}</td>
+                            <td style="display:none">{{fuel.litres}}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editFuelBalance(fuel)"><i class="fa fa-edit"></i></button>
                                 <button class="btn btn-danger btn-sm" @click="deleteFuelBalance(fuel.id)"><i class="fa fa-trash"></i></button>

@@ -27,7 +27,7 @@ class RequisitionController extends Controller
     public function store(Request $request)
     {
         $requisition = Requisition::create($request->all());
-        return response()->json($requisition);
+        return response()->json(new RequisitionResource($requisition));
     }
 
     /**

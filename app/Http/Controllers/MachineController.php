@@ -132,7 +132,7 @@ class MachineController extends Controller
                 'next_service_date' => Carbon::now()->addMonths(5)->format('Y-m-d'),
                 'track_by_id' => TrackBy::all()->random()->id,
                 'fuel_type_id' => FuelType::all()->random()->id,
-                'type' => 'External',
+                'type' => 'Internal',
                 'fuel_balance_id' => FuelBalance::all()->random()->id,
                  'plate_no' => $asset->cSerialNo ? $asset->cSerialNo : $faker->word
             ]);

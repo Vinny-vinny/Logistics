@@ -34,7 +34,7 @@
                             <input type="text" class="form-control" v-model="form.where_to_charge" required>
                         </div>
                         <div class="form-group">
-                            <label>Expenses</label>
+                            <label>Items</label>
                             <table style="width: 100%">
                                 <tr>
                                     <th></th>
@@ -43,7 +43,7 @@
                                 </tr>
                                 <tr v-for="(item,k) in form.inventory_items" :key="k">
                                     <td><select class="form-control i_p" v-model="item.part" @change="part =item.part">
-                                        <option selected disabled>Select Part</option>
+                                        <option selected disabled>Select Item</option>
                                         <option :value="part.id" v-for="part in parts" :key="part.id">
                                             {{part.code}} - {{part.description}}
                                         </option>

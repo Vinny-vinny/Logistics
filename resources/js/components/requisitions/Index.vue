@@ -90,6 +90,7 @@
                 eventBus.$on('cancel',()=>{
                     this.add_requisition = false;
                     this.editing = false;
+                    this.getRequisitions();
                     this.initDatable();
                 });
                 eventBus.$on('updateRequisition',(rq)=>{

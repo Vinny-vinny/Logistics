@@ -14,7 +14,7 @@
                                 <div class="form-group">
                                     <label>Vehicle</label>
                                     <select name="vehicle_id" class="form-control" v-model="form.vehicle_id"
-                                            @change="getFuelType()">
+                                            @change="getFuelType()" required>
                                         <option :value="vehicle.id" v-for="vehicle in vehicles" :key="vehicle.id">
                                           {{vehicle.code}}
                                         </option>
@@ -43,7 +43,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Expenses</label>
+                                    <label>Other Services</label>
                                     <select name="expense_id" class="form-control" v-model="form.expense_id" @change="genExpenses()">
                                         <option :value="expense.id" v-for="expense in expenses" :key="expense.id">
                                             {{expense.name}}
@@ -70,7 +70,7 @@
                                             <td style="font-size:16px"><b>Total Fuel Cost: </b>{{totalAmount | number}}</td>
                                         </tr>
                                         <tr>
-                                            <td style="font-size:16px"><b>Total Expense: </b>{{(totalExpense + genExpenses()) | number}}</td>
+                                            <td style="font-size:16px"><b>Total Expense: </b>{{(genExpenses()) | number}}</td>
                                         </tr>
                                         <tr>
                                             <td style="font-size:16px"><b>Grand Total: </b>{{grandTotal}}</td>
@@ -91,58 +91,29 @@
                                         <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
                                     </select>
                                 </div>
-                                <div class="form-group" v-if="!other">
-                                    <label>Driver</label>
-                                    <select name="driver_id" class="form-control" v-model="form.driver_id">
-                                        <option :value="driver.id" v-for="driver in drivers" :key="driver.id">
-                                            {{driver.name}}
-                                        </option>
-                                    </select>
+                                <div class="form-group">
+                                    <label>Authorized By</label>
+                                    <input type="text" class="form-control" :value="username()" disabled>
                                 </div>
                                 <div class="form-group">
                                     <label>Invoice No</label>
                                     <input type="text" class="form-control" v-model="form.invoice_no">
-                                </div>
-                                <div class="form-group" v-if="other ==true">
-                                    <label>Driver</label>
-                                    <input type="text" class="form-control" v-model="form.driver_name" placeholder="Driver Name">
                                 </div>
                             </div>
                         </div>
 
                              <div class="row">
                             <div class="col-md-12">
-
                                 <div class="form-group">
-                                    <label>Misc expenses</label>
-                                    <table style="width:100%">
-                                        <tr>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                        <tr v-for="(expense,k) in form.other_expenses" :key="k">
-                                            <td><select class="form-control pt" v-model="expense.name">
-                                                <option selected disabled>Select Part</option>
-                                                <option :value="part.id" v-for="part in parts" :key="part.id">
-                                                    {{part.code}} - {{part.description}}
-                                                </option>
-                                            </select></td>
-                                            <td><input type="number" v-model="expense.qty" class="form-control qt"
-                                                       placeholder="Qty"></td>
-                                            <td>
-                                                <i class="fa fa-minus-circle remove" @click="removeExpense(k)"
-                                                   v-show="k || ( !k && form.other_expenses.length > 1)"></i>
-                                                <i class="fa fa-plus-circle add" @click="addExpense(k)"
-                                                   v-show="k === form.other_expenses.length-1"></i>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                    <label>Requested By</label>
+                                    <input type="text" class="form-control" v-model="form.requested_by" required>
                                 </div>
+
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
+
                     </form>
                 </div>
             </div>
@@ -163,13 +134,12 @@
                     invoice_no: '',
                     expense_id: '',
                     fuel_type_id: '',
-                    driver_name: '',
-                    driver_id: '',
+                    authorized_by: '',
+                    requested_by:'',
                     odometer_readings: '',
                     customer_type:'',
                     asset_type:'',
                     rate:0,
-                    other_expenses: [{name: '', qty: ''}],
                     id: ''
                 },
                 edit_fuel: this.edit,
@@ -205,6 +175,7 @@
             this.getParts();
 
         },
+
         mounted: function () {
             var self = this;
             $('#datepicker').datepicker({
@@ -218,45 +189,38 @@
                 let total = this.form.rate * this.form.litres;
                 return this.total = total;
             },
-            totalExpense(){
-                let total=0;
-                if (Object.values(this.form.other_expenses[0])[0] !== '' || Object.values(this.form.other_expenses[0])[1] !== '') {
-                    for (let i = 0; i < this.form.other_expenses.length; i++) {
-                         if (this.form.other_expenses[i]['name'] !== '' && this.form.other_expenses[i]['qty'] !== '') {
-                             for (let j =0;j<this.parts.length;j++){
-                                 if (this.parts[j]['id'] === this.form.other_expenses[i]['name']){
-                                   total += parseInt(this.form.other_expenses[i]['qty']) * parseFloat(this.parts[j]['cost']);
-                                 }
-                             }
-                         }
-                    }
-                 }
-                return total;
-            },
+
             grandTotal(){
                 let total = 0;
-                if (this.totalAmount > 0 || this.totalExpense > 0 || this.genExpenses() > 0){
-                    total += parseFloat(this.totalAmount) + parseFloat(this.totalExpense) + parseFloat(this.genExpenses());
+                if (this.totalAmount > 0 || this.genExpenses() > 0){
+                    total += parseFloat(this.totalAmount) + parseFloat(this.genExpenses());
                 }
                 return total;
             }
         },
         methods: {
+           username(){
+             return  User.name();
+           },
             getRate(){
            for (let i=0; i < this.fuel_types.length; i++){
                if (this.fuel_types[i]['id'] === this.form.fuel_type_id){
-                   this.form.rate = this.fuel_types[i]['rate'];
+                  this.form.rate = this.fuel_types[i]['rate'];
                }
            }
             },
             customerTypes(){
-                this.show_customer = true;
                 this.filtered_customers = [];
-              for (let i =0; i < this.customers.length; i++){
-                  if (this.customers[i]['type'] === this.form.customer_type){
-                      this.filtered_customers.push(this.customers[i]);
-                  }
-              }
+                if (this.form.customer_type === 'Internal'){
+                    return this.show_customer = false;
+                }
+                    this.show_customer = true
+                    for (let i = 0; i < this.customers.length; i++) {
+                        if (this.customers[i]['type'] === this.form.customer_type) {
+                            this.filtered_customers.push(this.customers[i]);
+                        }
+                    }
+
             },
             genExpenses(){
                 let total = 0;
@@ -275,12 +239,6 @@
                         this.parts = res.data
                     })
 
-            },
-            addExpense() {
-                this.form.other_expenses.push({name: '', qty: ''});
-            },
-            removeExpense(i) {
-                this.form.other_expenses.splice(i, 1);
             },
             getFuelType() {
                 this.vehicles.forEach(vehicle => {
@@ -338,37 +296,13 @@
                 return [date.getFullYear(), mnth, day].join("-");
             },
             saveFuel() {
-                if (Object.values(this.form.other_expenses[0])[0] !== '' || Object.values(this.form.other_expenses[0])[1] !== '') {
-                    for (let i = 0; i < this.form.other_expenses.length; i++) {
-                        if (this.form.other_expenses[i]['name'] === '' || this.form.other_expenses[i]['qty'] === '') {
-                            return this.$toastr.e('Please all expenses fields are required.');
-                        }
-                    }
-                }
-                if (this.form.vehicle_id === '' && this.form.vehicle_name === '') {
-                    return this.$toastr.e('Please Select a Vehicle.');
-                }
-                for (let i = 0; i < this.vehicles.length; i++) {
-                    if (this.vehicles[i]['id'] === this.form.vehicle_id) {
-                        if (this.vehicles[i]['odometer_readings'] > this.form.odometer_readings) {
-                            return false;
-                        }
-                    }
-                }
-                if (this.form.driver_name === '' && this.form.driver_id === '') {
-                    return this.$toastr.e('Please select a Driver');
-                }
-                if (this.form.supplier_type ==='cash_purchase'){
-                    if (this.form.rate ==='' || this.form.currency ==='' || this.form.supplier_name ==='' || this.form.cash_sale_no ===''){
-                        return this.$toastr.e('All fields for Cash Sale are required');
-                    }
-                } else if(this.form.supplier_type ==='supplier'){
-                    if(this.form.supplier_id ==='' || this.form.invoice_no ===''){
-                        return  this.$toastr.e('Supplier and Invoice no fields are required.');
-                    }
-                }
+                 this.form.authorized_by = User.id();
+
                 if (this.other && this.form.fuel_type_id ===''){
                     return this.$toastr.e('Select Fuel Type.');
+                }
+                if (this.form.odometer_readings < this.previous_odometer){
+                    return this.$toastr.e('Current Odometer Readings cannot be less than Previous Readings.');
                 }
                 this.other_fuel_asset ? this.form.asset_type = 'other' : this.form.asset_type = 'company';
 
@@ -390,13 +324,12 @@
                     .catch(error => error.response)
             },
             cancel() {
-                eventBus.$emit('cancel')
+                eventBus.$emit('cancel');
             },
             listen() {
 
                 if (this.edit) {
                     this.form = this.$store.state.fuels;
-                    this.form.other_expenses = JSON.parse(this.$store.state.fuels.other_expenses);
                     this.show_fuel_type = true;
                     this.fuel_type = this.$store.state.fuels.fuel_type;
                     this.form.rate = this.$store.state.fuels.rate;
@@ -405,14 +338,16 @@
                     this.show_customer = true;
                     this.editedCustomers();
                     this.form.asset_type ==='other' ? this.other =true : this.company = true;
-
-
                 }
             },
             editedCustomers(){
                 axios.get('customers')
                     .then(customers => {
                         this.filtered_customers = [];
+                        if (this.form.customer_type === 'Internal'){
+                            return this.show_customer = false;
+                        }
+                        this.show_customer = true
                         for (let i =0; i < customers.data.length; i++){
                             if (customers.data[i]['type'] === this.form.customer_type){
                                 this.filtered_customers.push(customers.data[i]);

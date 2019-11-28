@@ -2,8 +2,7 @@
 
 
 Route::view('/','home');
-Route::get('import-projects','ProjectController@importProjects');
-Route::get('import-customers','CustomerController@importCustomers');
+Route::get('cool','JobcardController@cool');
 Route::view('/{any}','home');
 Route::view('/{any}/{any1}','home');
 

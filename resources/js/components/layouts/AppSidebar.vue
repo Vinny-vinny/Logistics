@@ -19,6 +19,7 @@
                 <li class="header"></li>
                 <!-- Optionally, you can add icons to the links -->
                 <li><router-link to="/machines"><i class="fa fa-shopping-basket angle-left"></i> <span>Assets</span></router-link></li>
+                <li><router-link to="/requisitions"><i class="fa fa-shopping-basket angle-left"></i> <span>Requisitions</span></router-link></li>
                 <li><router-link to="/job-card"><i class="fa fa-tag"></i> <span>Job Card</span></router-link></li>
                      <li class="treeview">
                     <router-link to="/checklists"><i class="fa fa-check-square-o"></i> <span>Checklists</span>

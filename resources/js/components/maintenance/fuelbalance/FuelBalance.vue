@@ -10,8 +10,8 @@
                 <div class="box-body">
                     <form @submit.prevent="saveFuel()">
                         <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" class="form-control" v-model="form.name" required>
+                            <label>Litres</label>
+                            <input type="number" step="0.001" class="form-control" v-model="form.litres" required>
                         </div>
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
@@ -28,7 +28,7 @@
         data(){
             return {
                 form:{
-                    name:'',
+                    litres:'',
                     id:''
                 },
                 edit_fuel: this.edit

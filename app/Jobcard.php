@@ -42,4 +42,9 @@ class Jobcard extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function requisition()
+    {
+        return $this->belongsTo(Requisition::class);
+    }
+
 }

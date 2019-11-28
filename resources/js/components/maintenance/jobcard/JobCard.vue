@@ -52,7 +52,7 @@
                                 <div class="form-group" v-if="show_customers">
                                     <label>Customer</label>
                                     <select class="form-control" required v-model="form.customer_id">
-                                        <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
+                                        <option :value="customer.id" v-for="customer in customers" :key="customer.id">{{customer.name}}</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -109,10 +109,10 @@
                                     <label>Assigned To: </label> {{driver}}
                                 </div>
                                 <div class="form-group">
-                                    <label>Fuel Balance</label>
+                                    <label>Fuel Balance(L)</label>
                                     <select name="fuel_balance_id" class="form-control" v-model="form.fuel_balance_id"
                                             required>
-                                        <option :value="bal.id" v-for="bal in balances" :key="bal.id">{{bal.name}}
+                                        <option :value="bal.id" v-for="bal in balances" :key="bal.id">{{bal.litres}}
                                         </option>
                                     </select>
                                 </div>
@@ -144,42 +144,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Expenses</label>
-                                    <table style="width: 100%">
-                                        <tr>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                        <tr v-for="(item,k) in form.item_cost_qty" :key="k">
-                                            <td><select class="form-control i_p" v-model="item.part" @change="exp_id =item.part">
-                                                <option selected disabled>Select Part</option>
-                                                <option :value="part.id" v-for="part in parts" :key="part.id">
-                                                    {{part.code}} - {{part.description}}
-                                                </option>
-                                            </select>
-                                            </td>
-                                            <td><input type="number" class="form-control qty" v-model="item.quantity"
-                                                       placeholder="Qty"  @keyup="exp_qty = item.quantity">
-                                            </td>
-                                            <td><input type="number" class="form-control p_in" step="0.001" v-model="item.price_inclusive"
-                                                       placeholder="Price Inclusive VAT" disabled></td>
-                                            <td><input type="number" step="0.001" class="form-control p_ex" v-model="item.price_exclusive"
-                                                       placeholder="Price Exclusive VAT" disabled></td>
-                                            <td>
-                                                <i class="fa fa-minus-circle remove" @click="removeparts(k)"
-                                                   v-show="k || ( !k && form.item_cost_qty.length > 1)"></i>
-                                                <i class="fa fa-plus-circle add" @click="addparts(k)"
-                                                   v-show="k == form.item_cost_qty.length-1"></i>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -216,48 +181,44 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-11">
                                 <div class="form-group">
-                                    <label>Repair / Service Required</label>
+                                    <label>Requisitions</label>
+                                    <select class="form-control" v-model="form.requisition_id" @change="getDetails()" :disabled="disable_rq">
+                                        <option :value="rq.id" v-for="rq in filtered_rq" :key="rq.id">{{rq.description}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" v-if="show_inventory">
+                                    <label>Inventory Items</label>
                                     <table style="width:100%">
                                         <tr>
+                                            <th align="right">Part</th>
+                                            <th align="right">Quantity</th>
+                                            <th align="right">Price Inclusive VAT</th>
+                                            <th align="right">Price Exclusive VAT</th>
                                             <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
-
                                         </tr>
-                                        <tr v-for="(s,i) in form.service_required">
-                                            <td><select class="form-control i_p" v-model="s.category"
-                                                        placeholder="Category">
-                                                <option selected disabled>Select Category</option>
-                                                <option :value="cat.id" v-for="cat in categories" :key="cat.id">
-                                                    {{cat.name}}
-                                                </option>
-                                            </select></td>
-                                            <td><select class="form-control s_part" v-model="s.part" @change="part_id =s.part">
-                                                <option selected disabled>Select Part</option>
-                                                <option :value="part.id" v-for="part in parts" :key="part.id">
-                                                    {{part.code}} - {{part.description}}
-                                                </option>
-                                            </select>
-                                            </td>
-                                            <td><input type="number" class="form-control s_qty" v-model="s.qty"
-                                                       placeholder="Quantity" @keyup="part_qty = s.qty"></td>
-                                            <td><input type="number" class="form-control p_in_2" step="0.001" v-model="s.price_inclusive"
-                                                       placeholder="Price Inclusive VAT" disabled></td>
-                                            <td><input type="number" step="0.001" class="form-control p_ex_2" v-model="s.price_exclusive"
-                                                       placeholder="Price Exclusive VAT" disabled></td>
-                                            <td><input type="text" class="form-control s_descr" v-model="s.description"
-                                                       placeholder="Description"></td>
+                                        <tr v-for="(m,i) in filtered_items">
                                             <td>
-                                                <i class="fa fa-minus-circle s_add" @click="removeService(i)"
-                                                   v-show="i || (!i && form.service_required.length > 1)"></i>
-                                                <i class="fa fa-plus-circle s_add" @click="addService(i)"
-                                                   v-show="i == form.service_required.length -1"></i>
+                                                <select class="form-control i_p" v-model="m.part" disabled>                             >
+                                                    <option :value="p.id" v-for="p in parts" :key="p.id">
+                                                        {{p.code}} - {{p.description}}
+                                                    </option>
+
+                                                </select>
                                             </td>
+                                            <td><input type="number" class="form-control cost" v-model="m.quantity"
+                                                       placeholder="Quantity" disabled></td>
+                                            <td>
+                                                <input type="number" class="form-control rq_pi" v-model="m.price_inclusive"
+                                                       placeholder="Price Inclusive VAT" disabled></td>
+                                            <td>
+                                                <input type="number" class="form-control rq_pe" v-model="m.price_exclusive"
+                                                       placeholder="Price Exclusive VAT" disabled></td>
+
+
                                         </tr>
                                     </table>
                                 </div>
@@ -302,10 +263,9 @@
                     job_type_id:'',
                     cost_code:'',
                     customer_id:'',
+                    requisition_id:'',
                     id: '',
-                    item_cost_qty: [{part: '', quantity: '',price_inclusive:'',price_exclusive:''}],
                     maintenance: [{category: '', description: '', root_cause: ''}],
-                    service_required: [{category: '', part: '', qty: '', description: '',price_inclusive:'',price_exclusive:''}]
 
                 },
                 checklist: '',
@@ -341,22 +301,15 @@
                 part_qty:'',
                 part_id:'',
                 exp_qty:'',
-                exp_id:''
+                exp_id:'',
+                requisitions:{},
+                show_inventory:false,
+                filtered_items:[],
+                disable_rq:false,
+                filtered_rq:[]
             }
         },
         watch: {
-            computeExpenses(){
-                for (let p=0; p < this.parts.length; p++){
-                    for (let i=0; i < this.form.item_cost_qty.length; i++){
-                        if (this.form.item_cost_qty[i]['quantity'] !=='' && this.form.item_cost_qty[i]['part'] !==''){
-                            if (this.form.item_cost_qty[i]['part'] === this.parts[p]['id']){
-                                this.form.item_cost_qty[i]['price_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.item_cost_qty[i]['quantity']).toFixed(2);
-                                this.form.item_cost_qty[i]['price_exclusive'] = (this.parts[p]['cost'] * this.form.item_cost_qty[i]['quantity']).toFixed(2);
-                            }
-                        }
-                    }
-                }
-            },
             getCost(){
                 for (let p=0; p < this.parts.length; p++){
                     for (let i=0; i < this.form.service_required.length; i++){
@@ -368,7 +321,6 @@
                         }
                     }
                 }
-
             },
             'form.current_readings'() {
                     this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
@@ -421,6 +373,8 @@
             this.getMechanics();
             this.getJobtypes();
             this.getCustomers();
+            this.getRequisitions();
+            this.filteredRqs();
 
         },
         filters: {
@@ -446,24 +400,46 @@
             getCost(){
                return [this.part_qty, this.part_id,this.form.service_required].join();
             },
-            computeExpenses(){
-                return [this.exp_qty, this.exp_id,this.form.item_cost_qty].join();
-            }
 
         },
         methods: {
+            filteredRqs(){
+               axios.get('requisitions')
+                   .then(rq => {
+                       for (let i=0; i< rq.data.length; i++){
+                           console.log(rq.data[i])
+                           if (rq.data[i]['used'] ==0){
+                               this.filtered_rq.push(rq.data[i]);
+                           }
+                       }
+                   })
 
+
+            },
+            getDetails(){
+                this.show_inventory = true;
+                this.filtered_items = [];
+                for (let i=0; i < this.requisitions.length; i++){
+                    if (this.requisitions[i]['id'] === this.form.requisition_id){
+                        this.filtered_items = JSON.parse(this.requisitions[i]['inventory_items']);
+
+                    }
+                }
+
+            },
+            getRequisitions(){
+              axios.get('requisitions')
+                  .then(rq => {
+                      this.requisitions = rq.data
+                  })
+            },
             customerType(){
-                this.show_customers = true;
                 this.filtered_customers = [];
               if (this.customer_type ==='Internal'){
-                  for (let i=0; i<this.customers.length; i++){
-                      if (this.customers[i]['type'] === 'Internal'){
-                          this.filtered_customers.push(this.customers[i]);
-                      }
-                  }
+                  this.show_customers = false;
               }
               else if (this.customer_type === 'External'){
+                  this.show_customers = true;
                   for (let j=0; j<this.customers.length; j++){
                       if (this.customers[j]['type'] === 'External'){
                           this.filtered_customers.push(this.customers[j]);
@@ -551,12 +527,6 @@
                     vm.form.time_out = $('.time_out').val();
                 })
             },
-            addparts() {
-                this.form.item_cost_qty.push({part: '', quantity: '',price_inclusive:'',price_exclusive:''});
-            },
-            removeparts(i) {
-                this.form.item_cost_qty.splice(i, 1);
-            },
 
             getAssetDetails() {
                 this.machines.forEach(machine => {
@@ -593,13 +563,7 @@
                 if (parseFloat(this.form.current_readings) > parseFloat(this.form.next_readings)) {
                     return this.$toastr.e(`Sorry, Current ${this.track_name} readings cannot be greater than next readings.`);
                 }
-                if (Object.values(this.form.item_cost_qty[0])[0] !== '' || Object.values(this.form.item_cost_qty[0])[1] !== '') {
-                    for (let i = 0; i < this.form.item_cost_qty.length; i++) {
-                        if (this.form.item_cost_qty[i]['part'] === '' || this.form.item_cost_qty[i]['quantity'] === '') {
-                            return this.$toastr.e('Please all expenses fields are required.');
-                        }
-                    }
-                }
+
                 if (Object.values(this.form.maintenance[0])[0] !== '' || Object.values(this.form.maintenance[0])[1] !== '' || Object.values(this.form.maintenance[0])[2] !== '') {
                     for (let i = 0; i < this.form.maintenance.length; i++) {
                         if (this.form.maintenance[i]['category'] === '' || this.form.maintenance[i]['description'] === '' || this.form.maintenance[i]['root_cause'] === '') {
@@ -607,19 +571,10 @@
                         }
                     }
                 }
-                if (Object.values(this.form.service_required[0])[0] !== '' || Object.values(this.form.service_required[0])[1] !== '' || Object.values(this.form.service_required[0])[2] !== '' || Object.values(this.form.service_required[0])[3] !== '') {
-                    for (let i = 0; i < this.form.service_required.length; i++) {
-                        if (this.form.service_required[i]['category'] === '' || this.form.service_required[i]['part'] === '' || this.form.service_required[i]['qty'] === '' || this.form.service_required[i]['description'] === '') {
-                            return this.$toastr.e('Please all Repair/Service required fields are required.');
-                        }
-                    }
-                }
-
 
                 if (this.form.next_service_date === '') {
                     return this.$toastr.e('Next service date is required.');
                 }
-
                 this.edit_jobcard ? this.update() : this.save();
 
             },
@@ -631,9 +586,7 @@
                 this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : ''
                 this.form.next_service_date = this.convertDate(this.form.next_service_date);
                 this.form.actual_date = this.convertDate(this.form.actual_date);
-                this.form.item_cost_qty = JSON.stringify(this.form.item_cost_qty);
                 this.form.maintenance = JSON.stringify(this.form.maintenance);
-                this.form.service_required = JSON.stringify(this.form.service_required);
 
                 axios.post('job-card', this.form).then(res => {
                     this.$toastr.s('Jobcard created Successfully.');
@@ -651,9 +604,7 @@
                 this.form.next_service_date = this.convertDate(this.form.next_service_date);
                 this.form.actual_date = this.convertDate(this.form.actual_date);
                 this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
-                this.form.item_cost_qty = JSON.stringify(this.form.item_cost_qty);
                 this.form.maintenance = JSON.stringify(this.form.maintenance);
-                this.form.service_required = JSON.stringify(this.form.service_required);
                 axios.patch(`job-card/${this.form.id}`, this.form).then(res => {
                     this.$toastr.s('Jobcard updated Successfully.');
                     eventBus.$emit('updateJobcard', res.data)
@@ -704,18 +655,35 @@
                     this.make = this.$store.state.job_card.make;
                     this.driver = this.$store.state.job_card.driver;
                     this.service_types = this.form.service_types;
-                    this.form.item_cost_qty = JSON.parse(this.$store.state.job_card.item_cost_qty);
                     this.form.maintenance = JSON.parse(this.$store.state.job_card.maintenance);
-                    this.form.service_required = JSON.parse(this.$store.state.job_card.service_required);
 
-                    console.log(this.$store.state.job_card);
                     this.status = this.$store.state.job_card.status;
                     this.customer_type = this.$store.state.job_card.customer_type;
                     this.show_customers = true;
                     this.filtered_customers = [];
                     this.Customers();
                     this.ServiceTypes();
+                    console.log(this.customer_type)
+
+                    if (this.form.requisition_id){
+                        this.disable_rq = true;
+                        this.show_inventory = true;
+                        this.editedRequisitions();
+                    }
                 }
+            },
+            editedRequisitions(){
+              axios.get('requisitions')
+                  .then(rq => {
+                      this.filtered_items = [];
+                      this.filtered_rq = [];
+                      for (let i=0; i < rq.data.length; i++){
+                          if (rq.data[i]['id'] === this.form.requisition_id){
+                              this.filtered_items = JSON.parse(rq.data[i]['inventory_items']);
+                              this.filtered_rq.push(rq.data[i])
+                          }
+                      }
+                  })
             },
             ServiceTypes(){
                 axios.get('service-types')
@@ -733,16 +701,13 @@
                     .then(res => {
                         this.customers =res.data;
                         if (this.customer_type ==='Internal'){
-                            for (let i=0; i<this.customers.length; i++){
-                                if (this.customers[i]['type'] === 'Internal'){
-                                    this.filtered_customers.push(this.customers[i]);
-                                }
-                            }
+                            this.show_customers = false;
                         }
                         else if (this.customer_type === 'External'){
                             for (let j=0; j<this.customers.length; j++){
                                 if (this.customers[j]['type'] === 'External'){
-                                    this.filtered_customers.push(this.customers[j]);
+                                   // this.filtered_customers.push(this.customers[j]);
+                                    this.show_customers = true;
                                 }
                             }
                         }
@@ -815,6 +780,15 @@
         margin-left:10px;
         margin-bottom: 8px;
     }
+    .rq_pi{
+        margin-left: 15px;
+        margin-bottom: 8px;
+    }
+    .rq_pe{
+        margin-left: 20px;
+        margin-bottom: 8px;
+    }
+
 
     .vdp-datepicker input {
         border-radius: 0;

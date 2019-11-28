@@ -15,7 +15,7 @@ class CreateFuelBalancesTable extends Migration
     {
         Schema::create('fuel_balances', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
+            $table->float('litres');
             $table->timestamps();
         });
     }

@@ -12,13 +12,13 @@ class FuelBalanceSeeder extends Seeder
     public function run()
     {
         \App\FuelBalance::create([
-           'name' => 'Full'
+           'litres' => 10.5
         ]);
         \App\FuelBalance::create([
-            'name' => '1/2'
+            'litres' => 23.7
         ]);
         \App\FuelBalance::create([
-            'name' => '1/4'
+            'litres' => 16
         ]);
     }
 }

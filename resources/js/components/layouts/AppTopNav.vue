@@ -4,7 +4,7 @@
 
         <!-- Logo -->
         <a href="#" class="logo">
-            <b>Technical</b>
+            <b>Logistics</b>
         </a>
         <!-- Header Navbar -->
         <nav class="navbar navbar-static-top" role="navigation">
