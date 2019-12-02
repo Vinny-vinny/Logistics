@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\RequisitionResource;
-use App\Requisition;
+use App\CustomerType;
 use Illuminate\Http\Request;
 
-class RequisitionController extends Controller
+class CustomerTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +14,17 @@ class RequisitionController extends Controller
      */
     public function index()
     {
-        return response()->json(RequisitionResource::collection(Requisition::all()));
+        return response()->json(CustomerType::all());
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -26,9 +35,7 @@ class RequisitionController extends Controller
      */
     public function store(Request $request)
     {
-        $request['req_no'] = Requisition::count() +1;
-        $requisition = Requisition::create($request->all());
-        return response()->json(new RequisitionResource($requisition));
+        //
     }
 
     /**
@@ -42,6 +49,16 @@ class RequisitionController extends Controller
         //
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
 
     /**
      * Update the specified resource in storage.
@@ -52,8 +69,7 @@ class RequisitionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Requisition::find($id)->update($request->except(['date_requested','project','person_requested']));
-        return response()->json(new RequisitionResource(Requisition::find($id)));
+        //
     }
 
     /**
@@ -64,6 +80,6 @@ class RequisitionController extends Controller
      */
     public function destroy($id)
     {
-        Requisition::destroy($id);
+        //
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
+use App\CustomerType;
 use App\SageCustomer;
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
@@ -59,7 +60,7 @@ class CustomerController extends Controller
                 'name' => $customer->Name ? $customer->Name : $faker->name,
                 'contact_person' => $customer->Contact_Person ?  $customer->Contact_Person : $faker->name,
                 'email' => $customer->EMail ? $customer->EMail : $faker->email,
-                'type' => 'External'
+                'customer_type_id' => CustomerType::all()->random()->id
             ]);
 
         }

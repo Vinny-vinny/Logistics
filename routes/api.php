@@ -42,6 +42,7 @@ Route::apiResource('warehouse','WarehouseController');
 Route::get('import-parts/{warehouse}','PartsController@importParts');
 Route::apiResource('projects','ProjectController');
 Route::apiResource('customers','CustomerController');
+Route::apiResource('customer-types','CustomerTypeController');
 Route::apiResource('jobcard-category','JobcardCategoryController');
 Route::apiResource('mechanics','MechanicsController');
 Route::apiResource('requisitions','RequisitionController');

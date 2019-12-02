@@ -25,7 +25,9 @@ class RequisitionResource extends JsonResource
             'project' => $this->project->code,
             'requested_by' => $this->requested_by,
             'person_requested' => $this->user->name,
-            'inventory_items' => $this->inventory_items,
+            'inventory_items_internal' => $this->inventory_items_internal,
+            'inventory_items_external' => $this->inventory_items_external,
+            'type' => $this->type,
             'used' => $this->used,
         ];
     }
