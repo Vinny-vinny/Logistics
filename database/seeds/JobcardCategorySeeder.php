@@ -11,7 +11,9 @@ class JobcardCategorySeeder extends Seeder
      */
     public function run()
     {
-        \App\JobcardCategory::create(['name' => 'Master']);
+        \App\JobcardCategory::create(['name' => 'Building Repairs']);
+        \App\JobcardCategory::create(['name' => 'Project']);
         \App\JobcardCategory::create(['name' => 'Workshop']);
+        \App\JobcardCategory::create(['name' => 'General']);
     }
 }

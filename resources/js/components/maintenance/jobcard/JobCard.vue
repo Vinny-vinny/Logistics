@@ -44,15 +44,15 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Customer Type</label>
-                                    <select class="form-control" v-model="customer_type" required @change="customerType()">
-                                        <option value="Internal">Internal</option>
-                                        <option value="External">External</option>
+                                    <select class="form-control" v-model="form.customer_type_id" required @change="customerType()">
+                                        <option :value="type.id" v-for="type in customer_types" :key="type.id">{{type.name}}</option>
+
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customers">
                                     <label>Customer</label>
                                     <select class="form-control" required v-model="form.customer_id">
-                                        <option :value="customer.id" v-for="customer in customers" :key="customer.id">{{customer.name}}</option>
+                                        <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -72,7 +72,10 @@
                                         </option>
                                     </select>
                                 </div>
-
+                                <div class="form-group">
+                                    <label>Cost Code</label>
+                                    <input type="text" class="form-control" v-model="form.cost_code" required>
+                                </div>
                                 <div class="form-group">
                                     <label>Servicing Date</label>
                                     <datepicker v-model="form.actual_date" required></datepicker>
@@ -138,10 +141,7 @@
                                         <option :value="project.id" v-for="project in projects" :key="project.id">{{project.code}} - {{project.name}}</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label>Cost Code</label>
-                                    <input type="text" class="form-control" v-model="form.cost_code" required>
-                                </div>
+
                             </div>
                         </div>
 
@@ -306,7 +306,8 @@
                 show_inventory:false,
                 filtered_items:[],
                 disable_rq:false,
-                filtered_rq:[]
+                filtered_rq:[],
+                customer_types:{}
             }
         },
         watch: {
@@ -341,11 +342,6 @@
                         return this.$toastr.e('Sorry, Next service date cannot be less than completion date.');
                     }
                 }
-                if (moment(this.form.next_service_date).format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD')) {
-                    this.$refs.nextServiceDate.clearDate();
-                    this.form.next_service_date = '';
-                    return this.$toastr.e('Sorry, next service date cannot be later than today.');
-                }
                 if (this.form.actual_date !== '' && this.form.completion_date !== '' && this.form.time_in !== '' || this.form.time_out !== '') {
                     if (moment(this.form.actual_date).format('YYYY-MM-DD') === moment(this.form.completion_date).format('YYYY-MM-DD')) {
                         if (moment(this.form.time_in, 'h:mm A').format('HH:mm') > moment(this.form.time_out, 'h:mm A').format('HH:mm')) {
@@ -375,6 +371,7 @@
             this.getCustomers();
             this.getRequisitions();
             this.filteredRqs();
+            this.getCustomerTypes();
 
         },
         filters: {
@@ -403,6 +400,12 @@
 
         },
         methods: {
+            getCustomerTypes(){
+              axios.get('customer-types')
+              .then(res => {
+                  this.customer_types = res.data;
+              })
+            },
             filteredRqs(){
                axios.get('requisitions')
                    .then(rq => {
@@ -435,17 +438,12 @@
             },
             customerType(){
                 this.filtered_customers = [];
-              if (this.customer_type ==='Internal'){
-                  this.show_customers = false;
-              }
-              else if (this.customer_type === 'External'){
                   this.show_customers = true;
                   for (let j=0; j<this.customers.length; j++){
-                      if (this.customers[j]['type'] === 'External'){
+                      if (this.customers[j]['customer_type_id'] === this.form.customer_type_id){
                           this.filtered_customers.push(this.customers[j]);
                       }
                   }
-              }
             },
             getCustomers(){
               axios.get('customers')
@@ -571,6 +569,11 @@
                         }
                     }
                 }
+                if (moment(this.form.next_service_date).format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD')) {
+                    this.$refs.nextServiceDate.clearDate();
+                    this.form.next_service_date = '';
+                    return this.$toastr.e('Sorry, next service date cannot be later than today.');
+                }
 
                 if (this.form.next_service_date === '') {
                     return this.$toastr.e('Next service date is required.');
@@ -658,12 +661,11 @@
                     this.form.maintenance = JSON.parse(this.$store.state.job_card.maintenance);
 
                     this.status = this.$store.state.job_card.status;
-                    this.customer_type = this.$store.state.job_card.customer_type;
                     this.show_customers = true;
                     this.filtered_customers = [];
                     this.Customers();
                     this.ServiceTypes();
-                    console.log(this.customer_type)
+
 
                     if (this.form.requisition_id){
                         this.disable_rq = true;
@@ -700,17 +702,12 @@
                 axios.get('customers')
                     .then(res => {
                         this.customers =res.data;
-                        if (this.customer_type ==='Internal'){
-                            this.show_customers = false;
-                        }
-                        else if (this.customer_type === 'External'){
+                            this.show_customers = true;
                             for (let j=0; j<this.customers.length; j++){
-                                if (this.customers[j]['type'] === 'External'){
-                                   // this.filtered_customers.push(this.customers[j]);
-                                    this.show_customers = true;
+                                if (this.customers[j]['customer_type_id'] === this.form.customer_type_id){
+                                    this.filtered_customers.push(this.customers[j]);
                                 }
                             }
-                        }
                     })
             }
         },

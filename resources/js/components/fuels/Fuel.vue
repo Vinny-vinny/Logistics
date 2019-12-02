@@ -50,6 +50,12 @@
                                         </option>
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label>Jobcard</label>
+                                    <select v-model="form.jobcard_id" class="form-control">
+                                        <option :value="job.id" v-for="job in jobcards" :key="job.id">{{job.card_no}}</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="col-md-6">
@@ -80,9 +86,8 @@
 
                                 <div class="form-group">
                                     <label>Customer Type</label>
-                                    <select class="form-control" v-model="form.customer_type" required @change="customerTypes()">
-                                        <option value="Internal">Internal</option>
-                                        <option value="External">External</option>
+                                    <select class="form-control" v-model="form.customer_type_id" required @change="customerTypes()">
+                                        <option :value="type.id" v-for="type in customer_types" :key="type.id">{{type.name}}</option>
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customer">
@@ -99,18 +104,13 @@
                                     <label>Invoice No</label>
                                     <input type="text" class="form-control" v-model="form.invoice_no">
                                 </div>
-                            </div>
-                        </div>
-
-                             <div class="row">
-                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Requested By</label>
                                     <input type="text" class="form-control" v-model="form.requested_by" required>
                                 </div>
-
                             </div>
-                        </div>
+                            </div>
+
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
 
@@ -137,7 +137,8 @@
                     authorized_by: '',
                     requested_by:'',
                     odometer_readings: '',
-                    customer_type:'',
+                    customer_type_id:'',
+                    jobcard_id:'',
                     asset_type:'',
                     rate:0,
                     id: ''
@@ -160,6 +161,8 @@
                 total_expenses:0,
                 pa:{},
                 filtered_customers:[],
+                customer_types:{},
+                jobcards:{},
                 show_customer:false
             }
         },
@@ -173,6 +176,8 @@
             this.getFuelTypes();
             this.assetType();
             this.getParts();
+            this.getCustomerTypes();
+            this.getJobcards();
 
         },
 
@@ -199,6 +204,18 @@
             }
         },
         methods: {
+            getJobcards(){
+              axios.get('job-card')
+              .then(res => {
+                  this.jobcards = res.data
+              })
+            },
+            getCustomerTypes(){
+              axios.get('customer-types')
+                .then(res => {
+                    this.customer_types = res.data;
+                })
+            },
            username(){
              return  User.name();
            },
@@ -211,12 +228,10 @@
             },
             customerTypes(){
                 this.filtered_customers = [];
-                if (this.form.customer_type === 'Internal'){
-                    return this.show_customer = false;
-                }
-                    this.show_customer = true
+                    this.show_customer = true;
+                    console.log(this.form.customer_type_id)
                     for (let i = 0; i < this.customers.length; i++) {
-                        if (this.customers[i]['type'] === this.form.customer_type) {
+                        if (this.customers[i]['customer_type_id'] === this.form.customer_type_id) {
                             this.filtered_customers.push(this.customers[i]);
                         }
                     }
@@ -344,12 +359,9 @@
                 axios.get('customers')
                     .then(customers => {
                         this.filtered_customers = [];
-                        if (this.form.customer_type === 'Internal'){
-                            return this.show_customer = false;
-                        }
                         this.show_customer = true
                         for (let i =0; i < customers.data.length; i++){
-                            if (customers.data[i]['type'] === this.form.customer_type){
+                            if (customers.data[i]['customer_type_id'] === this.form.customer_type_id){
                                 this.filtered_customers.push(customers.data[i]);
                             }
                         }

@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
          $this->call(JobcardCategorySeeder::class);
          $this->call(MechanicSeeder::class);
          $this->call(JobTypeSeeder::class);
+         $this->call(CustomerTypesSeeder::class);
 
 
     }

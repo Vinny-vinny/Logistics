@@ -161,7 +161,7 @@
                             if (res.data[i]['category'].toLowerCase() === 'workshop'){
                                 this.jobcards.push(res.data[i]);
                                 if (res.data[i]['id'] === this.form.jobcard_id){
-                                    this.jobcards.splice(res.data[i],1);
+                                    //this.jobcards.splice(res.data[i],1);
                                 }
                             }
                         }
