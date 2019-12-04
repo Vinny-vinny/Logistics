@@ -5492,6 +5492,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['edit'],
@@ -5517,6 +5540,7 @@ __webpack_require__.r(__webpack_exports__);
         cost_code: '',
         customer_id: '',
         requisition_id: '',
+        labour_cost: 0,
         id: '',
         maintenance: [{
           category: '',
@@ -5584,6 +5608,8 @@ __webpack_require__.r(__webpack_exports__);
       this.show_next_readings = false;
     },
     timeframe: function timeframe() {
+      var _this = this;
+
       if (this.form.actual_date !== '' && this.form.completion_date !== '') {
         if (moment(this.form.actual_date).format('YYYY-MM-DD') > moment(this.form.completion_date).format('YYYY-MM-DD')) {
           this.$refs.completionDate.clearDate();
@@ -5600,12 +5626,33 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
 
-      if (this.form.actual_date !== '' && this.form.completion_date !== '' && this.form.time_in !== '' || this.form.time_out !== '') {
+      if (this.form.actual_date !== '' && this.form.completion_date !== '' && this.form.time_in !== '' && this.form.time_out !== '') {
         if (moment(this.form.actual_date).format('YYYY-MM-DD') === moment(this.form.completion_date).format('YYYY-MM-DD')) {
           if (moment(this.form.time_in, 'h:mm A').format('HH:mm') > moment(this.form.time_out, 'h:mm A').format('HH:mm')) {
             this.form.time_out = '';
             return this.$toastr.e('Sorry, time in cannot be greater than time out.');
           }
+        } //Labour calculation = hrs* job type
+
+
+        var initialdate = moment(this.form.actual_date).format('YYYY-MM-DD');
+        var enddate = moment(this.form.completion_date).format('YYYY-MM-DD');
+        var start_time = moment(this.form.time_in, "HH:mm:ss").format("hh:mm");
+        var end_time = moment(this.form.time_out, "HH:mm:ss").format("hh:mm");
+        var datetimeA = moment(initialdate + " " + start_time);
+        var datetimeB = moment(enddate + " " + end_time);
+        var time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
+
+        if (this.form.job_type_id !== '') {
+          axios.get('job-types').then(function (res) {
+            _this.job_types = res.data;
+
+            var cost = _this.job_types.find(function (type) {
+              return type.id == _this.form.job_type_id;
+            }).hourly_rate;
+
+            _this.form.labour_cost = time_in_minutes / 60 * cost;
+          });
         }
       }
     }
@@ -5659,7 +5706,7 @@ __webpack_require__.r(__webpack_exports__);
       return this.form.service_type === 'Internal';
     },
     timeframe: function timeframe() {
-      return [this.form.actual_date, this.form.time_in, this.form.completion_date, this.form.time_out, this.form.next_service_date].join();
+      return [this.form.actual_date, this.form.time_in, this.form.completion_date, this.form.time_out, this.form.next_service_date, this.form.job_type_id].join();
     },
     getCost: function getCost() {
       return [this.part_qty, this.part_id, this.form.service_required].join();
@@ -5667,21 +5714,21 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     getCustomerTypes: function getCustomerTypes() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get('customer-types').then(function (res) {
-        _this.customer_types = res.data;
+        _this2.customer_types = res.data;
       });
     },
     filteredRqs: function filteredRqs() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.get('requisitions').then(function (rq) {
         for (var i = 0; i < rq.data.length; i++) {
           console.log(rq.data[i]);
 
           if (rq.data[i]['used'] == 0) {
-            _this2.filtered_rq.push(rq.data[i]);
+            _this3.filtered_rq.push(rq.data[i]);
           }
         }
       });
@@ -5697,10 +5744,10 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     getRequisitions: function getRequisitions() {
-      var _this3 = this;
+      var _this4 = this;
 
       axios.get('requisitions').then(function (rq) {
-        _this3.requisitions = rq.data;
+        _this4.requisitions = rq.data;
       });
     },
     customerType: function customerType() {
@@ -5714,38 +5761,38 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     getCustomers: function getCustomers() {
-      var _this4 = this;
+      var _this5 = this;
 
       axios.get('customers').then(function (customers) {
-        _this4.customers = customers.data;
+        _this5.customers = customers.data;
       });
     },
     getJobtypes: function getJobtypes() {
-      var _this5 = this;
+      var _this6 = this;
 
       axios.get('job-types').then(function (res) {
-        _this5.job_types = res.data;
+        _this6.job_types = res.data;
       });
     },
     getMechanics: function getMechanics() {
-      var _this6 = this;
+      var _this7 = this;
 
       axios.get('mechanics').then(function (res) {
-        _this6.mechanics = res.data;
+        _this7.mechanics = res.data;
       });
     },
     getJobCategories: function getJobCategories() {
-      var _this7 = this;
+      var _this8 = this;
 
       axios.get('jobcard-category').then(function (category) {
-        _this7.job_categories = category.data;
+        _this8.job_categories = category.data;
       });
     },
     getProjects: function getProjects() {
-      var _this8 = this;
+      var _this9 = this;
 
       axios.get('projects').then(function (res) {
-        _this8.projects = res.data;
+        _this9.projects = res.data;
       });
     },
     addService: function addService(i) {
@@ -5762,11 +5809,11 @@ __webpack_require__.r(__webpack_exports__);
       this.form.service_required.splice(i, 1);
     },
     close: function close() {
-      var _this9 = this;
+      var _this10 = this;
 
       if (confirm('Do you really want to close?')) {
         axios.post("close-jobcard/".concat(this.form.id)).then(function (res) {
-          _this9.$toastr.s("Jobcard ".concat(_this9.$store.state.job_card.card_no, " was successfully closed."));
+          _this10.$toastr.s("Jobcard ".concat(_this10.$store.state.job_card.card_no, " was successfully closed."));
 
           eventBus.$emit('cancel');
         });
@@ -5783,25 +5830,25 @@ __webpack_require__.r(__webpack_exports__);
       this.form.maintenance.splice(i, 1);
     },
     getCategories: function getCategories() {
-      var _this10 = this;
+      var _this11 = this;
 
       axios.get('categories').then(function (category) {
-        _this10.categories = category.data;
+        _this11.categories = category.data;
       });
     },
     getParts: function getParts() {
-      var _this11 = this;
+      var _this12 = this;
 
       axios.get('parts').then(function (res) {
-        _this11.parts = res.data;
+        _this12.parts = res.data;
       });
     },
     nextReadings: function nextReadings() {
-      var _this12 = this;
+      var _this13 = this;
 
       this.services.forEach(function (service) {
-        if (service.id === _this12.form.service_type_id) {
-          _this12.service_after = service.service_after;
+        if (service.id === _this13.form.service_type_id) {
+          _this13.service_after = service.service_after;
         }
       });
     },
@@ -5819,29 +5866,29 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getAssetDetails: function getAssetDetails() {
-      var _this13 = this;
+      var _this14 = this;
 
       this.machines.forEach(function (machine) {
-        if (machine.id === _this13.form.machine_id) {
-          _this13.make = machine.make;
-          _this13.previous_readings = machine.current_readings;
-          _this13.form.track_by_id = machine.track_by_id;
+        if (machine.id === _this14.form.machine_id) {
+          _this14.make = machine.make;
+          _this14.previous_readings = machine.current_readings;
+          _this14.form.track_by_id = machine.track_by_id;
 
-          _this13.tracks.forEach(function (track) {
+          _this14.tracks.forEach(function (track) {
             if (track.id === machine.track_by_id) {
-              _this13.track_name = track.name;
-              _this13.show_track_by = true;
+              _this14.track_name = track.name;
+              _this14.show_track_by = true;
             }
           });
 
-          _this13.users.forEach(function (user) {
+          _this14.users.forEach(function (user) {
             if (user.id === machine.assign_to) {
-              _this13.driver = user.name;
+              _this14.driver = user.name;
               return;
             }
           });
 
-          _this13.service_types = machine.service_types;
+          _this14.service_types = machine.service_types;
         }
 
         return;
@@ -5886,7 +5933,7 @@ __webpack_require__.r(__webpack_exports__);
       this.saveJob();
     },
     saveJob: function saveJob() {
-      var _this14 = this;
+      var _this15 = this;
 
       delete this.form.id;
       this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
@@ -5894,7 +5941,7 @@ __webpack_require__.r(__webpack_exports__);
       this.form.actual_date = this.convertDate(this.form.actual_date);
       this.form.maintenance = JSON.stringify(this.form.maintenance);
       axios.post('job-card', this.form).then(function (res) {
-        _this14.$toastr.s('Jobcard created Successfully.');
+        _this15.$toastr.s('Jobcard created Successfully.');
 
         eventBus.$emit('listJobcards', res.data);
       })["catch"](function (error) {
@@ -5908,14 +5955,14 @@ __webpack_require__.r(__webpack_exports__);
       return [date.getFullYear(), mnth, day].join("-");
     },
     update: function update() {
-      var _this15 = this;
+      var _this16 = this;
 
       this.form.next_service_date = this.convertDate(this.form.next_service_date);
       this.form.actual_date = this.convertDate(this.form.actual_date);
       this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
       this.form.maintenance = JSON.stringify(this.form.maintenance);
       axios.patch("job-card/".concat(this.form.id), this.form).then(function (res) {
-        _this15.$toastr.s('Jobcard updated Successfully.');
+        _this16.$toastr.s('Jobcard updated Successfully.');
 
         eventBus.$emit('updateJobcard', res.data);
       })["catch"](function (error) {
@@ -5923,38 +5970,38 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getMachines: function getMachines() {
-      var _this16 = this;
+      var _this17 = this;
 
       axios.get('machines').then(function (machines) {
-        _this16.machines = machines.data;
+        _this17.machines = machines.data;
       });
     },
     getTracks: function getTracks() {
-      var _this17 = this;
+      var _this18 = this;
 
       axios.get('track-by').then(function (tracks) {
-        _this17.tracks = tracks.data;
+        _this18.tracks = tracks.data;
       });
     },
     getServiceTypes: function getServiceTypes() {
-      var _this18 = this;
+      var _this19 = this;
 
       axios.get('service-types').then(function (service_types) {
-        _this18.services = service_types.data;
+        _this19.services = service_types.data;
       });
     },
     getBalances: function getBalances() {
-      var _this19 = this;
+      var _this20 = this;
 
       axios.get('fuel-balance').then(function (balance) {
-        _this19.balances = balance.data;
+        _this20.balances = balance.data;
       });
     },
     getUsers: function getUsers() {
-      var _this20 = this;
+      var _this21 = this;
 
       axios.get('users').then(function (users) {
-        _this20.users = users.data;
+        _this21.users = users.data;
       });
     },
     cancel: function cancel() {
@@ -5982,48 +6029,46 @@ __webpack_require__.r(__webpack_exports__);
           this.show_inventory = true;
           this.editedRequisitions();
         }
-
-        console.log(this.form);
       }
     },
     editedRequisitions: function editedRequisitions() {
-      var _this21 = this;
+      var _this22 = this;
 
       axios.get('requisitions').then(function (rq) {
-        _this21.filtered_items = [];
-        _this21.filtered_rq = [];
+        _this22.filtered_items = [];
+        _this22.filtered_rq = [];
 
         for (var i = 0; i < rq.data.length; i++) {
-          if (rq.data[i]['id'] === _this21.form.requisition_id) {
-            _this21.filtered_items = JSON.parse(rq.data[i]['inventory_items']);
+          if (rq.data[i]['id'] === _this22.form.requisition_id) {
+            _this22.filtered_items = JSON.parse(rq.data[i]['inventory_items']);
 
-            _this21.filtered_rq.push(rq.data[i]);
+            _this22.filtered_rq.push(rq.data[i]);
           }
         }
       });
     },
     ServiceTypes: function ServiceTypes() {
-      var _this22 = this;
+      var _this23 = this;
 
       axios.get('service-types').then(function (res) {
         for (var i = 0; i < res.data.length; i++) {
-          if (res.data[i]['id'] === _this22.form.service_type_id) {
-            _this22.service_after = res.data[i]['service_after'];
-            _this22.form.next_readings = parseFloat(_this22.form.current_readings) + parseFloat(_this22.service_after);
+          if (res.data[i]['id'] === _this23.form.service_type_id) {
+            _this23.service_after = res.data[i]['service_after'];
+            _this23.form.next_readings = parseFloat(_this23.form.current_readings) + parseFloat(_this23.service_after);
           }
         }
       });
     },
     Customers: function Customers() {
-      var _this23 = this;
+      var _this24 = this;
 
       axios.get('customers').then(function (res) {
-        _this23.customers = res.data;
-        _this23.show_customers = true;
+        _this24.customers = res.data;
+        _this24.show_customers = true;
 
-        for (var j = 0; j < _this23.customers.length; j++) {
-          if (_this23.customers[j]['customer_type_id'] === _this23.form.customer_type_id) {
-            _this23.filtered_customers.push(_this23.customers[j]);
+        for (var j = 0; j < _this24.customers.length; j++) {
+          if (_this24.customers[j]['customer_type_id'] === _this24.form.customer_type_id) {
+            _this24.filtered_customers.push(_this24.customers[j]);
           }
         }
       });
@@ -6233,7 +6278,12 @@ __webpack_require__.r(__webpack_exports__);
     return {
       form: {
         service_type: '',
-        machine_id: ''
+        machine_id: '',
+        maintenance: [{
+          category: '',
+          description: '',
+          root_cause: ''
+        }]
       },
       show_print: false,
       machines: {}
@@ -6253,6 +6303,7 @@ __webpack_require__.r(__webpack_exports__);
     generateJob: function generateJob() {
       var _this2 = this;
 
+      this.form.maintenance = JSON.stringify(this.form.maintenance);
       axios.post('generate-job', this.form).then(function (res) {
         _this2.$router.push({
           path: "/jobcard-form/".concat(res.data.id)
@@ -10228,7 +10279,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.i_p{\n     margin-bottom: 8px;\n}\n.qty, .cost {\n    margin-left: 5px;\n    margin-bottom: 8px;\n}\n.cost {\n    margin-left: 8px;\n    margin-bottom: 8px;\n}\n.remove, .add {\n    margin-left: 20px;\n    margin-bottom: 8px;\n}\n.cause {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.s_add {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.s_descr {\n    margin-left: 12px;\n    margin-bottom: 8px;\n}\n.s_qty {\n    margin-left: 5px;\n    margin-bottom: 8px;\n}\n.s_part {\n    margin-left: 2px;\n    margin-bottom: 8px;\n}\n.p_in{\n margin-left:10px;\n margin-bottom: 8px;\n}\n.p_ex{\n    margin-left:15px;\n    margin-bottom: 8px;\n}\n.p_in_2{\n    margin-left:8px;\n    margin-bottom: 8px;\n}\n.p_ex_2{\n    margin-left:10px;\n    margin-bottom: 8px;\n}\n.rq_pi{\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.rq_pe{\n    margin-left: 20px;\n    margin-bottom: 8px;\n}\n.vdp-datepicker input {\n    border-radius: 0;\n    box-shadow: none;\n    border-color: #d2d6de;\n    display: block;\n    width: 100%;\n    height: 34px;\n    padding: 6px 12px;\n    font-size: 14px;\n    line-height: 1.42857143;\n    color: #555;\n    background-color: #fff;\n    background-image: none;\n    border: 1px solid #ccc;\n    border-radius: 4px;\n    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;\n    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n}\n.cool{\n    border: #339FFF solid 2px;\n    padding: 15px;\n}\n\n", ""]);
+exports.push([module.i, "\n.i_p {\n    margin-bottom: 8px;\n}\n.qty, .cost {\n    margin-left: 5px;\n    margin-bottom: 8px;\n}\n.cost {\n    margin-left: 8px;\n    margin-bottom: 8px;\n}\n.remove, .add {\n    margin-left: 20px;\n    margin-bottom: 8px;\n}\n.cause {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.s_add {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.s_descr {\n    margin-left: 12px;\n    margin-bottom: 8px;\n}\n.s_qty {\n    margin-left: 5px;\n    margin-bottom: 8px;\n}\n.s_part {\n    margin-left: 2px;\n    margin-bottom: 8px;\n}\n.p_in {\n    margin-left: 10px;\n    margin-bottom: 8px;\n}\n.p_ex {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.p_in_2 {\n    margin-left: 8px;\n    margin-bottom: 8px;\n}\n.p_ex_2 {\n    margin-left: 10px;\n    margin-bottom: 8px;\n}\n.rq_pi {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.rq_pe {\n    margin-left: 20px;\n    margin-bottom: 8px;\n}\n.vdp-datepicker input {\n    border-radius: 0;\n    box-shadow: none;\n    border-color: #d2d6de;\n    display: block;\n    width: 100%;\n    height: 34px;\n    padding: 6px 12px;\n    font-size: 14px;\n    line-height: 1.42857143;\n    color: #555;\n    background-color: #fff;\n    background-image: none;\n    border: 1px solid #ccc;\n    border-radius: 4px;\n    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;\n    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n}\n.cool {\n    border: #339FFF solid 2px;\n    padding: 15px;\n}\n\n", ""]);
 
 // exports
 
@@ -34637,7 +34688,12 @@ var render = function() {
                             key: category.id,
                             domProps: { value: category.id }
                           },
-                          [_vm._v(_vm._s(category.name))]
+                          [
+                            _vm._v(
+                              _vm._s(category.name) +
+                                "\n                                    "
+                            )
+                          ]
                         )
                       }),
                       0
@@ -34689,11 +34745,13 @@ var render = function() {
                           },
                           [
                             _vm._v(
-                              _vm._s(job_type.name) +
+                              "\n                                        " +
+                                _vm._s(job_type.name) +
                                 " - " +
                                 _vm._s(job_type.currency) +
                                 " " +
-                                _vm._s(job_type.hourly_rate)
+                                _vm._s(job_type.hourly_rate) +
+                                "\n                                    "
                             )
                           ]
                         )
@@ -34747,7 +34805,13 @@ var render = function() {
                         return _c(
                           "option",
                           { key: type.id, domProps: { value: type.id } },
-                          [_vm._v(_vm._s(type.name))]
+                          [
+                            _vm._v(
+                              "\n                                        " +
+                                _vm._s(type.name) +
+                                "\n                                    "
+                            )
+                          ]
                         )
                       }),
                       0
@@ -34798,7 +34862,12 @@ var render = function() {
                                 key: customer.id,
                                 domProps: { value: customer.id }
                               },
-                              [_vm._v(_vm._s(customer.name))]
+                              [
+                                _vm._v(
+                                  _vm._s(customer.name) +
+                                    "\n                                    "
+                                )
+                              ]
                             )
                           }),
                           0
@@ -34849,7 +34918,13 @@ var render = function() {
                             key: mechanic.id,
                             domProps: { value: mechanic.id }
                           },
-                          [_vm._v(_vm._s(mechanic.name))]
+                          [
+                            _vm._v(
+                              "\n                                        " +
+                                _vm._s(mechanic.name) +
+                                "\n                                    "
+                            )
+                          ]
                         )
                       }),
                       0
@@ -35275,9 +35350,11 @@ var render = function() {
                               },
                               [
                                 _vm._v(
-                                  _vm._s(project.code) +
+                                  "\n                                        " +
+                                    _vm._s(project.code) +
                                     " - " +
-                                    _vm._s(project.name)
+                                    _vm._s(project.name) +
+                                    "\n                                    "
                                 )
                               ]
                             )
@@ -35285,7 +35362,33 @@ var render = function() {
                           0
                         )
                       ])
-                    : _vm._e()
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Lobour Cost")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.form.labour_cost,
+                          expression: "form.labour_cost"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text", disabled: "" },
+                      domProps: { value: _vm.form.labour_cost },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.form, "labour_cost", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
                 ])
               ]),
               _vm._v(" "),
@@ -35524,7 +35627,13 @@ var render = function() {
                         return _c(
                           "option",
                           { key: rq.id, domProps: { value: rq.id } },
-                          [_vm._v(_vm._s(rq.description))]
+                          [
+                            _vm._v(
+                              "\n                                        " +
+                                _vm._s(rq.description) +
+                                "\n                                    "
+                            )
+                          ]
                         )
                       }),
                       0
@@ -35585,7 +35694,7 @@ var render = function() {
                                     },
                                     [
                                       _vm._v(
-                                        "                             >\n                                                "
+                                        " >\n                                                "
                                       ),
                                       _vm._l(_vm.parts, function(p) {
                                         return _c(

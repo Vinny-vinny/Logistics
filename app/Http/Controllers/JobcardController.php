@@ -37,9 +37,9 @@ class JobcardController extends Controller
     {
         $request['time_in'] = Carbon::parse($request->time_in)->format('H:i');
         $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
-
+        $card_no = Jobcard::count()+1;
+        $request['card_no'] =  substr('LEWA-' . $card_no . '-' . Machine::find($request->machine_id)->code, 0, 20);
         $jobcard = Jobcard::create($request->except(['files']));
-        $jobcard->update(['card_no' => substr('LEWA-' . $jobcard->id . '-' . Machine::find($jobcard->machine_id)->code, 0, 20)]);
         Machine::find($jobcard->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),

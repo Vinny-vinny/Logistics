@@ -38,7 +38,8 @@
             return{
                 form:{
                     service_type:'',
-                    machine_id:''
+                    machine_id:'',
+                    maintenance: [{category: '', description: '', root_cause: ''}],
                 },
                 show_print:false,
                 machines:{}
@@ -55,6 +56,7 @@
                     })
             },
             generateJob(){
+                this.form.maintenance = JSON.stringify(this.form.maintenance);
                 axios.post('generate-job',this.form)
                     .then(res => {
                         this.$router.push({path:`/jobcard-form/${res.data.id}`});
