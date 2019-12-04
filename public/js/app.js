@@ -7622,7 +7622,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 
@@ -7663,7 +7662,8 @@ __webpack_require__.r(__webpack_exports__);
       service_types: [],
       services: [],
       show_service: false,
-      fuel_types: {}
+      fuel_types: {},
+      show_next_readings: false
     };
   },
   created: function created() {
@@ -7889,6 +7889,16 @@ __webpack_require__.r(__webpack_exports__);
           this.show_file = true;
         }
 
+        axios.get('machines').then(function (res) {
+          var machine = res.data.find(function (m) {
+            return m.id === _this8.form.id;
+          });
+
+          if (machine.next_readings >= 0 && machine.next_readings > machine.current_readings) {
+            _this8.show_next_readings = true;
+            _this8.form.next_readings = machine.next_readings;
+          }
+        });
         axios.get('service-types').then(function (res) {
           for (var i = 0; i < res.data.length; i++) {
             if (res.data[i]['track_by_id'] === _this8.$store.state.machine.track_by_id) {
@@ -38083,6 +38093,48 @@ var render = function() {
                             1
                           )
                         ])
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.selected_next_maintenance && _vm.show_next_readings
+                    ? _c("div", { staticClass: "form-group" }, [
+                        _c("label", [
+                          _vm._v(
+                            "Next " +
+                              _vm._s(_vm.track_type) +
+                              " due for service"
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.next_readings,
+                              expression: "form.next_readings"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "number",
+                            step: "0.001",
+                            disabled: ""
+                          },
+                          domProps: { value: _vm.form.next_readings },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "next_readings",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
                       ])
                     : _vm._e(),
                   _vm._v(" "),

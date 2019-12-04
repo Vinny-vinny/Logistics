@@ -722,7 +722,7 @@
                         this.show_inventory = true;
                         this.editedRequisitions();
                     }
-                
+
                 }
             },
             editedRequisitions() {
