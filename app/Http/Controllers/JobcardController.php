@@ -49,6 +49,15 @@ class JobcardController extends Controller
         $request->requisition_id ? Requisition::find($request->requisition_id)->update(['used' => 1]) : '';
         return response()->json(new JobcardResource($jobcard));
     }
+    //Auto generate Jobcard
+    public function generateJobcard(Request $request)
+    {
+        $request['track_by_id'] = Machine::find($request->machine_id)->track_by_id;
+        $jobcard_no = Jobcard::count()+1;
+        $request['card_no'] = substr('LEWA-' . $jobcard_no . '-' . Machine::find($request->machine_id)->code, 0, 20);
+        $card = Jobcard::create($request->all());
+        return response()->json($card);
+    }
     /**
      * Display the specified resource.
      *

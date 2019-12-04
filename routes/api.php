@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::apiResource('job-card','JobcardController');
 Route::post('close-jobcard/{id}','JobcardController@closeJobcard');
+Route::post('generate-job','JobcardController@generateJobcard');
 Route::apiResource('machines','MachineController');
 Route::get('import-machines','MachineController@importMachines');
 Route::apiResource('users','UserController');

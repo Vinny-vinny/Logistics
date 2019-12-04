@@ -24,7 +24,7 @@ class JobcardResource extends JsonResource
             'mechanic_id' => $this->mechanic_id,
             'project_id' => $this->project_id,
             'jobcard_category_id' => $this->jobcard_category_id,
-            'category' => $this->category->name,
+            'category' => $this->category ? $this->category->name : '',
             'service_type' => $this->service_type,
             'customer_type_id' => $this->customer_type_id,
             'next_readings' => $this->next_readings,
@@ -47,8 +47,7 @@ class JobcardResource extends JsonResource
             'requisition_id' => $this->requisition_id,
             'inventory_items' => $this->requisition_id ? $this->requisition->inventory_items : '',
             'checklist_assigned' => $this->checklist_assigned,
-            'service_types' => $this->machine->service_types,
-            'jibcard_id' => $this->jibcard_id
+            'service_types' => $this->machine->service_types
         ];
     }
 }

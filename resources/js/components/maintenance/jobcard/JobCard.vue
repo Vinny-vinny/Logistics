@@ -5,17 +5,17 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">{{edit_jobcard ? 'Update Jobcard' : 'New Jobcard'}}</h3>
+                   <h3 class="box-title">{{edit_jobcard ?'Update Jobcard: #'+form.card_no: 'New Jobcard'}}</h3>
                 </div>
                 <div class="box-body">
                     <form @submit.prevent="saveJobcard()" enctype="multipart/form-data" id="jobcard">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="radio-inline"><input type="radio" name="service_type" value="internal"
+                                    <label class="radio-inline"><input type="radio" name="service_type" value="Internal"
                                                                        v-model="form.service_type">Internal</label>
                                     <label class="radio-inline"><input type="radio" name="service_type"
-                                                                       value="external" v-model="form.service_type">External</label>
+                                                                       value="External" v-model="form.service_type">External</label>
                                 </div>
                                 <div class="form-group">
                                     <label>Vehicle/Chasis #</label>
@@ -106,7 +106,6 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Make & Model: </label> {{make}}
-
                                 </div>
                                 <div class="form-group">
                                     <label>Assigned To: </label> {{driver}}
@@ -258,7 +257,7 @@
                     next_readings: 0,
                     next_service_date: '',
                     current_readings: '',
-                    service_type: 'internal',
+                    service_type: 'Internal',
                     project_id:'',
                     job_type_id:'',
                     cost_code:'',
@@ -389,7 +388,7 @@
                 }
             },
             serviceType() {
-                return this.form.service_type === 'internal';
+                return this.form.service_type === 'Internal';
             },
             timeframe() {
                 return [this.form.actual_date, this.form.time_in, this.form.completion_date, this.form.time_out, this.form.next_service_date].join();
@@ -672,6 +671,7 @@
                         this.show_inventory = true;
                         this.editedRequisitions();
                     }
+                    console.log(this.form);
                 }
             },
             editedRequisitions(){

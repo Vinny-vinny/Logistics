@@ -9,6 +9,21 @@ import VueToastr from 'vue-toastr';
 Vue.use(VueToastr);
 import moment from 'moment'
 import JsonExcel from 'vue-json-excel'
+import VueHtmlToPaper from 'vue-html-to-paper'
+const options = {
+    name: '_blank',
+    specs: [
+        'fullscreen=yes',
+        'titlebar=yes',
+        'scrollbars=yes'
+    ],
+    styles: [
+        'assets/css/bootstrap.min.css',
+        'assets/css/kidlat.css'
+    ]
+}
+
+Vue.use(VueHtmlToPaper, options);
 
 Vue.component('downloadExcel', JsonExcel)
 

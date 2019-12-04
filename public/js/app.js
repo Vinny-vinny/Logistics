@@ -5079,6 +5079,9 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _JobCard__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./JobCard */ "./resources/js/components/maintenance/jobcard/JobCard.vue");
+/* harmony import */ var _JobForm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./JobForm */ "./resources/js/components/maintenance/jobcard/JobForm.vue");
+//
+//
 //
 //
 //
@@ -5120,18 +5123,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       tableData: [],
       add_jobcard: false,
-      editing: false
+      editing: false,
+      show_form: false
     };
   },
   created: function created() {
     this.listen();
     this.getJobs();
-    console.log(moment('6.00pm', 'h:mm A').format('HH:mm') > moment('5:00pm', 'h:mm A').format('HH:mm'));
   },
   mounted: function mounted() {
     this.initDatable();
@@ -5141,10 +5145,11 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       axios.get('job-card').then(function (res) {
-        return _this.tableData = res.data;
+        _this.tableData = res.data;
       })["catch"](function (error) {
         return Exception.handle(error);
       });
+      this.initDatable();
     },
     editJobcard: function editJobcard(job) {
       var _this2 = this;
@@ -5197,9 +5202,21 @@ __webpack_require__.r(__webpack_exports__);
           }
         }
 
-        console.log(job);
-
         _this4.tableData.unshift(job);
+
+        _this4.initDatable();
+      });
+      eventBus.$on('close_form', function () {
+        _this4.show_form = false;
+
+        _this4.getJobs();
+
+        _this4.initDatable();
+      });
+      eventBus.$on('cancel_job', function () {
+        _this4.show_form = false;
+
+        _this4.getJobs();
 
         _this4.initDatable();
       });
@@ -5220,7 +5237,8 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   components: {
-    JobCard: _JobCard__WEBPACK_IMPORTED_MODULE_0__["default"]
+    JobCard: _JobCard__WEBPACK_IMPORTED_MODULE_0__["default"],
+    JobForm: _JobForm__WEBPACK_IMPORTED_MODULE_1__["default"]
   }
 });
 
@@ -5236,7 +5254,6 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vuejs_datepicker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuejs-datepicker */ "./node_modules/vuejs-datepicker/dist/vuejs-datepicker.esm.js");
-//
 //
 //
 //
@@ -5494,7 +5511,7 @@ __webpack_require__.r(__webpack_exports__);
         next_readings: 0,
         next_service_date: '',
         current_readings: '',
-        service_type: 'internal',
+        service_type: 'Internal',
         project_id: '',
         job_type_id: '',
         cost_code: '',
@@ -5639,7 +5656,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     serviceType: function serviceType() {
-      return this.form.service_type === 'internal';
+      return this.form.service_type === 'Internal';
     },
     timeframe: function timeframe() {
       return [this.form.actual_date, this.form.time_in, this.form.completion_date, this.form.time_out, this.form.next_service_date].join();
@@ -5965,6 +5982,8 @@ __webpack_require__.r(__webpack_exports__);
           this.show_inventory = true;
           this.editedRequisitions();
         }
+
+        console.log(this.form);
       }
     },
     editedRequisitions: function editedRequisitions() {
@@ -6012,6 +6031,241 @@ __webpack_require__.r(__webpack_exports__);
   },
   components: {
     datepicker: vuejs_datepicker__WEBPACK_IMPORTED_MODULE_0__["default"]
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['printForm'],
+  data: function data() {
+    return {
+      job_card: '',
+      machine: '',
+      track_by: '',
+      jobcard_type: ''
+    };
+  },
+  mounted: function mounted() {
+    this.jobInfo();
+  },
+  computed: {
+    service_type: function service_type() {
+      return this.jobcard_type === 'Internal';
+    }
+  },
+  methods: {
+    jobInfo: function jobInfo() {
+      var _this = this;
+
+      axios.get('job-card').then(function (res) {
+        var job_details = res.data.find(function (job) {
+          return job.id == _this.$route.params['id'];
+        });
+        _this.job_card = job_details.card_no;
+        _this.jobcard_type = job_details.service_type;
+        axios.get('machines').then(function (res) {
+          _this.machine = res.data.find(function (vehicle) {
+            return vehicle.id = job_details.machine_id;
+          }).code;
+        });
+        axios.get('track-by').then(function (res) {
+          _this.track_by = res.data.find(function (track) {
+            return track.id == job_details.track_by_id;
+          }).name;
+        });
+        axios.get('users').then(function (res) {
+          _this.print();
+        });
+      });
+    },
+    print: function print() {
+      window.print();
+      this.$router.push('/job-card');
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['printJob'],
+  data: function data() {
+    return {
+      form: {
+        service_type: '',
+        machine_id: ''
+      },
+      show_print: false,
+      machines: {}
+    };
+  },
+  created: function created() {
+    this.getMachines();
+  },
+  methods: {
+    getMachines: function getMachines() {
+      var _this = this;
+
+      axios.get('machines').then(function (res) {
+        _this.machines = res.data;
+      });
+    },
+    generateJob: function generateJob() {
+      var _this2 = this;
+
+      axios.post('generate-job', this.form).then(function (res) {
+        _this2.$router.push({
+          path: "/jobcard-form/".concat(res.data.id)
+        });
+
+        eventBus.$emit('close_form');
+      })["catch"](function (err) {
+        return console.log(err);
+      });
+    },
+    cancel: function cancel() {
+      eventBus.$emit('cancel_job');
+    }
   }
 });
 
@@ -9975,6 +10229,25 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 // module
 exports.push([module.i, "\n.i_p{\n     margin-bottom: 8px;\n}\n.qty, .cost {\n    margin-left: 5px;\n    margin-bottom: 8px;\n}\n.cost {\n    margin-left: 8px;\n    margin-bottom: 8px;\n}\n.remove, .add {\n    margin-left: 20px;\n    margin-bottom: 8px;\n}\n.cause {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.s_add {\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.s_descr {\n    margin-left: 12px;\n    margin-bottom: 8px;\n}\n.s_qty {\n    margin-left: 5px;\n    margin-bottom: 8px;\n}\n.s_part {\n    margin-left: 2px;\n    margin-bottom: 8px;\n}\n.p_in{\n margin-left:10px;\n margin-bottom: 8px;\n}\n.p_ex{\n    margin-left:15px;\n    margin-bottom: 8px;\n}\n.p_in_2{\n    margin-left:8px;\n    margin-bottom: 8px;\n}\n.p_ex_2{\n    margin-left:10px;\n    margin-bottom: 8px;\n}\n.rq_pi{\n    margin-left: 15px;\n    margin-bottom: 8px;\n}\n.rq_pe{\n    margin-left: 20px;\n    margin-bottom: 8px;\n}\n.vdp-datepicker input {\n    border-radius: 0;\n    box-shadow: none;\n    border-color: #d2d6de;\n    display: block;\n    width: 100%;\n    height: 34px;\n    padding: 6px 12px;\n    font-size: 14px;\n    line-height: 1.42857143;\n    color: #555;\n    background-color: #fff;\n    background-image: none;\n    border: 1px solid #ccc;\n    border-radius: 4px;\n    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);\n    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;\n    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;\n}\n.cool{\n    border: #339FFF solid 2px;\n    padding: 15px;\n}\n\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css&":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css& ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n@media print {\n#button-container[data-v-6a62eff8]{\n        display: none;\n}\n}\n", ""]);
 
 // exports
 
@@ -28528,6 +28801,36 @@ if(false) {}
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css&":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css& ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/externalservice/ExternalService.vue?vue&type=style&index=0&id=4766b28c&scoped=true&lang=css&":
 /*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/maintenance/jobcard/externalservice/ExternalService.vue?vue&type=style&index=0&id=4766b28c&scoped=true&lang=css& ***!
@@ -29199,6 +29502,29 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (this && this.clearImmediate);
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/vue-html-to-paper/dist/index.js":
+/*!******************************************************!*\
+  !*** ./node_modules/vue-html-to-paper/dist/index.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports=function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,t),o.l=!0,o.exports}var n={};return t.m=e,t.c=n,t.d=function(e,n,r){t.o(e,n)||Object.defineProperty(e,n,{configurable:!1,enumerable:!0,get:r})},t.n=function(e){var n=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(n,"a",n),n},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="",t(t.s=0)}([function(e,t,n){"use strict";function r(e,t){t.forEach(function(t){var n=e.document.createElement("link");n.setAttribute("rel","stylesheet"),n.setAttribute("type","text/css"),n.setAttribute("href",t),e.document.getElementsByTagName("head")[0].appendChild(n)})}Object.defineProperty(t,"__esModule",{value:!0}),t.default={install:function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};e.mixin({methods:{$htmlToPaper:function(e){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:function(){return!0},o=t.name,i=void 0===o?"_blank":o,u=t.specs,l=void 0===u?["fullscreen=yes","titlebar=yes","scrollbars=yes"]:u,c=t.replace,s=void 0===c||c,a=t.styles,d=void 0===a?[]:a;l=l.length?l.join(","):"";var f=document.getElementById(e);if(!f)return void alert("Element to print #"+e+" not found!");var m=window.open("",i,l,s);return m.document.write("\n            <html>\n              <head>\n                <title>"+document.title+"</title>\n              </head>\n              <body>\n                "+f.innerHTML+"\n              </body>\n            </html>\n          "),r(m,d),setTimeout(function(){m.document.close(),m.focus(),m.print(),m.close(),n()},1e3),!0}}})}}}]);
+
+/***/ }),
+
+/***/ "./node_modules/vue-html-to-paper/index.js":
+/*!*************************************************!*\
+  !*** ./node_modules/vue-html-to-paper/index.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! ./dist */ "./node_modules/vue-html-to-paper/dist/index.js");
+
 
 /***/ }),
 
@@ -33973,7 +34299,11 @@ var render = function() {
         ? _c("job-card", { attrs: { edit: _vm.editing } })
         : _vm._e(),
       _vm._v(" "),
-      !_vm.add_jobcard
+      _vm.show_form
+        ? _c("job-form", { attrs: { printJob: _vm.show_form } })
+        : _vm._e(),
+      _vm._v(" "),
+      !_vm.add_jobcard && !_vm.show_form
         ? _c("section", { staticClass: "content" }, [
             _c("div", { staticClass: "box" }, [
               _c("div", { staticClass: "box-header with-border" }, [
@@ -33982,7 +34312,20 @@ var render = function() {
                 _c(
                   "button",
                   {
-                    staticClass: "btn btn-primary pull-right",
+                    staticClass: "btn btn-success pull-right",
+                    on: {
+                      click: function($event) {
+                        _vm.show_form = true
+                      }
+                    }
+                  },
+                  [_vm._v("Print Job Card Form")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary pull-right mr",
                     on: {
                       click: function($event) {
                         _vm.add_jobcard = true
@@ -34095,7 +34438,13 @@ var render = function() {
       _c("div", { staticClass: "box" }, [
         _c("div", { staticClass: "box-header with-border" }, [
           _c("h3", { staticClass: "box-title" }, [
-            _vm._v(_vm._s(_vm.edit_jobcard ? "Update Jobcard" : "New Jobcard"))
+            _vm._v(
+              _vm._s(
+                _vm.edit_jobcard
+                  ? "Update Jobcard: #" + _vm.form.card_no
+                  : "New Jobcard"
+              )
+            )
           ])
         ]),
         _vm._v(" "),
@@ -34128,17 +34477,17 @@ var render = function() {
                         attrs: {
                           type: "radio",
                           name: "service_type",
-                          value: "internal"
+                          value: "Internal"
                         },
                         domProps: {
-                          checked: _vm._q(_vm.form.service_type, "internal")
+                          checked: _vm._q(_vm.form.service_type, "Internal")
                         },
                         on: {
                           change: function($event) {
                             return _vm.$set(
                               _vm.form,
                               "service_type",
-                              "internal"
+                              "Internal"
                             )
                           }
                         }
@@ -34159,17 +34508,17 @@ var render = function() {
                         attrs: {
                           type: "radio",
                           name: "service_type",
-                          value: "external"
+                          value: "External"
                         },
                         domProps: {
-                          checked: _vm._q(_vm.form.service_type, "external")
+                          checked: _vm._q(_vm.form.service_type, "External")
                         },
                         on: {
                           change: function($event) {
                             return _vm.$set(
                               _vm.form,
                               "service_type",
-                              "external"
+                              "External"
                             )
                           }
                         }
@@ -34712,9 +35061,7 @@ var render = function() {
                   _c("div", { staticClass: "form-group" }, [
                     _c("label", [_vm._v("Make & Model: ")]),
                     _vm._v(
-                      " " +
-                        _vm._s(_vm.make) +
-                        "\n\n                            "
+                      " " + _vm._s(_vm.make) + "\n                            "
                     )
                   ]),
                   _vm._v(" "),
@@ -35445,6 +35792,411 @@ var staticRenderFns = [
       _c("th", { attrs: { align: "right" } }, [_vm._v("Price Exclusive VAT")]),
       _vm._v(" "),
       _c("th")
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true&":
+/*!**********************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true& ***!
+  \**********************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("section", { staticClass: "content" }, [
+      _c("div", { staticClass: "box" }, [
+        _c("div", { staticClass: "box-header with-border" }, [
+          _c("h2", { staticClass: "box-title float-center" }, [
+            _vm._v("Job Card Form: #" + _vm._s(_vm.job_card))
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "box-body" }, [
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-md-6" }, [
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", [_vm._v("Vehicle/Chasis: ")]),
+                _vm._v(" #" + _vm._s(_vm.machine) + "\n               ")
+              ]),
+              _vm._v(" "),
+              _vm._m(0),
+              _vm._v(" "),
+              _vm._m(1),
+              _vm._v(" "),
+              _vm._m(2),
+              _vm._v(" "),
+              _vm._m(3),
+              _vm._v(" "),
+              _vm._m(4),
+              _vm._v(" "),
+              _vm._m(5),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", [
+                  _vm._v("Current " + _vm._s(_vm.track_by) + " Readings")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: { type: "text" }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-md-6" }, [
+              _vm._m(6),
+              _vm._v(" "),
+              _vm._m(7),
+              _vm._v(" "),
+              _vm._m(8),
+              _vm._v(" "),
+              _vm._m(9),
+              _vm._v(" "),
+              _vm._m(10),
+              _vm._v(" "),
+              _vm._m(11),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", [
+                  _vm._v("Next " + _vm._s(_vm.track_by) + " Maintenance")
+                ]),
+                _vm._v(" "),
+                _c("input", {
+                  staticClass: "form-control",
+                  attrs: { type: "text" }
+                })
+              ]),
+              _vm._v(" "),
+              _vm.service_type
+                ? _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Department")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: { type: "text" }
+                    })
+                  ])
+                : _vm._e()
+            ])
+          ]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              attrs: { id: "button-container" },
+              on: { click: _vm.print }
+            },
+            [_vm._v("Print Form")]
+          )
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Category")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Job Type")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Customer Type")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Customer Name")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Cost Code")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Fuel Balance(L)")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Service Type")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Servicing Date")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Servicing Time In")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Servicing Completion Date")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Servicing Time Out")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", [_vm._v("Next Service Date")]),
+      _vm._v(" "),
+      _c("input", { staticClass: "form-control", attrs: { type: "text" } })
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true&":
+/*!******************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true& ***!
+  \******************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    !_vm.show_print
+      ? _c("section", { staticClass: "content" }, [
+          _c("div", { staticClass: "box" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("div", { staticClass: "box-body" }, [
+              _c(
+                "form",
+                {
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.generateJob()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Vehicle/Chasis #")]),
+                    _vm._v(" "),
+                    _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.machine_id,
+                            expression: "form.machine_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { required: "" },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              _vm.form,
+                              "machine_id",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
+                          }
+                        }
+                      },
+                      _vm._l(_vm.machines, function(m) {
+                        return _c(
+                          "option",
+                          { key: m.id, domProps: { value: m.id } },
+                          [_vm._v(_vm._s(m.code))]
+                        )
+                      }),
+                      0
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", [_vm._v("Type")]),
+                    _vm._v(" "),
+                    _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.service_type,
+                            expression: "form.service_type"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { required: "" },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              _vm.form,
+                              "service_type",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "Internal" } }, [
+                          _vm._v("Internal")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "External" } }, [
+                          _vm._v("External")
+                        ])
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-success",
+                      attrs: { type: "submit" }
+                    },
+                    [_vm._v("Generate")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-outline-danger",
+                      attrs: { type: "button" },
+                      on: { click: _vm.cancel }
+                    },
+                    [_vm._v("Cancel")]
+                  )
+                ]
+              )
+            ])
+          ])
+        ])
+      : _vm._e()
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "box-header with-border" }, [
+      _c("h3", { staticClass: "box-title" })
     ])
   }
 ]
@@ -59982,10 +60734,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var vue_json_excel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-json-excel */ "./node_modules/vue-json-excel/JsonExcel.vue");
-/* harmony import */ var _helpers_User__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers/User */ "./resources/js/helpers/User.js");
-/* harmony import */ var _helpers_Exception__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helpers/Exception */ "./resources/js/helpers/Exception.js");
-/* harmony import */ var _routes_router__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./routes/router */ "./resources/js/routes/router.js");
-/* harmony import */ var _store_store__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./store/store */ "./resources/js/store/store.js");
+/* harmony import */ var vue_html_to_paper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-html-to-paper */ "./node_modules/vue-html-to-paper/index.js");
+/* harmony import */ var vue_html_to_paper__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(vue_html_to_paper__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _helpers_User__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helpers/User */ "./resources/js/helpers/User.js");
+/* harmony import */ var _helpers_Exception__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./helpers/Exception */ "./resources/js/helpers/Exception.js");
+/* harmony import */ var _routes_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./routes/router */ "./resources/js/routes/router.js");
+/* harmony import */ var _store_store__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./store/store */ "./resources/js/store/store.js");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -59996,6 +60750,13 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 Vue.use(vue_toastr__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 
+
+var options = {
+  name: '_blank',
+  specs: ['fullscreen=yes', 'titlebar=yes', 'scrollbars=yes'],
+  styles: ['assets/css/bootstrap.min.css', 'assets/css/kidlat.css']
+};
+Vue.use(vue_html_to_paper__WEBPACK_IMPORTED_MODULE_3___default.a, options);
 Vue.component('downloadExcel', vue_json_excel__WEBPACK_IMPORTED_MODULE_2__["default"]);
 Vue.config.productionTip = false;
 Vue.filter('formatDate', function (value) {
@@ -60004,7 +60765,7 @@ Vue.filter('formatDate', function (value) {
   }
 });
 
-window.User = _helpers_User__WEBPACK_IMPORTED_MODULE_3__["default"];
+window.User = _helpers_User__WEBPACK_IMPORTED_MODULE_4__["default"];
 Vue.filter('currency', function (value) {
   var formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -60017,11 +60778,11 @@ Vue.filter('number', function (value) {
   return new Intl.NumberFormat().format(value);
 });
 
-window.Exception = _helpers_Exception__WEBPACK_IMPORTED_MODULE_4__["default"];
+window.Exception = _helpers_Exception__WEBPACK_IMPORTED_MODULE_5__["default"];
 
 
-_routes_router__WEBPACK_IMPORTED_MODULE_5__["default"].beforeEach(function (to, from, next) {
-  _store_store__WEBPACK_IMPORTED_MODULE_6__["default"].dispatch('pathTo', to.path);
+_routes_router__WEBPACK_IMPORTED_MODULE_6__["default"].beforeEach(function (to, from, next) {
+  _store_store__WEBPACK_IMPORTED_MODULE_7__["default"].dispatch('pathTo', to.path);
   next();
 });
 window.eventBus = new Vue();
@@ -60052,8 +60813,8 @@ Vue.component('app-top-nav', __webpack_require__(/*! ./components/layouts/AppTop
 
 var app = new Vue({
   el: '#app',
-  router: _routes_router__WEBPACK_IMPORTED_MODULE_5__["default"],
-  store: _store_store__WEBPACK_IMPORTED_MODULE_6__["default"]
+  router: _routes_router__WEBPACK_IMPORTED_MODULE_6__["default"],
+  store: _store_store__WEBPACK_IMPORTED_MODULE_7__["default"]
 });
 
 /***/ }),
@@ -62042,6 +62803,162 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCard_vue_vue_type_template_id_21b71f14___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCard_vue_vue_type_template_id_21b71f14___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/maintenance/jobcard/JobCardForm.vue":
+/*!*********************************************************************!*\
+  !*** ./resources/js/components/maintenance/jobcard/JobCardForm.vue ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _JobCardForm_vue_vue_type_template_id_6a62eff8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true& */ "./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true&");
+/* harmony import */ var _JobCardForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./JobCardForm.vue?vue&type=script&lang=js& */ "./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _JobCardForm_vue_vue_type_style_index_0_id_6a62eff8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css& */ "./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _JobCardForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _JobCardForm_vue_vue_type_template_id_6a62eff8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _JobCardForm_vue_vue_type_template_id_6a62eff8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "6a62eff8",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/maintenance/jobcard/JobCardForm.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************!*\
+  !*** ./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./JobCardForm.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css&":
+/*!******************************************************************************************************************************!*\
+  !*** ./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css& ***!
+  \******************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_style_index_0_id_6a62eff8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader!../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=style&index=0&id=6a62eff8&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_style_index_0_id_6a62eff8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_style_index_0_id_6a62eff8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_style_index_0_id_6a62eff8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_style_index_0_id_6a62eff8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_style_index_0_id_6a62eff8_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true&":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true& ***!
+  \****************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_template_id_6a62eff8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobCardForm.vue?vue&type=template&id=6a62eff8&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_template_id_6a62eff8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobCardForm_vue_vue_type_template_id_6a62eff8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/maintenance/jobcard/JobForm.vue":
+/*!*****************************************************************!*\
+  !*** ./resources/js/components/maintenance/jobcard/JobForm.vue ***!
+  \*****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _JobForm_vue_vue_type_template_id_3e70b6c8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true& */ "./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true&");
+/* harmony import */ var _JobForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./JobForm.vue?vue&type=script&lang=js& */ "./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _JobForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _JobForm_vue_vue_type_template_id_3e70b6c8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _JobForm_vue_vue_type_template_id_3e70b6c8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "3e70b6c8",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/maintenance/jobcard/JobForm.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=script&lang=js&":
+/*!******************************************************************************************!*\
+  !*** ./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JobForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./JobForm.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JobForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true&":
+/*!************************************************************************************************************!*\
+  !*** ./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true& ***!
+  \************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobForm_vue_vue_type_template_id_3e70b6c8_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/maintenance/jobcard/JobForm.vue?vue&type=template&id=3e70b6c8&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobForm_vue_vue_type_template_id_3e70b6c8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JobForm_vue_vue_type_template_id_3e70b6c8_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -64147,6 +65064,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_maintenance_jobtypes_Index__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ../components/maintenance/jobtypes/Index */ "./resources/js/components/maintenance/jobtypes/Index.vue");
 /* harmony import */ var _components_fuels_types_Index__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ../components/fuels/types/Index */ "./resources/js/components/fuels/types/Index.vue");
 /* harmony import */ var _components_requisitions_Index__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../components/requisitions/Index */ "./resources/js/components/requisitions/Index.vue");
+/* harmony import */ var _components_maintenance_jobcard_JobCardForm__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../components/maintenance/jobcard/JobCardForm */ "./resources/js/components/maintenance/jobcard/JobCardForm.vue");
+
 
 
 
@@ -64286,6 +65205,10 @@ var routes = [{
 }, {
   path: '/requisitions',
   component: _components_requisitions_Index__WEBPACK_IMPORTED_MODULE_27__["default"],
+  beforeEnter: guard
+}, {
+  path: '/jobcard-form/:id',
+  component: _components_maintenance_jobcard_JobCardForm__WEBPACK_IMPORTED_MODULE_28__["default"],
   beforeEnter: guard
 }];
 /* harmony default export */ __webpack_exports__["default"] = (new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({

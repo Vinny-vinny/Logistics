@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "moment": "^2.24.0",
+        "vue-html-to-paper": "^1.1.1",
         "vue-json-excel": "^0.2.98",
         "vue-multiselect": "^2.1.6",
         "vue-resource": "^1.5.1",
