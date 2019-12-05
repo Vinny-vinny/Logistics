@@ -13,7 +13,8 @@
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-                            <th>#</th>
+
+                            <th>Req #</th>
                             <th>Description</th>
                             <th>Requested On</th>
                             <th>Requested By</th>
@@ -23,14 +24,15 @@
                         </thead>
                         <tbody>
                         <tr v-for="rq in tableData">
-                            <td>{{rq.id}}</td>
+                            <td>{{rq.req_no}}</td>
                             <td>{{rq.description}}</td>
                             <td>{{rq.date_requested}}</td>
                             <td>{{rq.person_requested}}</td>
                             <td>{{rq.project}}</td>
                             <td>
-                                <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>
+                               <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
+                               <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
+<!--                               <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->
                             </td>
                         </tr>
                         </tbody>

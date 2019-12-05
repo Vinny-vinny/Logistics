@@ -26,7 +26,8 @@ class RequisitionController extends Controller
      */
     public function store(Request $request)
     {
-        $request['req_no'] = Requisition::count() +1;
+        $req = Requisition::count() +1;
+        $request['req_no'] = 'REQ00'.$req;
         $requisition = Requisition::create($request->all());
         return response()->json(new RequisitionResource($requisition));
     }
@@ -52,6 +53,7 @@ class RequisitionController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         Requisition::find($id)->update($request->except(['date_requested','project','person_requested']));
         return response()->json(new RequisitionResource(Requisition::find($id)));
     }

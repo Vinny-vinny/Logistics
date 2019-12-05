@@ -18,7 +18,7 @@ class RequisitionResource extends JsonResource
         return [
             'id' => $this->id,
             'requested_on' => $this->requested_on,
-            'date_requested' => Carbon::parse($this->requested_on)->format('d/m/y'),
+            'date_requested' => Carbon::parse($this->requested_on)->format('d/m/Y'),
             'description' => $this->description,
             'where_to_charge' => $this->where_to_charge,
             'project_id' => $this->project_id,
@@ -29,6 +29,7 @@ class RequisitionResource extends JsonResource
             'inventory_items_external' => $this->inventory_items_external,
             'type' => $this->type,
             'used' => $this->used,
+            'req_no' => $this->req_no
         ];
     }
 }

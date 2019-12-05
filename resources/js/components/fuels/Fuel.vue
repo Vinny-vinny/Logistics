@@ -52,7 +52,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Jobcard</label>
-                                    <select v-model="form.jobcard_id" class="form-control">
+                                    <select v-model="form.job_card_id" class="form-control">
                                         <option :value="job.id" v-for="job in jobcards" :key="job.id">{{job.card_no}}</option>
                                     </select>
                                 </div>
@@ -138,7 +138,7 @@
                     requested_by:'',
                     odometer_readings: '',
                     customer_type_id:'',
-                    jobcard_id:'',
+                    job_card_id:'',
                     asset_type:'',
                     rate:0,
                     id: ''

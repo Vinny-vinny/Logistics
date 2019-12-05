@@ -241,27 +241,36 @@
                 }
                 if (Object.values(this.form.inventory_items_external[0])[0] !== '' || Object.values(this.form.inventory_items_external[0])[1] !== ''|| Object.values(this.form.inventory_items_external[0])[2] !== '') {
                     for (let i = 0; i < this.form.inventory_items_external.length; i++) {
-                        if (this.form.inventory_items_external[i]['part'] === '' || this.form.inventory_items_external[i]['quantity'] === '') {
+                        if (this.form.inventory_items_external[i]['part'] === '' || this.form.inventory_items_external[i]['quantity'] === '' || this.form.inventory_items_external[i]['unit_price'] === '') {
                             return this.$toastr.e('Inventory Item , Quantity and Price fields are required.');
                         }
                     }
                 }
                 this.form.requested_on = this.convertDate(this.form.requested_on);
-                this.form.inventory_items_internal = JSON.stringify(this.form.inventory_items_internal);
-                this.form.inventory_items_external = JSON.stringify(this.form.inventory_items_external);
+
+
                 this.edit_requisition ? this.update() : this.save();
             },
             save(){
                 delete this.form.id;
+                this.form.inventory_items_internal = JSON.stringify(this.form.inventory_items_internal);
+                this.form.inventory_items_external = JSON.stringify(this.form.inventory_items_external);
                 axios.post('requisitions',this.form)
                     .then(res => eventBus.$emit('listRequisitions',res.data))
                     .catch(error => error.response)
             },
             update(){
+                if (this.form.type === 'Internal'){
+                    this.form.inventory_items_internal = JSON.stringify(this.form.inventory_items_internal);
+                }
+                else {
+                    this.form.inventory_items_external = JSON.stringify(this.form.inventory_items_external);
+                }
                 axios.patch(`requisitions/${this.form.id}`,this.form)
                     .then(res => {
-                        this.edit_requisition = false;
-                        eventBus.$emit('updateRequisition',res.data);
+                        console.log(res.data)
+                         this.edit_requisition = false;
+                         eventBus.$emit('updateRequisition',res.data);
                     })
                     .catch(error => error.response)
             },

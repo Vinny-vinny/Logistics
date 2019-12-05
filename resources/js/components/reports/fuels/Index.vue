@@ -22,7 +22,6 @@
                             <th>Fuel On</th>
                             <th>Litres</th>
                             <th>Pump Price</th>
-                            <th>Currency</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,7 +30,6 @@
                             <td>{{fuel.fuel_on}}</td>
                             <td>{{fuel.Litres}}</td>
                             <td>{{fuel.Rate}}</td>
-                            <td>{{fuel.Currency}}</td>
                         </tr>
                         </tbody>
                     </table>

@@ -4,102 +4,118 @@
     <section class="content">
         <!-- Default box -->
         <div class="box">
+            <div class="box-header with-border">
+                <h2 class="box-title">Job Card #101010101</h2>
+            </div>
             <div class="box-body" id="printMe">
-                <div class="invoice-box">
-                    <table cellpadding="0" cellspacing="0">
-                        <tr class="top">
-                            <td colspan="4">
-                                <table>
-                                    <tr>
-                                        <td class="title">
-                                            <b>Maintenance Jobcard</b>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr class="information">
-                            <td colspan="4">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            Esl, Ltd.<br> 12345 Sunny Road<br> Mombasa, Kenya
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr class="heading">
-                            <td>Maintenance Required</td>
-                            <td>Root Cause</td>
-                            <td colspan="3">Job Card No. {{job.card_no}}</td>
-                        </tr>
-                        <tr class="item">
-                                <td>
-                                    <ul v-for="m in maintenance">
-                                    {{m.description}}
-                                    </ul>
-                                </td>
-                            <td>
-                                <ul v-for="m in maintenance">
-                                    {{m.root_cause}}
-                                </ul>
-                            </td>
-                            <td colspan="3">
-                                Asset Reg: {{job.code}} <br>
-                                Make / Model: {{job.make}} <br>
-                                Km or Svc meter Reading: {{job.current_readings}} {{job.track_name}}<br>
-                                Next Service: {{job.next_service_date}}<br>
-                                Date Opened: {{job.created}}<br>
-                                Time  In: {{job.time_in}}<br>
-                                Date Closed: {{job.closed_at}}<br>
-                                Time Out: {{job.time_out}}<br>
-                            </td>
-                        </tr>
-                        <tr class="heading">
-                            <td>Repair/Service Required</td>
-                            <td>Parts</td>
-                            <td>Category</td>
-                            <td>Qty</td>
-                            <td>Cost</td>
-                        </tr>
-                        <tr class="item">
-                            <td>
-                                <ul v-for="s_d in service_required">
-                                    {{s_d.description}}
-                                </ul>
-                            </td>
-                            <td>
-                                <ul v-for="s in services">
-                                    {{s.code}} - {{s.description}}
-                                </ul>
-                            </td>
-                            <td>
-                                <ul v-for="cat in categories">
-                                    {{cat.name}}
-                                </ul>
-                            </td>
-                            <td>
-                                <ul v-for="s in service_required">
-                                    {{s.qty}}
-                                </ul>
-                            </td>
-                            <td>
-                                <ul v-for="s in services">
-                                    {{s.cost | number}}
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr class="total">
-                            <td colspan="3"></td>
-                            <td>Total Cost: {{total_cost | number}}</td>
+                <div style="display: flex">
+                <table class="customers">
+                    <tr>
+                        <td>Job No.</td>
+                        <td>{{job.card_no}}</td>
+                    </tr>
+                    <tr>
+                        <td>GL Code</td>
+                        <td>Gl9090</td>
+                    </tr>
+                    <tr>
+                        <td>Cost Code</td>
+                        <td>{{job.cost_code}}</td>
+                    </tr>
+                    <tr>
+                        <td>Cost Center</td>
+                        <td>c232</td>
+                    </tr>
+                    <tr>
+                        <td>Date Start</td>
+                        <td>{{job.start_date}}</td>
+                    </tr>
+                    <tr>
+                        <td>Date Complete</td>
+                        <td>{{job.start_date}}</td>
+                    </tr>
+
+                </table>
+                    <br>
+                    <table class="customers" style="margin-left: 40px;margin-top: 120px;">
+                        <tr>
+                            <td>AUTHORIZED WORKS MANAGER'S SIGNATURE</td>
+                            <td style="opacity:0">uuuuuuuuuuuuuuuuuuu</td>
                         </tr>
                     </table>
+                    </div>
+                <hr>
+                <table class="customers">
+                    <tr>
+                        <th>DATE</th>
+                        <th>DESCRIPTION</th>
+                        <th>QTY</th>
+                        <th>AUTHORIZED BY</th>
+                        <th>QTY ISSUED</th>
+                        <th>RECEIVED BY</th>
+                        <th>SIGN</th>
+                        <th>INVOICE NO</th>
+                    </tr>
+                    <tr>
+                        <td>234234</td>
+                        <td>SDWEWE</td>
+                        <td>12</td>
+                        <td>VINN</td>
+                        <td>4</td>
+                        <td>JOHNY</td>
+                        <td></td>
+                        <td>INV789</td>
+                    </tr>
+
+                </table>
+                <br>
+                <div style="display: flex">
+                <table class="customers" style="width: 50%">
+                    <tr>
+                        <td>STORE ISSUES TOTAL VALUE</td>
+                        <td>5000</td>
+                    </tr>
+                    <tr>
+                        <td>LABOUR CHARGES</td>
+                        <td>4000</td>
+                    </tr>
+                    <tr>
+                        <td>TRANSPORT CHARGES</td>
+                        <td>700</td>
+                    </tr>
+                    <tr>
+                        <td>TOTAL COST OF PROJECT</td>
+                        <td>9000</td>
+                    </tr>
+                </table>
+
+                    <div style="margin-left: 40px">
+                        <p style="margin-bottom:0">This information is accurate to my knowledge</p>
+                <table class="customers">
+                    <tr>
+                        <td>CONSTRUCTION MANAGERS SIGN</td>
+                        <td style="opacity:0">uuuuuuuuuuuuuuuuuuu</td>
+                    </tr>
+                </table>
+                <p style="margin-bottom:0">I approve the coding allocated to this project</p>
+                <table class="customers">
+                    <tr>
+                        <td>WORKS MANAGERS SIGN</td>
+                        <td style="opacity:0">uuuuuuuuuuuuuuuuuuuu</td>
+                    </tr>
+                </table>
+                    </div>
+
                 </div>
+                <br>
+                <p style="text-align: center;">This JOB CARD is NOT Valid without Manager's Signature</p>
+
             </div>
-            <div class="print_item">
-                <router-link :to="{path:'/job-card'}" class="btn btn-outline-danger" style="margin-bottom: 10px">Back</router-link>
-                <button @click="printDiv('printMe')" class="btn btn-success" style="margin-bottom: 10px"><i class="fa fa-print"></i>Print Job Card</button>
+            <div class="row print">
+                <div class="form-group">
+                    <button class="btn btn-primary" @click="print()" style="margin-left: 50px;"> <i class="fa fa-print"></i> Print</button>
+                    <router-link to="/job-card" class="btn btn-outline-warning"> Back</router-link>
+                </div>
             </div>
         </div>
     </section>
@@ -118,162 +134,51 @@
                 total_cost:0
             }
         },
-        created(){
+        created() {
           this.getJob();
         },
-
         methods:{
-        printDiv(divName){
-        var printContents = document.getElementById(divName).innerHTML;
-        var originalContents = document.body.innerHTML;
-        document.body.innerHTML = printContents;
-        window.print();
-        document.body.innerHTML = originalContents;    },
             getJob(){
-                axios.get('job-card/'+this.$route.params['id'])
-                    .then(job => {
-                        this.job = job.data;
-                        this.maintenance = JSON.parse(job.data.maintenance);
-                        let services = JSON.parse(job.data.service_required);
-                        this.service_required = services;
-                        let total =0;
-                            axios.get('parts')
-                                .then(part => {
-                                    for (let i=0; i < services.length; i++) {
-                                        for(let j=0; j < part.data.length; j++){
-                                            if (part.data[j]['id'] === services[i]['part']){
-                                                this.total_cost +=parseFloat(part.data[j]['cost'])*parseInt(services[i]['qty']);
-                                                this.services.push({id:part.data[j]['id'],code:part.data[j]['code'],description:part.data[j]['description'],cost:parseFloat(part.data[j]['cost'])*parseInt(services[i]['qty'])});
-                                            }
-                                        }
-                                      axios.get('categories')
-                                          .then(category => {
-                                              for (let c=0; c < category.data.length; c++){
-                                                  if (services[i]['category'] === category.data[c]['id']){
-                                                     this.categories.push(category.data[c]);
-                                                  }
-                                              }
-                                          })
-                                    }
-
-                                })
-
-                    })
+              axios.get('job-card')
+              .then(res => {
+                  this.job = res.data.find(j => j.id == this.$route.params['id']);
+                  console.log(this.job);
+              })
             },
+            print(){
+                window.print();
+            }
 
         }
     }
 </script>
 
-<style>
-    .invoice-box {
-        max-width: 100%;
-        margin: auto;
-        padding: 30px;
-        border: 1px solid #eee;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-        font-size: 16px;
-        line-height: 24px;
-        font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
-        color: #555;
-    }
-
-    .invoice-box table {
-        width: 100%;
-        line-height: inherit;
-        text-align: left;
-    }
-
-    .invoice-box table td {
-        padding: 5px;
-        vertical-align: top;
-    }
-
-    .invoice-box table tr td:nth-child(n + 2) {
-        text-align: right;
-    }
-
-    .invoice-box table tr.top table td {
-        padding-bottom: 20px;
-    }
-
-    .invoice-box table tr.top table td.title {
-        font-size: 45px;
-        line-height: 45px;
-        color: #333;
-    }
-
-    .invoice-box table tr.information table td {
-        padding-bottom: 40px;
-    }
-
-    .invoice-box table tr.heading th {
-        background: #eee;
-        border-bottom: 1px solid #ddd;
-        font-weight: bold;
-    }
-
-    .invoice-box table tr.details td {
-        padding-bottom: 20px;
-    }
-
-    .invoice-box table tr.item td {
-        border-bottom: 1px solid #eee;
-    }
-
-    .invoice-box table tr.item.last td {
-        border-bottom: none;
-    }
-
-    .invoice-box table tr.item input {
-        padding-left: 5px;
-    }
-
-    .invoice-box table tr.item td:first-child input {
-        margin-left: -5px;
+<style scoped>
+    .customers {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
         width: 100%;
     }
 
-    .invoice-box table tr.total td:nth-child(2) {
-        border-top: 2px solid #eee;
-        font-weight: bold;
+    .customers td, .customers th {
+        border: 1px solid #ddd;
+        padding: 8px;
     }
 
-    .invoice-box input[type="number"] {
-        width: 60px;
-    }
+    .customers tr:nth-child(even){background-color: #f2f2f2;}
 
-    @media only screen and (max-width: 600px) {
-        .invoice-box table tr.top table td {
-            width: 100%;
-            display: block;
-            text-align: center;
-        }
+    .customers tr:hover {background-color: #ddd;}
 
-        .invoice-box table tr.information table td {
-            width: 100%;
-            display: block;
-            text-align: center;
-        }
-    }
-
-    /** RTL **/
-    .rtl {
-        direction: rtl;
-        font-family: Tahoma, "Helvetica Neue", "Helvetica", Helvetica, Arial,
-        sans-serif;
-    }
-
-    .rtl table {
-        text-align: right;
-    }
-
-    .rtl table tr td:nth-child(2) {
+    .customers th {
+        padding-top: 12px;
+        padding-bottom: 12px;
         text-align: left;
+        background-color: gray;
+        color: white;
     }
-    .print_item{
-        margin-left: 20%;
-        margin-bottom: 5px;
+    @media print {
+        .print {
+            display: none;
+        }
     }
-
 </style>

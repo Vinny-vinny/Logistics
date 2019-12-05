@@ -21,6 +21,7 @@
                             <th>Card #</th>
                             <th>Machine</th>
                             <th>Driver</th>
+                            <th>Customer</th>
                             <th>Created At</th>
                             </tr>
                         </thead>
@@ -29,6 +30,7 @@
                             <td>{{job.Card}}</td>
                             <td>{{job.Machine}}</td>
                             <td>{{job.Driver}}</td>
+                            <td>{{job.Customer}}</td>
                             <td>{{job.Created}}</td>
                         </tr>
                         </tbody>

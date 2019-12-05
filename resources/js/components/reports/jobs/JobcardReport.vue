@@ -1,4 +1,4 @@
-<template>
+ <template>
     <div>
         <app-index v-if="show_job"></app-index>
         <!-- Main content -->

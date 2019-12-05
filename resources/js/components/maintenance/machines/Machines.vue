@@ -72,21 +72,16 @@
                                     </div>
                                 </div>
 
-<!--                                <div class="row">-->
-<!--                                    <div class="col-md-6">-->
                                         <div class="form-group" v-if="selected_next_maintenance && show_next_readings">
                                             <label>Next {{track_type}} due for service</label>
                                             <input type="number" step="0.001" class="form-control" v-model="form.next_readings" disabled>
                                         </div>
-<!--                                    </div>-->
-<!--                                    <div class="col-md-6">-->
                                         <div class="form-group" v-if="selected_next_maintenance">
                                             <label>Remind before (No. of {{track_type}})</label>
                                             <input type="number" class="form-control" v-model="form.reminder_before"
                                                    required>
                                         </div>
-<!--                                    </div>-->
-<!--                                </div>-->
+
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">

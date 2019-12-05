@@ -19,17 +19,16 @@ class JobcardReportResource extends JsonResource
             'Card' => $this->card_no,
             'Driver' => $this->machine->user->name,
             'Machine' => $this->machine->code,
-            'labour' => $this->labour,
-            'cost' => $this->cost,
+            'Labour Cost' => $this->labour_cost,
             'Next Readings' => $this->next_readings,
             'Current Readings' => $this->current_readings,
             'Next Service Date' => $this->next_service_date,
-            'Fuel Balance' => $this->fuelbalance->name,
+            'Fuel Balance' => $this->fuelbalance->litres.' Litres',
             'Actual Date' => $this->actual_date,
             'Completion Date' => $this->completion_date,
             'Time In' => $this->time_in,
             'Time Out' => $this->time_out,
-            'Supplier' =>  $this->internal_supplier ? $this->internal_supplier->name: $this->external_supplier->name,
+            'Customer' =>  $this->customer->name,
             'Created' => Carbon::parse($this->created_at)->diffForHumans()
 
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class JobcardResource extends JsonResource
@@ -33,6 +34,8 @@ class JobcardResource extends JsonResource
             'next_service_date' => $this->next_service_date,
             'fuel_balance_id' => $this->fuel_balance_id,
             'actual_date' => $this->actual_date,
+            'start_date' => Carbon::parse($this->actual_date)->format('d/m/Y'),
+            'complete_date' => Carbon::parse($this->completion_date)->format('d/m/Y'),
             'completion_date' => $this->completion_date,
             'time_in' => $this->time_in,
             'time_out' => $this->time_out,
