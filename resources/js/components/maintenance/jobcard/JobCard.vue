@@ -205,22 +205,24 @@
                                     <label>Requisitions</label>
                                     <select class="form-control" v-model="form.requisition_id" @change="getDetails()"
                                             :disabled="disable_rq">
-                                        <option :value="rq.id" v-for="rq in filtered_rq" :key="rq.id">
-                                            {{rq.description}}
+                                        <option :value="rq.id" v-for="rq in rqs" :key="rq.id">
+                                            {{rq.req_no}}
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group" v-if="show_inventory">
+
+                                <div class="form-group" v-if="show_inventory && filtered_rq=='Internal'">
                                     <label>Inventory Items</label>
                                     <table style="width:100%">
                                         <tr>
                                             <th align="right">Part</th>
                                             <th align="right">Quantity</th>
-                                            <th align="right">Price Inclusive VAT</th>
-                                            <th align="right">Price Exclusive VAT</th>
-                                            <th></th>
+                                            <th align="right">Unit Cost</th>
+                                            <th align="right">Total Cost</th>
+                                            <th align="right">Total Cost Inclusive VAT</th>
+
                                         </tr>
-                                        <tr v-for="(m,i) in filtered_items">
+                                        <tr v-for="(m,i) in filtered_items_internal">
                                             <td>
                                                 <select class="form-control i_p" v-model="m.part" disabled> >
                                                     <option :value="p.id" v-for="p in parts" :key="p.id">
@@ -233,12 +235,57 @@
                                                        placeholder="Quantity" disabled></td>
                                             <td>
                                                 <input type="number" class="form-control rq_pi"
-                                                       v-model="m.price_inclusive"
-                                                       placeholder="Price Inclusive VAT" disabled></td>
+                                                       v-model="m.unit_cost"
+                                                       placeholder="Unit Cost" disabled></td>
+
+                                            <td>
+                                                <input type="number" class="form-control rq_pi"
+                                                       v-model="m.total_cost"
+                                                       placeholder="Total Cost" disabled></td>
                                             <td>
                                                 <input type="number" class="form-control rq_pe"
-                                                       v-model="m.price_exclusive"
-                                                       placeholder="Price Exclusive VAT" disabled></td>
+                                                       v-model="m.total_cost_inclusive"
+                                                       placeholder="Total Cost Inclusive VAT" disabled></td>
+
+
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="form-group" v-if="show_inventory && filtered_rq=='External'">
+                                    <label>Inventory Items</label>
+                                    <table style="width:100%">
+                                        <tr>
+                                            <th align="right">Part</th>
+                                            <th align="right">Quantity</th>
+                                            <th align="right">Unit Price</th>
+                                            <th align="right">Total Price</th>
+                                            <th align="right">Total Price Inclusive VAT</th>
+
+                                        </tr>
+                                        <tr v-for="(m,i) in filtered_items_external">
+                                            <td>
+                                                <select class="form-control i_p" v-model="m.part" disabled> >
+                                                    <option :value="p.id" v-for="p in parts" :key="p.id">
+                                                        {{p.code}} - {{p.description}}
+                                                    </option>
+
+                                                </select>
+                                            </td>
+                                            <td><input type="number" class="form-control cost" v-model="m.quantity"
+                                                       placeholder="Quantity" disabled></td>
+                                            <td>
+                                                <input type="number" class="form-control rq_pi"
+                                                       v-model="m.unit_price"
+                                                       placeholder="Unit Price" disabled></td>
+
+                                            <td>
+                                                <input type="number" class="form-control rq_pi"
+                                                       v-model="m.total_price"
+                                                       placeholder="Total Price" disabled></td>
+                                            <td>
+                                                <input type="number" class="form-control rq_pe"
+                                                       v-model="m.total_price_inclusive"
+                                                       placeholder="Total Price Inclusive VAT" disabled></td>
 
 
                                         </tr>
@@ -327,10 +374,12 @@
                 exp_id: '',
                 requisitions: {},
                 show_inventory: false,
-                filtered_items: [],
+                filtered_items_internal: [],
+                filtered_items_external: [],
                 disable_rq: false,
-                filtered_rq: [],
-                customer_types: {}
+                filtered_rq: '',
+                customer_types: {},
+                rqs:[]
             }
         },
         watch: {
@@ -453,21 +502,31 @@
                 axios.get('requisitions')
                     .then(rq => {
                         for (let i = 0; i < rq.data.length; i++) {
-                            console.log(rq.data[i])
-                            if (rq.data[i]['used'] == 0) {
-                                this.filtered_rq.push(rq.data[i]);
+                            if (rq.data[i]['used'] == 0 && rq.data[i]['type'] !==null) {
+                                this.rqs.push(rq.data[i]);
                             }
                         }
+
                     })
 
 
             },
             getDetails() {
                 this.show_inventory = true;
-                this.filtered_items = [];
+                this.filtered_items_internal = [];
+                this.filtered_items_external = [];
                 for (let i = 0; i < this.requisitions.length; i++) {
                     if (this.requisitions[i]['id'] === this.form.requisition_id) {
-                        this.filtered_items = JSON.parse(this.requisitions[i]['inventory_items']);
+                        if(this.requisitions[i]['type'] ==='Internal'){
+                            this.filtered_rq ='Internal';
+                                this.filtered_items_internal = JSON.parse(this.requisitions[i]['inventory_items_internal']);
+                            return;
+                        }
+                        if(this.requisitions[i]['type'] ==='External'){
+                            this.filtered_rq ='External';
+                            this.filtered_items_external = JSON.parse(this.requisitions[i]['inventory_items_external']);
+                            return;
+                        }
 
                     }
                 }
@@ -721,19 +780,35 @@
                         this.disable_rq = true;
                         this.show_inventory = true;
                         this.editedRequisitions();
+                        console.log(this.rqs)
                     }
 
                 }
             },
             editedRequisitions() {
+                this.rqs = [];
                 axios.get('requisitions')
                     .then(rq => {
-                        this.filtered_items = [];
-                        this.filtered_rq = [];
+                        this.filtered_items_internal = [];
+                        this.filtered_items_external = [];
                         for (let i = 0; i < rq.data.length; i++) {
+                            if (rq.data[i]['type'] !=null){
+                                if (rq.data[i]['id'] == this.form.requisition_id){
+                                    this.rqs.splice(rq.data[i],1);
+                                }
+                               this.rqs.push(rq.data[i]);
+                            }
                             if (rq.data[i]['id'] === this.form.requisition_id) {
-                                this.filtered_items = JSON.parse(rq.data[i]['inventory_items']);
-                                this.filtered_rq.push(rq.data[i])
+                                if(rq.data[i]['type'] ==='Internal'){
+                                    this.filtered_rq ='Internal';
+                                    this.filtered_items_internal = JSON.parse(rq.data[i]['inventory_items_internal']);
+                                    //return;
+                                }
+                                if(rq.data[i]['type'] ==='External'){
+                                    this.filtered_rq ='External';
+                                    this.filtered_items_external = JSON.parse(rq.data[i]['inventory_items_external']);
+                                 //return;
+                                }
                             }
                         }
                     })

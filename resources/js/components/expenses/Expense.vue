@@ -5,7 +5,7 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">{{edit_expense ? 'Update Expense' : 'New Expense'}}</h3>
+                    <h3 class="box-title">{{edit_expense ? 'Update Other Charges' : 'New Other Charges'}}</h3>
                 </div>
                 <div class="box-body">
                     <form @submit.prevent="saveExpense()">

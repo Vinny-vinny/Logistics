@@ -17,7 +17,6 @@
                             <th>#</th>
                             <th>Code</th>
                             <th>Make</th>
-                            <th>Description</th>
                             <th>Chasis #</th>
                             <th>Assigned To</th>
                             <th>Track By</th>
@@ -29,7 +28,6 @@
                             <td>{{machine.id}}</td>
                             <td>{{machine.code}}</td>
                             <td>{{machine.make}}</td>
-                            <td>{{machine.description}}</td>
                             <td>{{machine.chasis_no}}</td>
                             <td>{{machine.assign_to_id}}</td>
                             <td>{{machine.track_name}}</td>

@@ -47,4 +47,9 @@ class Jobcard extends Model
         return $this->belongsTo(Requisition::class);
     }
 
+    public function fuel()
+    {
+        return $this->belongsTo(Fuel::class,'id');
+    }
+
 }

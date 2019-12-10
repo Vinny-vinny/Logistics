@@ -29,7 +29,8 @@ class FuelController extends Controller
      */
     public function store(Request $request)
     {
-
+        $fuel_no = Fuel::count()+1;
+        $request['fuel_no'] = 'Fuel00'.$fuel_no;
         $fuel = Fuel::create($request->all());
         $request->get('vehicle_id') ? Machine::find($request->get('vehicle_id'))->update(['odometer_readings' => $request->get('odometer_readings')]) : '';
         return response()->json(new FuelResource($fuel));
@@ -56,7 +57,7 @@ class FuelController extends Controller
     public function update(Request $request, $id)
     {
 
-        Fuel::find($id)->update($request->except(['vehicle','fuel_type','previous_odometer','customer_type','asset_type']));
+        Fuel::find($id)->update($request->except(['vehicle','fuel_type','previous_odometer','customer_type','asset_type','date_fueled','person_authorizing','track_by','current_readings']));
         Machine::find($request->get('vehicle_id'))->update(['odometer_readings' => $request->get('odometer_readings')]);
         return response()->json(new FuelResource(Fuel::find($id)));
     }

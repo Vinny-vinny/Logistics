@@ -4,9 +4,7 @@
     <section class="content">
         <!-- Default box -->
         <div class="box">
-            <div class="box-header with-border">
-                <h2 class="box-title">Job Card #101010101</h2>
-            </div>
+            <h2 style="text-align: center;margin-right: 300px;">{{job.category}} Job Card</h2>
             <div class="box-body" id="printMe">
                 <div style="display: flex">
                 <table class="customers">
@@ -16,7 +14,7 @@
                     </tr>
                     <tr>
                         <td>GL Code</td>
-                        <td>Gl9090</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>Cost Code</td>
@@ -24,7 +22,7 @@
                     </tr>
                     <tr>
                         <td>Cost Center</td>
-                        <td>c232</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>Date Start</td>
@@ -45,7 +43,7 @@
                     </table>
                     </div>
                 <hr>
-                <table class="customers">
+                <table class="customers" v-if="requisition_type =='Internal'">
                     <tr>
                         <th>DATE</th>
                         <th>DESCRIPTION</th>
@@ -56,36 +54,117 @@
                         <th>SIGN</th>
                         <th>INVOICE NO</th>
                     </tr>
-                    <tr>
-                        <td>234234</td>
-                        <td>SDWEWE</td>
-                        <td>12</td>
-                        <td>VINN</td>
-                        <td>4</td>
-                        <td>JOHNY</td>
+                    <tr v-for="req in requisitions_internal">
+                        <td>{{requisition.date_requested}}</td>
+                        <td>{{requisition.description}}</td>
+                        <td>{{req.quantity}}</td>
+                        <td>{{requisition.person_requested}}</td>
+                        <td>{{req.quantity}}</td>
                         <td></td>
-                        <td>INV789</td>
+                        <td></td>
+                        <td></td>
                     </tr>
 
                 </table>
+                <table class="customers" v-if="requisition_type =='External'">
+                    <tr>
+                        <th>DATE</th>
+                        <th>DESCRIPTION</th>
+                        <th>QTY</th>
+                        <th>AUTHORIZED BY</th>
+                        <th>QTY ISSUED</th>
+                        <th>RECEIVED BY</th>
+                        <th>SIGN</th>
+                        <th>INVOICE NO</th>
+                    </tr>
+                    <tr v-for="req in requisitions_external">
+                        <td>{{requisition.date_requested}}</td>
+                        <td>{{requisition.description}}</td>
+                        <td>{{req.quantity}}</td>
+                        <td>{{requisition.person_requested}}</td>
+                        <td>{{req.quantity}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                </table>
+                <hr v-if="has_fuel">
+                <h3 style="text-align: center;margin-right: 400px;font-size: 16px;font-weight: 800" v-if="has_fuel">Fuel Docket</h3>
+                <table class="customers" style="width: 50%" v-if="has_fuel">
+                    <tr>
+                        <td>Date</td>
+                        <td>{{fuel_docket.date_fueled}}</td>
+                    </tr>
+                    <br>
+                    <tr>
+                        <td>Dept/Project/Sale</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Registration</td>
+                        <td>{{fuel_docket.vehicle}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{fuel_docket.track_by}} Readings</td>
+                        <td>{{fuel_docket.current_readings}}</td>
+                    </tr>
+                    <br>
+                    <tr>
+                        <td>Person Requesting</td>
+                        <td>{{fuel_docket.requested_by}}</td>
+                    </tr>
+                    <tr>
+                        <td>Sign</td>
+                        <td></td>
+                    </tr>
+                    <br>
+                    <tr>
+                        <td>Person Authorizing</td>
+                        <td>{{fuel_docket.person_authorizing}}</td>
+                    </tr>
+                    <tr>
+                        <td>Sign</td>
+                        <td></td>
+                    </tr>
+                    <br>
+                    <tr>
+                        <td>Litres Issued</td>
+                        <td>{{fuel_docket.litres}}</td>
+                    </tr>
+                    <tr>
+                        <td>End Meter Reading</td>
+                        <td>{{fuel_docket.odometer_readings}}</td>
+                    </tr>
+                    <br>
+                    <tr>
+                        <td>Storeman</td>
+                        <td>{{fuel_docket.store_man}}</td>
+                    </tr>
+                    <tr>
+                        <td>Sign</td>
+                        <td></td>
+                    </tr>
+                </table>
+
                 <br>
                 <div style="display: flex">
                 <table class="customers" style="width: 50%">
                     <tr>
                         <td>STORE ISSUES TOTAL VALUE</td>
-                        <td>5000</td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>LABOUR CHARGES</td>
-                        <td>4000</td>
+                        <td>{{job.labour_cost | number}}</td>
                     </tr>
-                    <tr>
-                        <td>TRANSPORT CHARGES</td>
-                        <td>700</td>
+                    <tr v-if="has_othercharges">
+                        <td>{{other_charges.name}}</td>
+                        <td>{{other_charges.cost | number}}</td>
                     </tr>
                     <tr>
                         <td>TOTAL COST OF PROJECT</td>
-                        <td>9000</td>
+                        <td>{{project_cost | number}}</td>
                     </tr>
                 </table>
 
@@ -107,6 +186,7 @@
                     </div>
 
                 </div>
+
                 <br>
                 <p style="text-align: center;">This JOB CARD is NOT Valid without Manager's Signature</p>
 
@@ -131,7 +211,16 @@
                 services:[],
                 categories:[],
                 service_required:{},
-                total_cost:0
+                total_cost:0,
+                requisitions_internal:{},
+                requisitions_external:{},
+                fuel_docket:{},
+                requisition_type:'',
+                requisition:{},
+                has_fuel:false,
+                other_charges:{},
+                has_othercharges:false,
+                project_cost:0
             }
         },
         created() {
@@ -142,7 +231,56 @@
               axios.get('job-card')
               .then(res => {
                   this.job = res.data.find(j => j.id == this.$route.params['id']);
-                  console.log(this.job);
+                   if (this.job.requisition_id){
+                       axios.get('requisitions')
+                       .then(res => {
+                        let req = res.data.find(r => r.id == this.job.requisition_id);
+                        this.requisition = req;
+                        if (req.type =='Internal'){
+                            this.requisition_type = 'Internal';
+                            this.requisitions_internal = JSON.parse(req.inventory_items_internal);
+                        }
+                           if (req.type =='External'){
+                               this.requisition_type = 'External';
+                               this.requisitions_external = JSON.parse(req.inventory_items_external);
+                                }
+                       })
+                   }
+                  //Labour calculation = hrs* job type
+                  if (this.job.closed_at) {
+                      let initialdate = moment(this.job.actual_date).format('YYYY-MM-DD');
+                      let enddate = moment(this.job.closed_at).format('YYYY-MM-DD');
+                      let start_time = moment(this.job.time_in, "HH:mm:ss").format("hh:mm")
+                      let end_time = moment(this.job.time_out, "HH:mm:ss").format("hh:mm");
+
+                      let datetimeA = moment(initialdate + " " + start_time);
+                      let datetimeB = moment(enddate + " " + end_time);
+                      let time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
+
+                      if (this.job.job_type_id !== '') {
+                          axios.get('job-types')
+                              .then(res => {
+                                  this.job_types = res.data;
+                                  let cost = this.job_types.find(type => type.id == this.job.job_type_id).hourly_rate;
+                                  this.project_cost = Math.abs(time_in_minutes / 60 * cost);
+                              })
+
+                      }
+                  }
+                 if (this.job.fuel){
+                   this.has_fuel = true;
+                    axios.get('fuel')
+                    .then(res => {
+                        this.fuel_docket = res.data.find(f => f.id == this.job.fuel);
+                        if (this.fuel_docket.expense_id){
+                            this.has_othercharges = true;
+                            axios.get('expense')
+                                .then(res => {
+                                    this.other_charges = res.data.find(charge => charge.id ==this.fuel_docket.expense_id);
+                                })
+                        }
+                    })
+                 }
               })
             },
             print(){

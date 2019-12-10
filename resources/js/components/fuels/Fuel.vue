@@ -43,7 +43,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Other Services</label>
+                                    <label>Other Charges</label>
                                     <select name="expense_id" class="form-control" v-model="form.expense_id" @change="genExpenses()">
                                         <option :value="expense.id" v-for="expense in expenses" :key="expense.id">
                                             {{expense.name}}
@@ -57,7 +57,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div class="col-md-6">
 
                                 <div class="form-group" style="margin-left:100px;">
@@ -108,12 +107,14 @@
                                     <label>Requested By</label>
                                     <input type="text" class="form-control" v-model="form.requested_by" required>
                                 </div>
+                                <div class="form-group">
+                                    <label>Store Man</label>
+                                    <input type="text" class="form-control" v-model="form.store_man" required>
+                                </div>
                             </div>
                             </div>
-
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-
                     </form>
                 </div>
             </div>
@@ -140,6 +141,7 @@
                     customer_type_id:'',
                     job_card_id:'',
                     asset_type:'',
+                    store_man:'',
                     rate:0,
                     id: ''
                 },

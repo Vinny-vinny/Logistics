@@ -5,7 +5,7 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">{{edit_requisition ? 'Update Requisition' : 'New Requisition'}}</h3>
+                    <h3 class="box-title">{{edit_requisition ? 'Update Requisition: #'+form.req_no : 'New Requisition'}}</h3>
                 </div>
                 <div class="box-body">
                     <form @submit.prevent="saveRequisition()">
@@ -253,23 +253,16 @@
             },
             save(){
                 delete this.form.id;
-                this.form.inventory_items_internal = JSON.stringify(this.form.inventory_items_internal);
-                this.form.inventory_items_external = JSON.stringify(this.form.inventory_items_external);
                 axios.post('requisitions',this.form)
-                    .then(res => eventBus.$emit('listRequisitions',res.data))
+                    .then(res =>{
+                      eventBus.$emit('listReqs',res.data)
+                    })
                     .catch(error => error.response)
             },
-            update(){
-                if (this.form.type === 'Internal'){
-                    this.form.inventory_items_internal = JSON.stringify(this.form.inventory_items_internal);
-                }
-                else {
-                    this.form.inventory_items_external = JSON.stringify(this.form.inventory_items_external);
-                }
+                update(){
                 axios.patch(`requisitions/${this.form.id}`,this.form)
                     .then(res => {
-                        console.log(res.data)
-                         this.edit_requisition = false;
+                        this.edit_requisition = false;
                          eventBus.$emit('updateRequisition',res.data);
                     })
                     .catch(error => error.response)
@@ -280,8 +273,18 @@
             listen(){
                 if (this.edit){
                     this.form = this.$store.state.requisitions;
-                    this.form.type === 'Internal' ? this.form.inventory_items_internal = JSON.parse(this.form.inventory_items_internal) : this.form.inventory_items_external = JSON.parse(this.form.inventory_items_external)
+                    if (this.form.type === 'Internal'){
+                        this.form.inventory_items_internal = JSON.parse(this.form.inventory_items_internal);
+                    }
+                    else if (this.form.type === 'External'){
+                        this.form.inventory_items_external = JSON.parse(this.form.inventory_items_external);
+                    }
+                else {
+                        this.form.inventory_items_internal= [{part: '', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:''}];
+                        this.form.inventory_items_external= [{part: '', quantity: '',unit_price:'',total_price:'',total_price_inclusive:''}];
+                    }
                 }
+
             },
         },
         components:{

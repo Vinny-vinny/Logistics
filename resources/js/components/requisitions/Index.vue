@@ -7,13 +7,13 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                    <button class="btn btn-primary pull-right" @click="add_requisition=true">Add Requisition</button>
+                    <router-link to="/requisition-form" class="btn btn-success pull-right">Print Requisition Form</router-link>
+                    <button class="btn btn-primary pull-right mr" @click="add_requisition=true">Add Requisition</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-
                             <th>Req #</th>
                             <th>Description</th>
                             <th>Requested On</th>
@@ -32,8 +32,7 @@
                             <td>
                                <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
                                <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
-<!--                               <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->
-                            </td>
+<!--                               <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -49,7 +48,8 @@
             return {
                 tableData: [],
                 add_requisition: false,
-                editing: false
+                editing: false,
+                show_form:false
             }
         },
         created(){
@@ -84,7 +84,7 @@
                     .catch(error => Exception.handle(error))
             },
             listen(){
-                eventBus.$on('listRequisitions',(rq) =>{
+                eventBus.$on('listReqs',(rq) =>{
                     this.tableData.unshift(rq);
                     this.add_requisition =false;
                     this.initDatable();

@@ -40,6 +40,8 @@ class FuelResource extends JsonResource
             'track_by' => $this->vehicle->track->name,
             'current_readings' => $this->vehicle->current_readings,
             'previous_odometer' => $this->vehicle ? $this->vehicle->odometer_readings :'',
+            'store_man' => $this->store_man,
+            'fuel_no' => $this->fuel_no
              ];
     }
 }

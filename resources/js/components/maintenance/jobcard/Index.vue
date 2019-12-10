@@ -16,7 +16,6 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Card #</th>
                             <th>Machine</th>
                             <th>Driver</th>
                             <th>Actions</th>
@@ -24,7 +23,6 @@
                         </thead>
                         <tbody>
                         <tr v-for="job in tableData">
-                            <td>{{job.id}}</td>
                             <td>{{job.card_no}}</td>
                             <td>{{job.machine}}</td>
                             <td>{{job.driver}}</td>

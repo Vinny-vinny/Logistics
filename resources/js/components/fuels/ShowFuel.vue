@@ -7,6 +7,7 @@
                 <div class="box-header with-border">
                     <h2 class="box-title">Fuel Issue Docket</h2>
                 </div>
+                <p style="text-align: center;margin-right: 300px;font-size: 16px">Number: {{fuel.fuel_no}}</p>
                 <div class="box-body" id="printMe">
 
                     <div>
@@ -58,7 +59,7 @@
                             <br>
                             <tr>
                                 <td>Storeman</td>
-                                <td></td>
+                                <td>{{fuel.store_man}}</td>
                             </tr>
                             <tr>
                                 <td>Sign</td>

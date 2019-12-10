@@ -26,7 +26,7 @@
                         </thead>
                         <tbody>
                         <tr v-for="fuel in tableData">
-                            <td>{{fuel.id}}</td>
+                            <td>{{fuel.fuel_no}}</td>
                             <td>{{fuel.vehicle}}</td>
                             <td>{{fuel.litres}}</td>
                             <td>{{fuel.fuel_type}}</td>

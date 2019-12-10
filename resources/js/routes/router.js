@@ -28,6 +28,7 @@ import Types from "../components/fuels/types/Index";
 import Requisition from "../components/requisitions/Index";
 import JobCardForm from "../components/maintenance/jobcard/JobCardForm";
 import ShowRequisition from "../components/requisitions/ShowRequisition";
+import RequisitionForm from "../components/requisitions/RequisitionForm";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -65,7 +66,8 @@ const routes = [
     {path:'/jobcard-category',component:JobCategory, beforeEnter: guard},
     {path:'/requisitions',component:Requisition, beforeEnter: guard},
     {path:'/jobcard-form/:id',component:JobCardForm, beforeEnter: guard},
-    {path:'/requisition/:id',component:ShowRequisition, beforeEnter: guard}
+    {path:'/requisition/:id',component:ShowRequisition, beforeEnter: guard},
+    {path:'/requisition-form',component:RequisitionForm, beforeEnter: guard}
 ];
 
 export default new VueRouter({

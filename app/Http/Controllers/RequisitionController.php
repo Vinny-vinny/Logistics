@@ -28,6 +28,8 @@ class RequisitionController extends Controller
     {
         $req = Requisition::count() +1;
         $request['req_no'] = 'REQ00'.$req;
+        $request['inventory_items_internal'] = json_encode($request->inventory_items_internal);
+        $request['inventory_items_external'] = json_encode($request->inventory_items_external);
         $requisition = Requisition::create($request->all());
         return response()->json(new RequisitionResource($requisition));
     }
@@ -54,8 +56,23 @@ class RequisitionController extends Controller
     public function update(Request $request, $id)
     {
 
+
+
+        $request['inventory_items_internal'] = json_encode($request->inventory_items_internal);
+        $request['inventory_items_external'] = json_encode($request->inventory_items_external);
         Requisition::find($id)->update($request->except(['date_requested','project','person_requested']));
         return response()->json(new RequisitionResource(Requisition::find($id)));
+    }
+    //auto generate requisition
+    public function autoGenerate(Request $request)
+    {
+
+        $request['inventory_items_internal'] = json_encode($request->inventory_items_internal);
+        $request['inventory_items_external'] = json_encode($request->inventory_items_external);
+        $req = Requisition::count() +1;
+        $request['req_no'] = 'REQ00'.$req;
+        $rq = Requisition::create($request->all());
+        return response()->json($rq);
     }
 
     /**

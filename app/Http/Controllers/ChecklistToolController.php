@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class ChecklistToolController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +13,18 @@ class UserController extends Controller
      */
     public function index()
     {
-        return response()->json(User::all());
+        //
     }
 
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -26,14 +34,30 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $users = User::create($request->all());
-        return response()->json($users);
+        //
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function show($id)
     {
-        return response()->json(User::first());
- }
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
 
     /**
      * Update the specified resource in storage.
@@ -44,8 +68,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        User::find($id)->update($request->all());
-        return response()->json(User::find($id));
+        //
     }
 
     /**
@@ -56,7 +79,6 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        User::destroy($id);
-        return response()->json($id);
+        //
     }
 }

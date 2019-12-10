@@ -50,7 +50,10 @@ class JobcardResource extends JsonResource
             'requisition_id' => $this->requisition_id,
             'inventory_items' => $this->requisition_id ? $this->requisition->inventory_items : '',
             'checklist_assigned' => $this->checklist_assigned,
-            'service_types' => $this->machine->service_types
+            'service_types' => $this->machine->service_types,
+            'labour_cost' => $this->labour_cost,
+            'closed_at' => $this->closed_at,
+            'fuel' => $this->fuel ? $this->fuel->id : ''
         ];
     }
 }

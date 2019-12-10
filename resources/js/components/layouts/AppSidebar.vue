@@ -55,7 +55,7 @@
                         <li><router-link to="/fuel-types">Fuel Types</router-link></li>
                         <li><router-link to="/track-by">Track By</router-link></li>
                         <li><router-link to="/service-types">Service Types</router-link></li>
-                        <li><router-link to="/expense">Expenses</router-link></li>
+                        <li><router-link to="/expense">Other Charges</router-link></li>
                         <li><router-link to="/parts">Parts</router-link></li>
                         <li><router-link to="/projects">Projects</router-link></li>
                         <li><router-link to="/customers">Customers</router-link></li>

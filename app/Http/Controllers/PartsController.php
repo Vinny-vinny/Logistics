@@ -58,7 +58,7 @@ class PartsController extends Controller
             $inserted[] = Part::create([
                 'code' => $asset->Code,
                 'description' => $asset->Description_1,
-                'cost' => $asset->AveUCst==0 ? $faker->unique()->numberBetween(50,250) : $asset->AveUCst ,
+                'cost' => $asset->AveUCst==0 ? $faker->unique()->numberBetween(10,2000) : $asset->AveUCst,
                 'stock_link' => $asset->StockLink,
                 ]);
 
