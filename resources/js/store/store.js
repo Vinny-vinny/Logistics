@@ -29,7 +29,8 @@ export default new Vuex.Store({
         customers:{},
         jobcard_categories:{},
         fuel_types:{},
-        requisitions:{}
+        requisitions:{},
+        checklist_tool:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -106,6 +107,9 @@ export default new Vuex.Store({
         },
         updateRequisition(state,rq){
          state.requisitions = rq;
+        },
+        updateTool(state,tool){
+         state.checklist_tool = tool;
         }
     },
     actions:{
@@ -183,6 +187,9 @@ export default new Vuex.Store({
         },
         updateRequisition({commit},rq){
         commit('updateRequisition',rq);
+        },
+        updateTool({commit},tool){
+        commit('updateTool',tool);
         }
     }
 })

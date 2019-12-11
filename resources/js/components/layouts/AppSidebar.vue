@@ -63,6 +63,7 @@
                         <li><router-link to="/categories">Categories</router-link></li>
                         <li><router-link to="/job-type">Job types</router-link></li>
                         <li><router-link to="/jobcard-category">Jobcard Categories</router-link></li>
+                        <li><router-link to="/checklist-tool">Checklist Tools</router-link></li>
                     </ul>
                 </li>
             </ul>

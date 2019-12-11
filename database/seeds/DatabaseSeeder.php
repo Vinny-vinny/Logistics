@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
          $this->call(MechanicSeeder::class);
          $this->call(JobTypeSeeder::class);
          $this->call(CustomerTypesSeeder::class);
+         $this->call(ChecklistToolSeeder::class);
 
 
     }

@@ -47,6 +47,7 @@ Route::apiResource('customer-types','CustomerTypeController');
 Route::apiResource('jobcard-category','JobcardCategoryController');
 Route::apiResource('mechanics','MechanicsController');
 Route::apiResource('requisitions','RequisitionController');
+Route::apiResource('checklist-tool','ChecklistToolController');
 Route::post('generate-requisition','RequisitionController@autoGenerate');
 Route::apiResource('job-types','JobTypesController');
 Route::get('import-projects','ProjectController@importProjects');

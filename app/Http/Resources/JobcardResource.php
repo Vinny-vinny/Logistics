@@ -43,6 +43,8 @@ class JobcardResource extends JsonResource
             'card_no' => $this->card_no,
             'driver' => $this->machine->user->name,
             'machine' => $this->machine->code,
+            'plate_no' => $this->machine->plate_no,
+            'mechanic' => $this->mechanic ? $this->mechanic->name :'',
             'track_name' => $this->trackby->name,
             'make' => $this->machine->make,
             'status' => $this->status,
@@ -53,7 +55,8 @@ class JobcardResource extends JsonResource
             'service_types' => $this->machine->service_types,
             'labour_cost' => $this->labour_cost,
             'closed_at' => $this->closed_at,
-            'fuel' => $this->fuel ? $this->fuel->id : ''
+            'fuel' => $this->fuel ? $this->fuel->id : '',
+           'checklist' => $this->checklist ? $this->checklist->id :''
         ];
     }
 }

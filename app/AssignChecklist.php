@@ -17,4 +17,6 @@ class AssignChecklist extends Model
     {
        return $this->belongsTo(Jobcard::class);
     }
+
+
 }

@@ -24,6 +24,18 @@
                         <td>Cost Center</td>
                         <td></td>
                     </tr>
+                    <tr v-if="workshop">
+                        <td>Reg or Project</td>
+                        <td>{{job.plate_no}}</td>
+                    </tr>
+                    <tr v-if="workshop">
+                        <td>Inspector</td>
+                        <td></td>
+                    </tr>
+                    <tr v-if="workshop">
+                        <td>Mechanic</td>
+                        <td>{{job.user}}</td>
+                    </tr>
                     <tr>
                         <td>Date Start</td>
                         <td>{{job.start_date}}</td>
@@ -32,18 +44,69 @@
                         <td>Date Complete</td>
                         <td>{{job.start_date}}</td>
                     </tr>
-
                 </table>
                     <br>
-                    <table class="customers" style="margin-left: 40px;margin-top: 120px;">
+                    <table class="customers" style="margin-left: 40px;margin-top: 120px;" v-if="!workshop">
                         <tr>
                             <td>AUTHORIZED WORKS MANAGER'S SIGNATURE</td>
                             <td style="opacity:0">uuuuuuuuuuuuuuuuuuu</td>
                         </tr>
                     </table>
+                    <table class="customers" style="margin-left: 40px;margin-top: 120px;" v-if="workshop">
+                        <tr>
+                            <td>Make</td>
+                            <td>{{job.make}}</td>
+                        </tr>
+                        <tr>
+                            <td>Speed</td>
+                            <td style="opacity:0"></td>
+                        </tr>
+                    </table>
                     </div>
                 <hr>
-                <table class="customers" v-if="requisition_type =='Internal'">
+                <div class="tools" v-if="workshop">
+                    <span v-for="tool in tools"><input type="checkbox" class="tool" checked>{{tool}}</span>
+                </div>
+                <table class="customers" v-if="workshop">
+                    <tr>
+                        <th>Repair Required</th>
+                        <th>Description</th>
+                        <th>Mech.Check</th>
+                        <th>Super Check</th>
+                    </tr>
+                    <tr v-for="checklist in checklists">
+                        <td>{{checklist.name}}</td>
+                        <td>{{checklist.description}}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                </table>
+                <hr>
+                <table class="customers" v-if="workshop">
+                    <tr>
+                        <th>Items Required</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total Value</th>
+                        <th>Received By:</th>
+                        <th>Auth By:</th>
+                        <th>Remarks</th>
+                        <th>Invoice No.</th>
+                    </tr>
+                    <tr v-for="req in items">
+                        <td>{{req.item}}</td>
+                        <td>{{req.qty}}</td>
+                        <td>{{req.unit_price | number}}</td>
+                        <td>{{req.total_value | number}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                </table>
+                <table class="customers" v-if="requisition_type =='Internal' && !workshop">
                     <tr>
                         <th>DATE</th>
                         <th>DESCRIPTION</th>
@@ -66,7 +129,7 @@
                     </tr>
 
                 </table>
-                <table class="customers" v-if="requisition_type =='External'">
+                <table class="customers" v-if="requisition_type =='External' && !workshop">
                     <tr>
                         <th>DATE</th>
                         <th>DESCRIPTION</th>
@@ -105,6 +168,7 @@
                         <td>Registration</td>
                         <td>{{fuel_docket.vehicle}}</td>
                     </tr>
+
                     <tr>
                         <td>{{fuel_docket.track_by}} Readings</td>
                         <td>{{fuel_docket.current_readings}}</td>
@@ -184,9 +248,7 @@
                     </tr>
                 </table>
                     </div>
-
                 </div>
-
                 <br>
                 <p style="text-align: center;">This JOB CARD is NOT Valid without Manager's Signature</p>
 
@@ -220,29 +282,99 @@
                 has_fuel:false,
                 other_charges:{},
                 has_othercharges:false,
-                project_cost:0
+                project_cost:0,
+                category:'',
+                checklists:{},
+                tools:[],
+                items:[]
             }
         },
         created() {
           this.getJob();
+        },
+        computed:{
+          workshop(){
+             return this.category ==='workshop';
+          }
         },
         methods:{
             getJob(){
               axios.get('job-card')
               .then(res => {
                   this.job = res.data.find(j => j.id == this.$route.params['id']);
+                  this.category = this.job.category.toLowerCase().trim();
+                  //checklist configuration
+                  if (this.category == 'workshop'){
+                    if (this.job.checklist){
+                        axios.get('assign-checklist')
+                        .then(res => {
+                            let assn_checklist = res.data.find(check => check.id ==this.job.checklist);
+
+                            //tools
+                            axios.get('checklists')
+                            .then(res => {
+                                let checklist = res.data.find(c => c.id == assn_checklist.checklist_id);
+                                this.checklists = JSON.parse(checklist.checklists);
+                                axios.get('checklist-tool')
+                                .then(res => {
+                                  this.checklists.forEach(c => {
+                                      for(let i=0;i<res.data.length;i++){
+                                          if (res.data[i]['id'] == c.tool){
+                                              this.tools.push(res.data[i]['name']);
+                                          }
+                                      }
+                                  })
+                                })
+
+                            })
+                        })
+                    }
+                  }
                    if (this.job.requisition_id){
                        axios.get('requisitions')
                        .then(res => {
                         let req = res.data.find(r => r.id == this.job.requisition_id);
                         this.requisition = req;
                         if (req.type =='Internal'){
+                            console.log('internal')
                             this.requisition_type = 'Internal';
                             this.requisitions_internal = JSON.parse(req.inventory_items_internal);
+
+                            axios.get('parts')
+                            .then(res => {
+                                this.requisitions_internal.forEach(item => {
+                                    for (let i=0;i<res.data.length;i++){
+                                        if (res.data[i]['id'] == item.part){
+                                            this.items.push({
+                                                'item':res.data[i]['description'],
+                                                'qty':item.quantity,
+                                                'unit_price':item.unit_cost,
+                                                'total_value':item.total_cost,
+                                            });
+                                        }
+                                    }
+                                })
+                            })
                         }
                            if (req.type =='External'){
+                               console.log('external')
                                this.requisition_type = 'External';
                                this.requisitions_external = JSON.parse(req.inventory_items_external);
+                               axios.get('parts')
+                                   .then(res => {
+                                       this.requisitions_external.forEach(item => {
+                                           for (let i=0;i<res.data.length;i++){
+                                               if (res.data[i]['id'] == item.part){
+                                                   this.items.push({
+                                                       'item':res.data[i]['description'],
+                                                       'qty':item.quantity,
+                                                       'unit_price':item.unit_price,
+                                                       'total_value':item.total_price,
+                                                   });
+                                               }
+                                           }
+                                       })
+                                   })
                                 }
                        })
                    }
@@ -318,5 +450,11 @@
         .print {
             display: none;
         }
+    }
+    ul#menu li {
+        display:inline;
+    }
+    .tool{
+        margin-left: 10px;
     }
 </style>

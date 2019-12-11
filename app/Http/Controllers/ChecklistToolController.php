@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\ChecklistTool;
 class ChecklistToolController extends Controller
 {
     /**
@@ -13,7 +13,7 @@ class ChecklistToolController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(ChecklistTool::all());
     }
 
     /**
@@ -25,18 +25,6 @@ class ChecklistToolController extends Controller
     {
         //
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      *
@@ -48,17 +36,11 @@ class ChecklistToolController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function store(Request $request)
     {
-        //
+        $tool = ChecklistTool::create($request->all());
+        return response()->json($tool);
     }
-
     /**
      * Update the specified resource in storage.
      *
@@ -68,7 +50,8 @@ class ChecklistToolController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        ChecklistTool::find($id)->update($request->all());
+        return response()->json(ChecklistTool::find($id));
     }
 
     /**
@@ -79,6 +62,7 @@ class ChecklistToolController extends Controller
      */
     public function destroy($id)
     {
-        //
+        ChecklistTool::destroy($id);
+        return response()->json($id);
     }
 }

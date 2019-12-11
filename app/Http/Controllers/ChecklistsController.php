@@ -28,58 +28,8 @@ class ChecklistsController extends Controller
      */
     public function store(Request $request)
     {
-        $checklist = CheckList::create($request->except(['check_list','files']));
+        $checklist = CheckList::create($request->all());
         return response()->json(new ChecklistResource($checklist));
-    }
-
-    //Add Checklist File
-    public function addFile(Request $request)
-    {
-        $image = Input::file('checklist_file');
-        $filename = $image->getClientOriginalName();
-        $name = time() . '' . $filename;
-
-        Storage::disk('public')->putFileAs(
-            'files',
-            $image,
-            $name
-        );
-        $checklist = ChecklistFile::create(['filename' => $filename,
-            'check_list_id' => CheckList::count() + 1,
-            'mime' => $image->getClientMimeType(),
-            'size' => $image->getClientSize(),
-            'path' => $name
-        ]);
-        return response()->json($checklist);
-
-    }
-    //Update Checklist File
-    public function updateFile($id)
-    {
-        $image = Input::file('checklist_file');
-        $filename = $image->getClientOriginalName();
-        $name = time() . '' . $filename;
-
-        Storage::disk('public')->putFileAs(
-            'files',
-            $image,
-            $name
-        );
-        $checklist = ChecklistFile::create(['filename' => $filename,
-            'check_list_id' => $id,
-            'mime' => $image->getClientMimeType(),
-            'size' => $image->getClientSize(),
-            'path' => $name
-        ]);
-       return response()->json($checklist);
-    }
-    //Remove Checklist File
-    public function removeFile(Request $request)
-    {
-       $file = ChecklistFile::find($request->id);
-        Storage::delete($file->path);
-        $file->delete();
-       return response()->json($file);
     }
     /**
      * Display the specified resource.
@@ -101,7 +51,7 @@ class ChecklistsController extends Controller
     public function update(Request $request, $id)
     {
 
-        CheckList::find($id)->update($request->except(['expiry_type','check_list','duration_type','files']));
+        CheckList::find($id)->update($request->except(['expiry_type','duration_type']));
         return response()->json(new ChecklistResource(CheckList::find($id)));
     }
 

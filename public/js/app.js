@@ -2144,30 +2144,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['edit'],
   data: function data() {
@@ -2176,8 +2152,8 @@ __webpack_require__.r(__webpack_exports__);
         expiry_type_id: '',
         duration_no: '',
         name: '',
-        files: [],
         checklists: [{
+          tool: 'tool',
           name: '',
           description: ''
         }],
@@ -2187,78 +2163,20 @@ __webpack_require__.r(__webpack_exports__);
       expiry_types: {},
       duration_type: '',
       show_duration: false,
-      check_list: 0,
-      updated_files: []
+      tools: {}
     };
   },
   created: function created() {
     this.listen();
     this.getExpiryTypes();
+    this.getTools();
   },
   methods: {
-    //download File   function
-    downloadFile: function downloadFile(file) {
-      var path = site_url + 'storage/files/' + file.path;
-      axios.get(path, {
-        responseType: 'blob'
-      }).then(function (_ref) {
-        var data = _ref.data;
-        var blob = new Blob([data], {
-          type: file.mime
-        });
-        var link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = file.filename;
-        link.click();
-      })["catch"](function (error) {
-        return console.error(error);
-      });
-    },
-    handleFiles: function handleFiles() {
-      var uploadedFiles = this.$refs.files.files;
-
-      for (var i = 0; i < uploadedFiles.length; i++) {
-        this.form.files.push(uploadedFiles[i]);
-      }
-
-      this.getImagePreviews();
-    },
-    getImagePreviews: function getImagePreviews() {
+    getTools: function getTools() {
       var _this = this;
 
-      var _loop = function _loop(i) {
-        if (/\.(jpe?g|png|gif)$/i.test(_this.form.files[i].name)) {
-          var reader = new FileReader();
-          reader.addEventListener("load", function () {
-            this.$refs['preview' + parseInt(i)][0].src = reader.result;
-          }.bind(_this), false);
-          reader.readAsDataURL(_this.form.files[i]);
-        } else {
-          _this.$nextTick(function () {
-            this.$refs['preview' + parseInt(i)][0].src = '/img/generic.png';
-          });
-        }
-      };
-
-      for (var i = 0; i < this.form.files.length; i++) {
-        _loop(i);
-      }
-    },
-    removeFile: function removeFile(key) {
-      this.form.files.splice(key, 1);
-      this.getImagePreviews();
-    },
-    deleteFile: function deleteFile(file) {
-      var _this2 = this;
-
-      axios.post("remove-checklist-file", {
-        id: file.id
-      }).then(function (res) {
-        for (var i = 0; i < _this2.updated_files.length; i++) {
-          if (_this2.updated_files[i]['id'] === file.id) {
-            _this2.updated_files.splice(i, 1);
-          }
-        }
+      axios.get('checklist-tool').then(function (res) {
+        _this.tools = res.data;
       });
     },
     removeChecklist: function removeChecklist(i) {
@@ -2266,81 +2184,43 @@ __webpack_require__.r(__webpack_exports__);
     },
     addChecklist: function addChecklist() {
       this.form.checklists.push({
+        tool: '',
         name: '',
         description: ''
       });
     },
     getDuration: function getDuration() {
-      var _this3 = this;
+      var _this2 = this;
 
       this.expiry_types.forEach(function (type) {
-        if (type.id === _this3.form.expiry_type_id) {
-          _this3.duration_type = type.name;
-          _this3.show_duration = true;
+        if (type.id === _this2.form.expiry_type_id) {
+          _this2.duration_type = type.name;
+          _this2.show_duration = true;
           return;
         }
       });
     },
     getExpiryTypes: function getExpiryTypes() {
-      var _this4 = this;
+      var _this3 = this;
 
       axios.get('expiry-types').then(function (expiry) {
-        _this4.expiry_types = expiry.data;
+        _this3.expiry_types = expiry.data;
       });
     },
     saveChecklist: function saveChecklist() {
-      if (this.check_list === 0) {
-        if (Object.values(this.form.checklists[0])[0] === '' || Object.values(this.form.checklists[0])[0] === '') {
-          return this.$toastr.e('Checklist field are required.');
-        }
+      if (Object.values(this.form.checklists[0])[0] === '' || Object.values(this.form.checklists[0])[1] === '' || Object.values(this.form.checklists[0])[2] === '') {
+        return this.$toastr.e('Checklist field are required.');
+      }
 
-        for (var i = 0; i < this.form.checklists.length; i++) {
-          if (this.form.checklists[i]['name'] === null || this.form.checklists[i]['name'] === '' || this.form.checklists[i]['description'] === null || this.form.checklists[i]['description'] === '') {
-            return this.$toastr.e('All checklist fields are required');
-          }
+      for (var i = 0; i < this.form.checklists.length; i++) {
+        if (this.form.checklists[i]['tool'] === null || this.form.checklists[i]['tool'] === '' || this.form.checklists[i]['name'] === null || this.form.checklists[i]['name'] === '' || this.form.checklists[i]['description'] === null || this.form.checklists[i]['description'] === '') {
+          return this.$toastr.e('All checklist fields are required');
         }
       }
 
       this.edit_checklist ? this.update() : this.save();
     },
     save: function save() {
-      var _this5 = this;
-
-      var config = {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      };
-
-      var _loop2 = function _loop2(i) {
-        if (_this5.form.files[i].id) {
-          return "continue";
-        }
-
-        var formData = new FormData();
-        formData.append('checklist_file', _this5.form.files[i]);
-        axios.post("add-checklist-file", formData, config).then(function (data) {
-          _this5.form.files[i].id = data['data']['id'];
-
-          if (_this5.form.files[i].id == _this5.form.files[_this5.form.files.length - 1].id) {
-            _this5.savePartial();
-          }
-
-          _this5.form.files.splice(i, 1, _this5.form.files[i]);
-        });
-      };
-
-      for (var i = 0; i < this.form.files.length; i++) {
-        var _ret = _loop2(i);
-
-        if (_ret === "continue") continue;
-      }
-
-      if (!this.form.files.length) {
-        this.savePartial();
-      }
-    },
-    savePartial: function savePartial() {
       this.form.checklists = JSON.stringify(this.form.checklists);
       delete this.form.id;
       axios.post('checklists', this.form).then(function (res) {
@@ -2350,48 +2230,22 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     update: function update() {
-      var _this6 = this;
-
-      var config = {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      };
-
-      var _loop3 = function _loop3(i) {
-        if (_this6.form.files[i].id) {
-          return "continue";
-        }
-
-        var formData = new FormData();
-        formData.append('checklist_file', _this6.form.files[i]);
-        axios.post("update-checklist-file/".concat(_this6.form.id), formData, config).then(function (data) {
-          _this6.form.files[i].id = data['data']['id'];
-
-          if (_this6.form.files[i].id == _this6.form.files[_this6.form.files.length - 1].id) {
-            _this6.updatePartial();
-          }
-
-          _this6.form.files.splice(i, 1, _this6.form.files[i]);
-        });
-      };
-
-      for (var i = 0; i < this.form.files.length; i++) {
-        var _ret2 = _loop3(i);
-
-        if (_ret2 === "continue") continue;
-      }
-
-      if (!this.form.files.length) {
-        this.updatePartial();
-      }
-    },
-    updatePartial: function updatePartial() {
-      var _this7 = this;
+      var _this4 = this;
 
       this.form.checklists = JSON.stringify(this.form.checklists);
       axios.patch("checklists/".concat(this.form.id), this.form).then(function (res) {
-        _this7.edit_checklist = false;
+        _this4.edit_checklist = false;
+        eventBus.$emit('updateChecklist', res.data);
+      })["catch"](function (error) {
+        return error.response;
+      });
+    },
+    updatePartial: function updatePartial() {
+      var _this5 = this;
+
+      this.form.checklists = JSON.stringify(this.form.checklists);
+      axios.patch("checklists/".concat(this.form.id), this.form).then(function (res) {
+        _this5.edit_checklist = false;
         eventBus.$emit('updateChecklist', res.data);
       })["catch"](function (error) {
         return error.response;
@@ -2412,16 +2266,6 @@ __webpack_require__.r(__webpack_exports__);
         this.show_duration = true;
         this.duration_type = this.$store.state.checklists.duration_type;
         this.form.checklists = JSON.parse(this.$store.state.checklists.checklists);
-        this.updated_files = this.$store.state.checklists.files;
-        console.log(this.form.files.length > 0);
-
-        if (this.form.files.length > 0) {
-          this.check_list = 1;
-        } else {
-          this.check_list = 0;
-        }
-
-        this.form.files = [];
       }
     }
   }
@@ -2940,6 +2784,237 @@ __webpack_require__.r(__webpack_exports__);
   },
   components: {
     AssignChecklist: _AssignChecklist__WEBPACK_IMPORTED_MODULE_0__["default"]
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Index.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/checklists/tools/Index.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Tool__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tool */ "./resources/js/components/checklists/tools/Tool.vue");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      tableData: [],
+      add_tool: false,
+      editing: false
+    };
+  },
+  created: function created() {
+    this.listen();
+    this.getTools();
+  },
+  mounted: function mounted() {
+    this.initDatable();
+  },
+  methods: {
+    getTools: function getTools() {
+      var _this = this;
+
+      axios.get('checklist-tool').then(function (res) {
+        return _this.tableData = res.data;
+      })["catch"](function (error) {
+        return Exception.handle(error);
+      });
+    },
+    editTool: function editTool(tool) {
+      var _this2 = this;
+
+      this.$store.dispatch('updateTool', tool).then(function () {
+        _this2.editing = true;
+        _this2.add_tool = true;
+      });
+    },
+    deleteTool: function deleteTool(id) {
+      var _this3 = this;
+
+      axios["delete"]("checklist-tool/".concat(id)).then(function (res) {
+        for (var i = 0; i < _this3.tableData.length; i++) {
+          if (_this3.tableData[i].id == res.data) {
+            _this3.tableData.splice(i, 1);
+          }
+        }
+      })["catch"](function (error) {
+        return Exception.handle(error);
+      });
+    },
+    listen: function listen() {
+      var _this4 = this;
+
+      eventBus.$on('listTools', function (tool) {
+        _this4.tableData.unshift(tool);
+
+        _this4.add_tool = false;
+
+        _this4.initDatable();
+      });
+      eventBus.$on('cancel', function () {
+        _this4.add_tool = false;
+        _this4.editing = false;
+
+        _this4.initDatable();
+      });
+      eventBus.$on('updateTool', function (tool) {
+        _this4.add_tool = false;
+        _this4.editing = false;
+
+        var index = _this4.tableData.map(function (t) {
+          return t.id;
+        }).indexOf(tool.id);
+
+        _this4.tableData.splice(index, 1);
+
+        _this4.tableData.unshift(tool);
+
+        _this4.initDatable();
+      });
+    },
+    initDatable: function initDatable() {
+      setTimeout(function () {
+        $('.dt').DataTable({
+          "pagingType": "full_numbers",
+          "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+          order: [[0, 'asc'], [3, 'desc']],
+          responsive: true,
+          destroy: true,
+          retrieve: true,
+          autoFill: true,
+          colReorder: true
+        });
+      }, 1000);
+    }
+  },
+  components: {
+    Tool: _Tool__WEBPACK_IMPORTED_MODULE_0__["default"]
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Tool.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/checklists/tools/Tool.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['edit'],
+  data: function data() {
+    return {
+      form: {
+        name: '',
+        id: ''
+      },
+      edit_tool: this.edit
+    };
+  },
+  created: function created() {
+    this.listen();
+  },
+  methods: {
+    saveTrack: function saveTrack() {
+      this.edit_tool ? this.update() : this.save();
+    },
+    save: function save() {
+      delete this.form.id;
+      axios.post('checklist-tool', this.form).then(function (res) {
+        return eventBus.$emit('listTools', res.data);
+      })["catch"](function (error) {
+        return error.response;
+      });
+    },
+    update: function update() {
+      var _this = this;
+
+      axios.patch("checklist-tool/".concat(this.form.id), this.form).then(function (res) {
+        _this.edit_tool = false;
+        eventBus.$emit('updateTool', res.data);
+      })["catch"](function (error) {
+        return error.response;
+      });
+    },
+    cancel: function cancel() {
+      eventBus.$emit('cancel');
+    },
+    listen: function listen() {
+      if (this.edit) {
+        this.form = this.$store.state.checklist_tool;
+      }
+    }
   }
 });
 
@@ -4541,6 +4616,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     username: function username() {
@@ -5072,6 +5148,68 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5089,11 +5227,20 @@ __webpack_require__.r(__webpack_exports__);
       has_fuel: false,
       other_charges: {},
       has_othercharges: false,
-      project_cost: 0
+      project_cost: 0,
+      category: '',
+      checklists: {},
+      tools: [],
+      items: []
     };
   },
   created: function created() {
     this.getJob();
+  },
+  computed: {
+    workshop: function workshop() {
+      return this.category === 'workshop';
+    }
   },
   methods: {
     getJob: function getJob() {
@@ -5103,6 +5250,33 @@ __webpack_require__.r(__webpack_exports__);
         _this.job = res.data.find(function (j) {
           return j.id == _this.$route.params['id'];
         });
+        _this.category = _this.job.category.toLowerCase().trim(); //checklist configuration
+
+        if (_this.category == 'workshop') {
+          if (_this.job.checklist) {
+            axios.get('assign-checklist').then(function (res) {
+              var assn_checklist = res.data.find(function (check) {
+                return check.id == _this.job.checklist;
+              }); //tools
+
+              axios.get('checklists').then(function (res) {
+                var checklist = res.data.find(function (c) {
+                  return c.id == assn_checklist.checklist_id;
+                });
+                _this.checklists = JSON.parse(checklist.checklists);
+                axios.get('checklist-tool').then(function (res) {
+                  _this.checklists.forEach(function (c) {
+                    for (var i = 0; i < res.data.length; i++) {
+                      if (res.data[i]['id'] == c.tool) {
+                        _this.tools.push(res.data[i]['name']);
+                      }
+                    }
+                  });
+                });
+              });
+            });
+          }
+        }
 
         if (_this.job.requisition_id) {
           axios.get('requisitions').then(function (res) {
@@ -5112,13 +5286,43 @@ __webpack_require__.r(__webpack_exports__);
             _this.requisition = req;
 
             if (req.type == 'Internal') {
+              console.log('internal');
               _this.requisition_type = 'Internal';
               _this.requisitions_internal = JSON.parse(req.inventory_items_internal);
+              axios.get('parts').then(function (res) {
+                _this.requisitions_internal.forEach(function (item) {
+                  for (var i = 0; i < res.data.length; i++) {
+                    if (res.data[i]['id'] == item.part) {
+                      _this.items.push({
+                        'item': res.data[i]['description'],
+                        'qty': item.quantity,
+                        'unit_price': item.unit_cost,
+                        'total_value': item.total_cost
+                      });
+                    }
+                  }
+                });
+              });
             }
 
             if (req.type == 'External') {
+              console.log('external');
               _this.requisition_type = 'External';
               _this.requisitions_external = JSON.parse(req.inventory_items_external);
+              axios.get('parts').then(function (res) {
+                _this.requisitions_external.forEach(function (item) {
+                  for (var i = 0; i < res.data.length; i++) {
+                    if (res.data[i]['id'] == item.part) {
+                      _this.items.push({
+                        'item': res.data[i]['description'],
+                        'qty': item.quantity,
+                        'unit_price': item.unit_price,
+                        'total_value': item.total_price
+                      });
+                    }
+                  }
+                });
+              });
             }
           });
         } //Labour calculation = hrs* job type
@@ -10672,7 +10876,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.add[data-v-0b78b84f] {\n    margin-left: 20px;\n    font-size: 18px;\n}\n.description[data-v-0b78b84f] {\n    margin-left: 10px;\n    margin-bottom: 10px;\n}\n.action_name[data-v-0b78b84f] {\n    margin-bottom: 10px;\n}\ninput[type=\"file\"][data-v-0b78b84f] {\n    opacity: 0;\n    width: 100%;\n    height: 200px;\n    position: absolute;\n    cursor: pointer;\n}\n.filezone[data-v-0b78b84f] {\n    outline: 2px dashed grey;\n    outline-offset: -10px;\n    background: #ccc;\n    color: dimgray;\n    padding: 10px 10px;\n    min-height: 200px;\n    position: relative;\n    cursor: pointer;\n}\n.filezone[data-v-0b78b84f]:hover {\n    background: #c0c0c0;\n}\n.filezone p[data-v-0b78b84f] {\n    font-size: 1.2em;\n    text-align: center;\n    padding: 50px 50px 50px 50px;\n}\ndiv.file-listing img[data-v-0b78b84f] {\n    max-width: 90%;\n}\ndiv.file-listing[data-v-0b78b84f] {\n    margin: auto;\n    padding: 10px;\n    border-bottom: 1px solid #ddd;\n}\ndiv.file-listing img[data-v-0b78b84f] {\n    height: 100px;\n}\ndiv.success-container[data-v-0b78b84f] {\n    text-align: center;\n    color: green;\n}\ndiv.remove-container[data-v-0b78b84f] {\n    text-align: center;\n}\ndiv.remove-container a[data-v-0b78b84f] {\n    color: red;\n    cursor: pointer;\n}\n", ""]);
+exports.push([module.i, "\n.add[data-v-0b78b84f] {\n    margin-left: 20px;\n    font-size: 18px;\n}\n.description[data-v-0b78b84f] {\n    margin-left: 10px;\n    margin-bottom: 10px;\n}\n.description_2[data-v-0b78b84f]{\n    margin-left: 20px;\n    margin-bottom: 10px;\n}\n.action_name[data-v-0b78b84f] {\n    margin-bottom: 10px;\n}\ninput[type=\"file\"][data-v-0b78b84f] {\n    opacity: 0;\n    width: 100%;\n    height: 200px;\n    position: absolute;\n    cursor: pointer;\n}\n.filezone[data-v-0b78b84f] {\n    outline: 2px dashed grey;\n    outline-offset: -10px;\n    background: #ccc;\n    color: dimgray;\n    padding: 10px 10px;\n    min-height: 200px;\n    position: relative;\n    cursor: pointer;\n}\n.filezone[data-v-0b78b84f]:hover {\n    background: #c0c0c0;\n}\n.filezone p[data-v-0b78b84f] {\n    font-size: 1.2em;\n    text-align: center;\n    padding: 50px 50px 50px 50px;\n}\ndiv.file-listing img[data-v-0b78b84f] {\n    max-width: 90%;\n}\ndiv.file-listing[data-v-0b78b84f] {\n    margin: auto;\n    padding: 10px;\n    border-bottom: 1px solid #ddd;\n}\ndiv.file-listing img[data-v-0b78b84f] {\n    height: 100px;\n}\ndiv.success-container[data-v-0b78b84f] {\n    text-align: center;\n    color: green;\n}\ndiv.remove-container[data-v-0b78b84f] {\n    text-align: center;\n}\ndiv.remove-container a[data-v-0b78b84f] {\n    color: red;\n    cursor: pointer;\n}\n", ""]);
 
 // exports
 
@@ -10748,7 +10952,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\n.customers[data-v-3c000a36] {\n    font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;\n    border-collapse: collapse;\n    width: 100%;\n}\n.customers td[data-v-3c000a36], .customers th[data-v-3c000a36] {\n    border: 1px solid #ddd;\n    padding: 8px;\n}\n.customers tr[data-v-3c000a36]:nth-child(even){background-color: #f2f2f2;}\n.customers tr[data-v-3c000a36]:hover {background-color: #ddd;}\n.customers th[data-v-3c000a36] {\n    padding-top: 12px;\n    padding-bottom: 12px;\n    text-align: left;\n    background-color: gray;\n    color: white;\n}\n@media print {\n.print[data-v-3c000a36] {\n        display: none;\n}\n}\n", ""]);
+exports.push([module.i, "\n.customers[data-v-3c000a36] {\n    font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;\n    border-collapse: collapse;\n    width: 100%;\n}\n.customers td[data-v-3c000a36], .customers th[data-v-3c000a36] {\n    border: 1px solid #ddd;\n    padding: 8px;\n}\n.customers tr[data-v-3c000a36]:nth-child(even){background-color: #f2f2f2;}\n.customers tr[data-v-3c000a36]:hover {background-color: #ddd;}\n.customers th[data-v-3c000a36] {\n    padding-top: 12px;\n    padding-bottom: 12px;\n    text-align: left;\n    background-color: gray;\n    color: white;\n}\n@media print {\n.print[data-v-3c000a36] {\n        display: none;\n}\n}\nul#menu li[data-v-3c000a36] {\n    display:inline;\n}\n.tool[data-v-3c000a36]{\n    margin-left: 10px;\n}\n", ""]);
 
 // exports
 
@@ -31194,283 +31398,156 @@ var render = function() {
                 : _vm._e(),
               _vm._v(" "),
               _c("div", { staticClass: "form-group" }, [
-                _c("label", { staticClass: "radio-inline" }, [
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.check_list,
-                        expression: "check_list"
-                      }
-                    ],
-                    attrs: { type: "radio", name: "check_list", value: "0" },
-                    domProps: { checked: _vm._q(_vm.check_list, "0") },
-                    on: {
-                      change: function($event) {
-                        _vm.check_list = "0"
-                      }
-                    }
-                  }),
-                  _vm._v("Type Checklist manually")
-                ]),
+                _c("label", [_vm._v("Enter Checklist")]),
                 _vm._v(" "),
-                _c("label", { staticClass: "radio-inline" }, [
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.check_list,
-                        expression: "check_list"
-                      }
-                    ],
-                    attrs: { type: "radio", name: "check_list", value: "1" },
-                    domProps: { checked: _vm._q(_vm.check_list, "1") },
-                    on: {
-                      change: function($event) {
-                        _vm.check_list = "1"
-                      }
-                    }
-                  }),
-                  _vm._v("Upload File")
-                ])
-              ]),
-              _vm._v(" "),
-              _vm.check_list == 1
-                ? _c(
-                    "div",
-                    { staticClass: "form-group" },
-                    [
-                      _c("label", [_vm._v("Upload Checklist File(s)")]),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        { staticClass: "large-12 medium-12 small-12 filezone" },
-                        [
+                _c(
+                  "table",
+                  { staticStyle: { width: "100%" } },
+                  [
+                    _vm._m(0),
+                    _vm._v(" "),
+                    _vm._l(_vm.form.checklists, function(checklist, k) {
+                      return _c("tr", [
+                        _c("td", [
+                          _c(
+                            "select",
+                            {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: checklist.tool,
+                                  expression: "checklist.tool"
+                                }
+                              ],
+                              staticClass: "form-control action_name",
+                              on: {
+                                change: function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    checklist,
+                                    "tool",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                }
+                              }
+                            },
+                            _vm._l(_vm.tools, function(tool) {
+                              return _c(
+                                "option",
+                                { key: tool.id, domProps: { value: tool.id } },
+                                [_vm._v(_vm._s(tool.name))]
+                              )
+                            }),
+                            0
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
                           _c("input", {
-                            ref: "files",
-                            attrs: { type: "file", id: "files", multiple: "" },
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: checklist.name,
+                                expression: "checklist.name"
+                              }
+                            ],
+                            staticClass: "form-control description",
+                            attrs: { type: "text", placeholder: "Action Name" },
+                            domProps: { value: checklist.name },
                             on: {
-                              change: function($event) {
-                                return _vm.handleFiles()
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(checklist, "name", $event.target.value)
+                              }
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: checklist.description,
+                                expression: "checklist.description"
+                              }
+                            ],
+                            staticClass: "form-control description_2",
+                            attrs: { type: "text", placeholder: "Description" },
+                            domProps: { value: checklist.description },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  checklist,
+                                  "description",
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c("i", {
+                            directives: [
+                              {
+                                name: "show",
+                                rawName: "v-show",
+                                value:
+                                  k || (!k && _vm.form.checklists.length > 1),
+                                expression:
+                                  "k || (!k && form.checklists.length > 1)"
+                              }
+                            ],
+                            staticClass: "fa fa-minus-circle add",
+                            on: {
+                              click: function($event) {
+                                return _vm.removeChecklist(k)
                               }
                             }
                           }),
                           _vm._v(" "),
-                          _vm._m(0)
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _vm._l(_vm.form.files, function(file, k) {
-                        return _c("div", { staticClass: "file-listing" }, [
-                          _c("img", {
-                            ref: "preview" + parseInt(k),
-                            refInFor: true,
-                            staticClass: "preview"
-                          }),
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(file.name) +
-                              "\n                            "
-                          ),
-                          _c("div", { staticClass: "remove-container" }, [
-                            _c(
-                              "a",
+                          _c("i", {
+                            directives: [
                               {
-                                staticClass: "remove",
-                                on: {
-                                  click: function($event) {
-                                    return _vm.removeFile(k)
-                                  }
-                                }
-                              },
-                              [
-                                _c("i", { staticClass: "fa fa-trash" }),
-                                _vm._v(" Remove")
-                              ]
-                            )
-                          ])
+                                name: "show",
+                                rawName: "v-show",
+                                value: k == _vm.form.checklists.length - 1,
+                                expression: "k == form.checklists.length-1"
+                              }
+                            ],
+                            staticClass: "fa fa-plus-circle add",
+                            on: {
+                              click: function($event) {
+                                return _vm.addChecklist(k)
+                              }
+                            }
+                          })
                         ])
-                      }),
-                      _vm._v(" "),
-                      _c("br"),
-                      _vm._v(" "),
-                      _vm._l(_vm.updated_files, function(file, key) {
-                        return _vm.edit
-                          ? _c("div", { staticClass: "file-listing" }, [
-                              _c("img", {
-                                attrs: {
-                                  src: "storage/files/" + file.path,
-                                  alt: file.name
-                                }
-                              }),
-                              _vm._v(
-                                "\n                             " +
-                                  _vm._s(file.filename) +
-                                  "\n                            "
-                              ),
-                              _c("div", { staticClass: "remove-container" }, [
-                                _c(
-                                  "a",
-                                  {
-                                    staticClass: "success",
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.downloadFile(file)
-                                      }
-                                    }
-                                  },
-                                  [
-                                    _c("i", { staticClass: "fa fa-download" }),
-                                    _vm._v(" Download")
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "a",
-                                  {
-                                    staticClass: "success",
-                                    staticStyle: { "margin-left": "10px" },
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.deleteFile(file)
-                                      }
-                                    }
-                                  },
-                                  [
-                                    _c("i", { staticClass: "fa fa-trash" }),
-                                    _vm._v(" Remove")
-                                  ]
-                                )
-                              ])
-                            ])
-                          : _vm._e()
-                      })
-                    ],
-                    2
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.check_list == 0
-                ? _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Enter Checklist")]),
-                    _vm._v(" "),
-                    _c(
-                      "table",
-                      { staticStyle: { width: "100%" } },
-                      [
-                        _vm._m(1),
-                        _vm._v(" "),
-                        _vm._l(_vm.form.checklists, function(checklist, k) {
-                          return _c("tr", [
-                            _c("td", [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: checklist.name,
-                                    expression: "checklist.name"
-                                  }
-                                ],
-                                staticClass: "form-control action_name",
-                                attrs: {
-                                  type: "text",
-                                  placeholder: "Action Name"
-                                },
-                                domProps: { value: checklist.name },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.$set(
-                                      checklist,
-                                      "name",
-                                      $event.target.value
-                                    )
-                                  }
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: checklist.description,
-                                    expression: "checklist.description"
-                                  }
-                                ],
-                                staticClass: "form-control description",
-                                attrs: {
-                                  type: "text",
-                                  placeholder: "Description"
-                                },
-                                domProps: { value: checklist.description },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.$set(
-                                      checklist,
-                                      "description",
-                                      $event.target.value
-                                    )
-                                  }
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _c("i", {
-                                directives: [
-                                  {
-                                    name: "show",
-                                    rawName: "v-show",
-                                    value:
-                                      k ||
-                                      (!k && _vm.form.checklists.length > 1),
-                                    expression:
-                                      "k || (!k && form.checklists.length > 1)"
-                                  }
-                                ],
-                                staticClass: "fa fa-minus-circle add",
-                                on: {
-                                  click: function($event) {
-                                    return _vm.removeChecklist(k)
-                                  }
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("i", {
-                                directives: [
-                                  {
-                                    name: "show",
-                                    rawName: "v-show",
-                                    value: k == _vm.form.checklists.length - 1,
-                                    expression: "k == form.checklists.length-1"
-                                  }
-                                ],
-                                staticClass: "fa fa-plus-circle add",
-                                on: {
-                                  click: function($event) {
-                                    return _vm.addChecklist(k)
-                                  }
-                                }
-                              })
-                            ])
-                          ])
-                        })
-                      ],
-                      2
-                    )
-                  ])
-                : _vm._e(),
+                      ])
+                    })
+                  ],
+                  2
+                )
+              ]),
               _vm._v(" "),
               _c(
                 "button",
@@ -31499,17 +31576,15 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("p", [
-      _vm._v("\n                                Drop your files here "),
-      _c("br"),
-      _vm._v("or click to search\n                            ")
+    return _c("tr", [
+      _c("th"),
+      _vm._v(" "),
+      _c("th"),
+      _vm._v(" "),
+      _c("th"),
+      _vm._v(" "),
+      _c("th")
     ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("tr", [_c("th"), _vm._v(" "), _c("th"), _vm._v(" "), _c("th")])
   }
 ]
 render._withStripped = true
@@ -31987,6 +32062,223 @@ var staticRenderFns = [
     ])
   }
 ]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Index.vue?vue&type=template&id=10848bf2&scoped=true&":
+/*!*************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/checklists/tools/Index.vue?vue&type=template&id=10848bf2&scoped=true& ***!
+  \*************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    [
+      _vm.add_tool ? _c("tool", { attrs: { edit: _vm.editing } }) : _vm._e(),
+      _vm._v(" "),
+      !_vm.add_tool
+        ? _c("section", { staticClass: "content" }, [
+            _c("div", { staticClass: "box" }, [
+              _c("div", { staticClass: "box-header with-border" }, [
+                _c("h3", { staticClass: "box-title" }, [
+                  _vm._v("Checklist Tools")
+                ]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary pull-right",
+                    on: {
+                      click: function($event) {
+                        _vm.add_tool = true
+                      }
+                    }
+                  },
+                  [_vm._v("Add Checklist Tool")]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "box-body" }, [
+                _c("table", { staticClass: "table table-striped dt" }, [
+                  _vm._m(0),
+                  _vm._v(" "),
+                  _c(
+                    "tbody",
+                    _vm._l(_vm.tableData, function(tool) {
+                      return _c("tr", [
+                        _c("td", [_vm._v(_vm._s(tool.id))]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(tool.name))]),
+                        _vm._v(" "),
+                        _c("td", { staticStyle: { display: "none" } }, [
+                          _vm._v(_vm._s(tool.name))
+                        ]),
+                        _vm._v(" "),
+                        _c("td", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-success btn-sm",
+                              on: {
+                                click: function($event) {
+                                  return _vm.editTool(tool)
+                                }
+                              }
+                            },
+                            [_c("i", { staticClass: "fa fa-edit" })]
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-danger btn-sm",
+                              on: {
+                                click: function($event) {
+                                  return _vm.deleteTool(tool.id)
+                                }
+                              }
+                            },
+                            [_c("i", { staticClass: "fa fa-trash" })]
+                          )
+                        ])
+                      ])
+                    }),
+                    0
+                  )
+                ])
+              ])
+            ])
+          ])
+        : _vm._e()
+    ],
+    1
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("#")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { display: "none" } }, [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Actions")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Tool.vue?vue&type=template&id=c563de1a&scoped=true&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/checklists/tools/Tool.vue?vue&type=template&id=c563de1a&scoped=true& ***!
+  \************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("section", { staticClass: "content" }, [
+      _c("div", { staticClass: "box" }, [
+        _c("div", { staticClass: "box-header with-border" }, [
+          _c("h3", { staticClass: "box-title" }, [
+            _vm._v(
+              _vm._s(
+                _vm.edit_tool ? "Update Checklist Tools" : "New Checklist Tool"
+              )
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "box-body" }, [
+          _c(
+            "form",
+            {
+              on: {
+                submit: function($event) {
+                  $event.preventDefault()
+                  return _vm.saveTrack()
+                }
+              }
+            },
+            [
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", [_vm._v("Name")]),
+                _vm._v(" "),
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.form.name,
+                      expression: "form.name"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text", required: "" },
+                  domProps: { value: _vm.form.name },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.form, "name", $event.target.value)
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c(
+                "button",
+                { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+                [_vm._v(_vm._s(_vm.edit_tool ? "Update" : "Save"))]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-outline-danger",
+                  attrs: { type: "button" },
+                  on: { click: _vm.cancel }
+                },
+                [_vm._v("Cancel")]
+              )
+            ]
+          )
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -34166,6 +34458,16 @@ var render = function() {
                     ])
                   ],
                   1
+                ),
+                _vm._v(" "),
+                _c(
+                  "li",
+                  [
+                    _c("router-link", { attrs: { to: "/checklist-tool" } }, [
+                      _vm._v("Checklist Tools")
+                    ])
+                  ],
+                  1
                 )
               ])
             ])
@@ -34630,6 +34932,30 @@ var render = function() {
               _vm._v(" "),
               _vm._m(1),
               _vm._v(" "),
+              _vm.workshop
+                ? _c("tr", [
+                    _c("td", [_vm._v("Reg or Project")]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v(_vm._s(_vm.job.plate_no))])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.workshop
+                ? _c("tr", [
+                    _c("td", [_vm._v("Inspector")]),
+                    _vm._v(" "),
+                    _c("td")
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.workshop
+                ? _c("tr", [
+                    _c("td", [_vm._v("Mechanic")]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v(_vm._s(_vm.job.user))])
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
               _c("tr", [
                 _c("td", [_vm._v("Date Start")]),
                 _vm._v(" "),
@@ -34645,17 +34971,128 @@ var render = function() {
             _vm._v(" "),
             _c("br"),
             _vm._v(" "),
-            _vm._m(2)
+            !_vm.workshop
+              ? _c(
+                  "table",
+                  {
+                    staticClass: "customers",
+                    staticStyle: {
+                      "margin-left": "40px",
+                      "margin-top": "120px"
+                    }
+                  },
+                  [_vm._m(2)]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.workshop
+              ? _c(
+                  "table",
+                  {
+                    staticClass: "customers",
+                    staticStyle: {
+                      "margin-left": "40px",
+                      "margin-top": "120px"
+                    }
+                  },
+                  [
+                    _c("tr", [
+                      _c("td", [_vm._v("Make")]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(_vm.job.make))])
+                    ]),
+                    _vm._v(" "),
+                    _vm._m(3)
+                  ]
+                )
+              : _vm._e()
           ]),
           _vm._v(" "),
           _c("hr"),
           _vm._v(" "),
-          _vm.requisition_type == "Internal"
+          _vm.workshop
+            ? _c(
+                "div",
+                { staticClass: "tools" },
+                _vm._l(_vm.tools, function(tool) {
+                  return _c("span", [
+                    _c("input", {
+                      staticClass: "tool",
+                      attrs: { type: "checkbox", checked: "" }
+                    }),
+                    _vm._v(_vm._s(tool))
+                  ])
+                }),
+                0
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.workshop
             ? _c(
                 "table",
                 { staticClass: "customers" },
                 [
-                  _vm._m(3),
+                  _vm._m(4),
+                  _vm._v(" "),
+                  _vm._l(_vm.checklists, function(checklist) {
+                    return _c("tr", [
+                      _c("td", [_vm._v(_vm._s(checklist.name))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(checklist.description))]),
+                      _vm._v(" "),
+                      _c("td"),
+                      _vm._v(" "),
+                      _c("td")
+                    ])
+                  })
+                ],
+                2
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _c("hr"),
+          _vm._v(" "),
+          _vm.workshop
+            ? _c(
+                "table",
+                { staticClass: "customers" },
+                [
+                  _vm._m(5),
+                  _vm._v(" "),
+                  _vm._l(_vm.items, function(req) {
+                    return _c("tr", [
+                      _c("td", [_vm._v(_vm._s(req.item))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(req.qty))]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("number")(req.unit_price)))
+                      ]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("number")(req.total_value)))
+                      ]),
+                      _vm._v(" "),
+                      _c("td"),
+                      _vm._v(" "),
+                      _c("td"),
+                      _vm._v(" "),
+                      _c("td"),
+                      _vm._v(" "),
+                      _c("td")
+                    ])
+                  })
+                ],
+                2
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.requisition_type == "Internal" && !_vm.workshop
+            ? _c(
+                "table",
+                { staticClass: "customers" },
+                [
+                  _vm._m(6),
                   _vm._v(" "),
                   _vm._l(_vm.requisitions_internal, function(req) {
                     return _c("tr", [
@@ -34685,12 +35122,12 @@ var render = function() {
               )
             : _vm._e(),
           _vm._v(" "),
-          _vm.requisition_type == "External"
+          _vm.requisition_type == "External" && !_vm.workshop
             ? _c(
                 "table",
                 { staticClass: "customers" },
                 [
-                  _vm._m(4),
+                  _vm._m(7),
                   _vm._v(" "),
                   _vm._l(_vm.requisitions_external, function(req) {
                     return _c("tr", [
@@ -34750,7 +35187,7 @@ var render = function() {
                   _vm._v(" "),
                   _c("br"),
                   _vm._v(" "),
-                  _vm._m(5),
+                  _vm._m(8),
                   _vm._v(" "),
                   _c("tr", [
                     _c("td", [_vm._v("Registration")]),
@@ -34774,7 +35211,7 @@ var render = function() {
                     _c("td", [_vm._v(_vm._s(_vm.fuel_docket.requested_by))])
                   ]),
                   _vm._v(" "),
-                  _vm._m(6),
+                  _vm._m(9),
                   _vm._v(" "),
                   _c("br"),
                   _vm._v(" "),
@@ -34786,7 +35223,7 @@ var render = function() {
                     ])
                   ]),
                   _vm._v(" "),
-                  _vm._m(7),
+                  _vm._m(10),
                   _vm._v(" "),
                   _c("br"),
                   _vm._v(" "),
@@ -34812,7 +35249,7 @@ var render = function() {
                     _c("td", [_vm._v(_vm._s(_vm.fuel_docket.store_man))])
                   ]),
                   _vm._v(" "),
-                  _vm._m(8)
+                  _vm._m(11)
                 ]
               )
             : _vm._e(),
@@ -34824,7 +35261,7 @@ var render = function() {
               "table",
               { staticClass: "customers", staticStyle: { width: "50%" } },
               [
-                _vm._m(9),
+                _vm._m(12),
                 _vm._v(" "),
                 _c("tr", [
                   _c("td", [_vm._v("LABOUR CHARGES")]),
@@ -34852,7 +35289,7 @@ var render = function() {
               ]
             ),
             _vm._v(" "),
-            _vm._m(10)
+            _vm._m(13)
           ]),
           _vm._v(" "),
           _c("br"),
@@ -34914,22 +35351,59 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "table",
-      {
-        staticClass: "customers",
-        staticStyle: { "margin-left": "40px", "margin-top": "120px" }
-      },
-      [
-        _c("tr", [
-          _c("td", [_vm._v("AUTHORIZED WORKS MANAGER'S SIGNATURE")]),
-          _vm._v(" "),
-          _c("td", { staticStyle: { opacity: "0" } }, [
-            _vm._v("uuuuuuuuuuuuuuuuuuu")
-          ])
-        ])
-      ]
-    )
+    return _c("tr", [
+      _c("td", [_vm._v("AUTHORIZED WORKS MANAGER'S SIGNATURE")]),
+      _vm._v(" "),
+      _c("td", { staticStyle: { opacity: "0" } }, [
+        _vm._v("uuuuuuuuuuuuuuuuuuu")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", [_vm._v("Speed")]),
+      _vm._v(" "),
+      _c("td", { staticStyle: { opacity: "0" } })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("th", [_vm._v("Repair Required")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Description")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Mech.Check")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Super Check")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("th", [_vm._v("Items Required")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Qty")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Unit Price")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Total Value")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Received By:")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Auth By:")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Remarks")]),
+      _vm._v(" "),
+      _c("th", [_vm._v("Invoice No.")])
+    ])
   },
   function() {
     var _vm = this
@@ -63032,6 +63506,144 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/checklists/tools/Index.vue":
+/*!************************************************************!*\
+  !*** ./resources/js/components/checklists/tools/Index.vue ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Index_vue_vue_type_template_id_10848bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Index.vue?vue&type=template&id=10848bf2&scoped=true& */ "./resources/js/components/checklists/tools/Index.vue?vue&type=template&id=10848bf2&scoped=true&");
+/* harmony import */ var _Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Index.vue?vue&type=script&lang=js& */ "./resources/js/components/checklists/tools/Index.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Index_vue_vue_type_template_id_10848bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Index_vue_vue_type_template_id_10848bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "10848bf2",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/checklists/tools/Index.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/checklists/tools/Index.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/checklists/tools/Index.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Index.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/checklists/tools/Index.vue?vue&type=template&id=10848bf2&scoped=true&":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/components/checklists/tools/Index.vue?vue&type=template&id=10848bf2&scoped=true& ***!
+  \*******************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_10848bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=template&id=10848bf2&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Index.vue?vue&type=template&id=10848bf2&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_10848bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_10848bf2_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/checklists/tools/Tool.vue":
+/*!***********************************************************!*\
+  !*** ./resources/js/components/checklists/tools/Tool.vue ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Tool_vue_vue_type_template_id_c563de1a_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tool.vue?vue&type=template&id=c563de1a&scoped=true& */ "./resources/js/components/checklists/tools/Tool.vue?vue&type=template&id=c563de1a&scoped=true&");
+/* harmony import */ var _Tool_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Tool.vue?vue&type=script&lang=js& */ "./resources/js/components/checklists/tools/Tool.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Tool_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Tool_vue_vue_type_template_id_c563de1a_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Tool_vue_vue_type_template_id_c563de1a_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "c563de1a",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/checklists/tools/Tool.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/checklists/tools/Tool.vue?vue&type=script&lang=js&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/checklists/tools/Tool.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Tool_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Tool.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Tool.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Tool_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/checklists/tools/Tool.vue?vue&type=template&id=c563de1a&scoped=true&":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/components/checklists/tools/Tool.vue?vue&type=template&id=c563de1a&scoped=true& ***!
+  \******************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Tool_vue_vue_type_template_id_c563de1a_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Tool.vue?vue&type=template&id=c563de1a&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/checklists/tools/Tool.vue?vue&type=template&id=c563de1a&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Tool_vue_vue_type_template_id_c563de1a_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Tool_vue_vue_type_template_id_c563de1a_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/customers/Customers.vue":
 /*!*********************************************************!*\
   !*** ./resources/js/components/customers/Customers.vue ***!
@@ -66798,6 +67410,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_maintenance_jobcard_JobCardForm__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../components/maintenance/jobcard/JobCardForm */ "./resources/js/components/maintenance/jobcard/JobCardForm.vue");
 /* harmony import */ var _components_requisitions_ShowRequisition__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../components/requisitions/ShowRequisition */ "./resources/js/components/requisitions/ShowRequisition.vue");
 /* harmony import */ var _components_requisitions_RequisitionForm__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ../components/requisitions/RequisitionForm */ "./resources/js/components/requisitions/RequisitionForm.vue");
+/* harmony import */ var _components_checklists_tools_Index__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ../components/checklists/tools/Index */ "./resources/js/components/checklists/tools/Index.vue");
+
 
 
 
@@ -66902,10 +67516,6 @@ var routes = [{
   component: _components_reports_jobs_JobcardReport__WEBPACK_IMPORTED_MODULE_15__["default"],
   beforeEnter: guard
 }, {
-  path: '/fuel-report',
-  component: _components_reports_fuels_FuelReport__WEBPACK_IMPORTED_MODULE_16__["default"],
-  beforeEnter: guard
-}, {
   path: '/parts',
   component: _components_parts_Index__WEBPACK_IMPORTED_MODULE_17__["default"],
   beforeEnter: guard
@@ -66952,6 +67562,10 @@ var routes = [{
 }, {
   path: '/requisition-form',
   component: _components_requisitions_RequisitionForm__WEBPACK_IMPORTED_MODULE_30__["default"],
+  beforeEnter: guard
+}, {
+  path: '/checklist-tool',
+  component: _components_checklists_tools_Index__WEBPACK_IMPORTED_MODULE_31__["default"],
   beforeEnter: guard
 }];
 /* harmony default export */ __webpack_exports__["default"] = (new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
@@ -67002,7 +67616,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     customers: {},
     jobcard_categories: {},
     fuel_types: {},
-    requisitions: {}
+    requisitions: {},
+    checklist_tool: {}
   },
   mutations: {
     pathTo: function pathTo(state, to) {
@@ -67079,6 +67694,9 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     },
     updateRequisition: function updateRequisition(state, rq) {
       state.requisitions = rq;
+    },
+    updateTool: function updateTool(state, tool) {
+      state.checklist_tool = tool;
     }
   },
   actions: {
@@ -67181,6 +67799,10 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     updateRequisition: function updateRequisition(_ref25, rq) {
       var commit = _ref25.commit;
       commit('updateRequisition', rq);
+    },
+    updateTool: function updateTool(_ref26, tool) {
+      var commit = _ref26.commit;
+      commit('updateTool', tool);
     }
   }
 }));

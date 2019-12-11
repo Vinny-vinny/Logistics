@@ -52,4 +52,14 @@ class Jobcard extends Model
         return $this->belongsTo(Fuel::class,'id');
     }
 
+    public function mechanic()
+    {
+        return $this->belongsTo(Mechanic::class);
+    }
+
+    public function checklist()
+    {
+        return $this->belongsTo(AssignChecklist::class,'id');
+    }
+
 }
