@@ -3703,7 +3703,9 @@ __webpack_require__.r(__webpack_exports__);
       filtered_customers: [],
       customer_types: {},
       jobcards: {},
-      show_customer: false
+      show_customer: false,
+      fuels: {},
+      jobs: {}
     };
   },
   created: function created() {
@@ -3717,6 +3719,19 @@ __webpack_require__.r(__webpack_exports__);
     this.getParts();
     this.getCustomerTypes();
     this.getJobcards();
+    this.getFuels();
+  },
+  watch: {
+    'form.vehicle_id': function formVehicle_id() {
+      var _this = this;
+
+      this.jobs = {};
+      axios.get('job-card').then(function (res) {
+        _this.jobs = res.data.filter(function (f) {
+          return f.machine_id == _this.form.vehicle_id;
+        });
+      });
+    }
   },
   mounted: function mounted() {
     var self = this;
@@ -3742,18 +3757,25 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    getFuels: function getFuels() {
+      var _this2 = this;
+
+      axios.get('fuel').then(function (res) {
+        _this2.fuels = res.data;
+      });
+    },
     getJobcards: function getJobcards() {
-      var _this = this;
+      var _this3 = this;
 
       axios.get('job-card').then(function (res) {
-        _this.jobcards = res.data;
+        _this3.jobcards = res.data;
       });
     },
     getCustomerTypes: function getCustomerTypes() {
-      var _this2 = this;
+      var _this4 = this;
 
       axios.get('customer-types').then(function (res) {
-        _this2.customer_types = res.data;
+        _this4.customer_types = res.data;
       });
     },
     username: function username() {
@@ -3791,24 +3813,24 @@ __webpack_require__.r(__webpack_exports__);
       return total;
     },
     getParts: function getParts() {
-      var _this3 = this;
+      var _this5 = this;
 
       axios.get('parts').then(function (res) {
-        _this3.parts = res.data;
+        _this5.parts = res.data;
       });
     },
     getFuelType: function getFuelType() {
-      var _this4 = this;
+      var _this6 = this;
 
       this.vehicles.forEach(function (vehicle) {
-        if (vehicle.id === _this4.form.vehicle_id) {
-          _this4.fuel_types.forEach(function (fuel) {
+        if (vehicle.id === _this6.form.vehicle_id) {
+          _this6.fuel_types.forEach(function (fuel) {
             if (fuel.id === vehicle.fuel_type_id) {
-              _this4.fuel_type = fuel.name;
-              _this4.form.rate = fuel.rate;
-              _this4.form.fuel_type_id = fuel.id;
-              _this4.show_fuel_type = true;
-              _this4.previous_odometer = vehicle.odometer_readings;
+              _this6.fuel_type = fuel.name;
+              _this6.form.rate = fuel.rate;
+              _this6.form.fuel_type_id = fuel.id;
+              _this6.show_fuel_type = true;
+              _this6.previous_odometer = vehicle.odometer_readings;
             }
           });
         }
@@ -3818,38 +3840,38 @@ __webpack_require__.r(__webpack_exports__);
       this.other_fuel_asset ? this.other = true : this.company = true;
     },
     getFuelTypes: function getFuelTypes() {
-      var _this5 = this;
+      var _this7 = this;
 
       axios.get('fuel-types').then(function (types) {
-        _this5.fuel_types = types.data;
+        _this7.fuel_types = types.data;
       });
     },
     getCustomers: function getCustomers() {
-      var _this6 = this;
+      var _this8 = this;
 
       axios.get('customers').then(function (customer) {
-        _this6.customers = customer.data;
+        _this8.customers = customer.data;
       });
     },
     getVehicles: function getVehicles() {
-      var _this7 = this;
+      var _this9 = this;
 
       axios.get('machines').then(function (vehicle) {
-        _this7.vehicles = vehicle.data;
+        _this9.vehicles = vehicle.data;
       });
     },
     getDrivers: function getDrivers() {
-      var _this8 = this;
+      var _this10 = this;
 
       axios.get('users').then(function (driver) {
-        _this8.drivers = driver.data;
+        _this10.drivers = driver.data;
       });
     },
     getExpenses: function getExpenses() {
-      var _this9 = this;
+      var _this11 = this;
 
       axios.get('expense').then(function (expense) {
-        _this9.expenses = expense.data;
+        _this11.expenses = expense.data;
       });
     },
     convertDate: function convertDate(str) {
@@ -3882,10 +3904,10 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     update: function update() {
-      var _this10 = this;
+      var _this12 = this;
 
       axios.patch("fuel/".concat(this.form.id), this.form).then(function (res) {
-        _this10.edit_fuel = false;
+        _this12.edit_fuel = false;
         eventBus.$emit('updateFuel', res.data);
       })["catch"](function (error) {
         return error.response;
@@ -3908,15 +3930,15 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     editedCustomers: function editedCustomers() {
-      var _this11 = this;
+      var _this13 = this;
 
       axios.get('customers').then(function (customers) {
-        _this11.filtered_customers = [];
-        _this11.show_customer = true;
+        _this13.filtered_customers = [];
+        _this13.show_customer = true;
 
         for (var i = 0; i < customers.data.length; i++) {
-          if (customers.data[i]['customer_type_id'] === _this11.form.customer_type_id) {
-            _this11.filtered_customers.push(customers.data[i]);
+          if (customers.data[i]['customer_type_id'] === _this13.form.customer_type_id) {
+            _this13.filtered_customers.push(customers.data[i]);
           }
         }
       });
@@ -5210,6 +5232,66 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5231,7 +5313,8 @@ __webpack_require__.r(__webpack_exports__);
       category: '',
       checklists: {},
       tools: [],
-      items: []
+      items: [],
+      hours_spent: 0
     };
   },
   created: function created() {
@@ -5286,7 +5369,6 @@ __webpack_require__.r(__webpack_exports__);
             _this.requisition = req;
 
             if (req.type == 'Internal') {
-              console.log('internal');
               _this.requisition_type = 'Internal';
               _this.requisitions_internal = JSON.parse(req.inventory_items_internal);
               axios.get('parts').then(function (res) {
@@ -5306,7 +5388,6 @@ __webpack_require__.r(__webpack_exports__);
             }
 
             if (req.type == 'External') {
-              console.log('external');
               _this.requisition_type = 'External';
               _this.requisitions_external = JSON.parse(req.inventory_items_external);
               axios.get('parts').then(function (res) {
@@ -5336,6 +5417,7 @@ __webpack_require__.r(__webpack_exports__);
           var datetimeA = moment(initialdate + " " + start_time);
           var datetimeB = moment(enddate + " " + end_time);
           var time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
+          _this.hours_spent = Math.ceil(time_in_minutes / 60);
 
           if (_this.job.job_type_id !== '') {
             axios.get('job-types').then(function (res) {
@@ -7724,8 +7806,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -7739,9 +7819,6 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     this.listen();
     this.getMachines();
-  },
-  mounted: function mounted() {
-    this.initDatable();
   },
   methods: {
     getMachines: function getMachines() {
@@ -32144,6 +32221,7 @@ var render = function() {
                             "button",
                             {
                               staticClass: "btn btn-danger btn-sm",
+                              staticStyle: { display: "none" },
                               on: {
                                 click: function($event) {
                                   return _vm.deleteTool(tool.id)
@@ -33156,51 +33234,53 @@ var render = function() {
                     )
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Jobcard")]),
-                    _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        directives: [
+                  _vm.jobs.length
+                    ? _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Jobcard")]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
                           {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.form.job_card_id,
-                            expression: "form.job_card_id"
-                          }
-                        ],
-                        staticClass: "form-control",
-                        on: {
-                          change: function($event) {
-                            var $$selectedVal = Array.prototype.filter
-                              .call($event.target.options, function(o) {
-                                return o.selected
-                              })
-                              .map(function(o) {
-                                var val = "_value" in o ? o._value : o.value
-                                return val
-                              })
-                            _vm.$set(
-                              _vm.form,
-                              "job_card_id",
-                              $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.job_card_id,
+                                expression: "form.job_card_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "job_card_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          _vm._l(_vm.jobs, function(job) {
+                            return _c(
+                              "option",
+                              { key: job.id, domProps: { value: job.id } },
+                              [_vm._v(_vm._s(job.card_no))]
                             )
-                          }
-                        }
-                      },
-                      _vm._l(_vm.jobcards, function(job) {
-                        return _c(
-                          "option",
-                          { key: job.id, domProps: { value: job.id } },
-                          [_vm._v(_vm._s(job.card_no))]
+                          }),
+                          0
                         )
-                      }),
-                      0
-                    )
-                  ])
+                      ])
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-md-6" }, [
@@ -34952,7 +35032,7 @@ var render = function() {
                 ? _c("tr", [
                     _c("td", [_vm._v("Mechanic")]),
                     _vm._v(" "),
-                    _c("td", [_vm._v(_vm._s(_vm.job.user))])
+                    _c("td", [_vm._v(_vm._s(_vm.job.mechanic))])
                   ])
                 : _vm._e(),
               _vm._v(" "),
@@ -35018,7 +35098,7 @@ var render = function() {
                   return _c("span", [
                     _c("input", {
                       staticClass: "tool",
-                      attrs: { type: "checkbox", checked: "" }
+                      attrs: { type: "checkbox" }
                     }),
                     _vm._v(_vm._s(tool))
                   ])
@@ -35050,7 +35130,7 @@ var render = function() {
               )
             : _vm._e(),
           _vm._v(" "),
-          _c("hr"),
+          _vm.workshop ? _c("hr") : _vm._e(),
           _vm._v(" "),
           _vm.workshop
             ? _c(
@@ -35256,47 +35336,126 @@ var render = function() {
           _vm._v(" "),
           _c("br"),
           _vm._v(" "),
-          _c("div", { staticStyle: { display: "flex" } }, [
-            _c(
-              "table",
-              { staticClass: "customers", staticStyle: { width: "50%" } },
-              [
-                _vm._m(12),
-                _vm._v(" "),
-                _c("tr", [
-                  _c("td", [_vm._v("LABOUR CHARGES")]),
-                  _vm._v(" "),
-                  _c("td", [
-                    _vm._v(_vm._s(_vm._f("number")(_vm.job.labour_cost)))
-                  ])
-                ]),
-                _vm._v(" "),
-                _vm.has_othercharges
-                  ? _c("tr", [
-                      _c("td", [_vm._v(_vm._s(_vm.other_charges.name))]),
+          _vm.workshop
+            ? _c("div", { staticStyle: { display: "flex" } }, [
+                _c(
+                  "table",
+                  { staticClass: "customers", staticStyle: { width: "50%" } },
+                  [
+                    _c("tr", [
+                      _c("td", [_vm._v("Labour /Con")]),
                       _vm._v(" "),
                       _c("td", [
-                        _vm._v(_vm._s(_vm._f("number")(_vm.other_charges.cost)))
+                        _vm._v(_vm._s(_vm._f("number")(_vm.job.labour_cost)))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("tr", [
+                      _c("td", [_vm._v("Miscellaneous")]),
+                      _vm._v(" "),
+                      _vm.has_othercharges
+                        ? _c("td", [
+                            _vm._v(
+                              _vm._s(_vm._f("number")(_vm.other_charges.cost))
+                            )
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      !_vm.has_othercharges ? _c("td") : _vm._e()
+                    ]),
+                    _vm._v(" "),
+                    _vm._m(12),
+                    _vm._v(" "),
+                    _vm._m(13),
+                    _vm._v(" "),
+                    _vm._m(14),
+                    _vm._v(" "),
+                    _vm._m(15),
+                    _vm._v(" "),
+                    _vm._m(16)
+                  ]
+                ),
+                _vm._v(" "),
+                _c("div", { staticStyle: { "margin-left": "40px" } }, [
+                  _c(
+                    "table",
+                    {
+                      staticClass: "customers",
+                      staticStyle: { height: "100%" }
+                    },
+                    [
+                      _vm._m(17),
+                      _vm._v(" "),
+                      _c("tr", [
+                        _c("td", [_vm._v("Time Taken")]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.hours_spent) + " hrs")])
+                      ]),
+                      _vm._v(" "),
+                      _c("tr", [
+                        _c("td", [_vm._v("Date Completed")]),
+                        _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(_vm.job.complete_date))])
+                      ]),
+                      _vm._v(" "),
+                      _vm._m(18),
+                      _vm._v(" "),
+                      _vm._m(19)
+                    ]
+                  )
+                ])
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          !_vm.workshop
+            ? _c("div", { staticStyle: { display: "flex" } }, [
+                _c(
+                  "table",
+                  { staticClass: "customers", staticStyle: { width: "50%" } },
+                  [
+                    _vm._m(20),
+                    _vm._v(" "),
+                    _c("tr", [
+                      _c("td", [_vm._v("LABOUR CHARGES")]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("number")(_vm.job.labour_cost)))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _vm.has_othercharges
+                      ? _c("tr", [
+                          _c("td", [_vm._v(_vm._s(_vm.other_charges.name))]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(_vm._f("number")(_vm.other_charges.cost))
+                            )
+                          ])
+                        ])
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c("tr", [
+                      _c("td", [_vm._v("TOTAL COST OF PROJECT")]),
+                      _vm._v(" "),
+                      _c("td", [
+                        _vm._v(_vm._s(_vm._f("number")(_vm.project_cost)))
                       ])
                     ])
-                  : _vm._e(),
+                  ]
+                ),
                 _vm._v(" "),
-                _c("tr", [
-                  _c("td", [_vm._v("TOTAL COST OF PROJECT")]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(_vm._f("number")(_vm.project_cost)))])
-                ])
-              ]
-            ),
-            _vm._v(" "),
-            _vm._m(13)
-          ]),
+                _vm._m(21)
+              ])
+            : _vm._e(),
           _vm._v(" "),
           _c("br"),
           _vm._v(" "),
-          _c("p", { staticStyle: { "text-align": "center" } }, [
-            _vm._v("This JOB CARD is NOT Valid without Manager's Signature")
-          ])
+          !_vm.workshop
+            ? _c("p", { staticStyle: { "text-align": "center" } }, [
+                _vm._v("This JOB CARD is NOT Valid without Manager's Signature")
+              ])
+            : _vm._e()
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "row print" }, [
@@ -35476,6 +35635,76 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("tr", [_c("td", [_vm._v("Sign")]), _vm._v(" "), _c("td")])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [_c("td", [_vm._v("Stock")]), _vm._v(" "), _c("td")])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [_c("td", [_vm._v("Cost")]), _vm._v(" "), _c("td")])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", [_vm._v("Total Due (Excl)")]),
+      _vm._v(" "),
+      _c("td")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", [_vm._v("Foreman's sign")]),
+      _vm._v(" "),
+      _c("td")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [_c("td", [_vm._v("Remarks")]), _vm._v(" "), _c("td")])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", [_vm._v("Cost at")]),
+      _vm._v(" "),
+      _c("td", { staticStyle: { opacity: "0" } }, [
+        _vm._v("uuuuuuuuuuuuuuuuuuuuuu")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", [_vm._v("Out Inspection")]),
+      _vm._v(" "),
+      _c("td")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("tr", [
+      _c("td", [_vm._v("Driver's Sign")]),
+      _vm._v(" "),
+      _c("td")
+    ])
   },
   function() {
     var _vm = this
@@ -39144,8 +39373,6 @@ var render = function() {
                     "tbody",
                     _vm._l(_vm.tableData, function(machine) {
                       return _c("tr", [
-                        _c("td", [_vm._v(_vm._s(machine.id))]),
-                        _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(machine.code))]),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(machine.make))]),
@@ -39203,8 +39430,6 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("#")]),
-        _vm._v(" "),
         _c("th", [_vm._v("Code")]),
         _vm._v(" "),
         _c("th", [_vm._v("Make")]),
@@ -66690,15 +66915,14 @@ __webpack_require__.r(__webpack_exports__);
 /*!**************************************************************!*\
   !*** ./resources/js/components/requisitions/Requisition.vue ***!
   \**************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Requisition_vue_vue_type_template_id_023d470f_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Requisition.vue?vue&type=template&id=023d470f&scoped=true& */ "./resources/js/components/requisitions/Requisition.vue?vue&type=template&id=023d470f&scoped=true&");
 /* harmony import */ var _Requisition_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Requisition.vue?vue&type=script&lang=js& */ "./resources/js/components/requisitions/Requisition.vue?vue&type=script&lang=js&");
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Requisition_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Requisition_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
-/* harmony import */ var _Requisition_vue_vue_type_style_index_0_id_023d470f_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Requisition.vue?vue&type=style&index=0&id=023d470f&scoped=true&lang=css& */ "./resources/js/components/requisitions/Requisition.vue?vue&type=style&index=0&id=023d470f&scoped=true&lang=css&");
+/* empty/unused harmony star reexport *//* harmony import */ var _Requisition_vue_vue_type_style_index_0_id_023d470f_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Requisition.vue?vue&type=style&index=0&id=023d470f&scoped=true&lang=css& */ "./resources/js/components/requisitions/Requisition.vue?vue&type=style&index=0&id=023d470f&scoped=true&lang=css&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -66730,7 +66954,7 @@ component.options.__file = "resources/js/components/requisitions/Requisition.vue
 /*!***************************************************************************************!*\
   !*** ./resources/js/components/requisitions/Requisition.vue?vue&type=script&lang=js& ***!
   \***************************************************************************************/
-/*! no static exports found */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

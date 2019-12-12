@@ -26,7 +26,7 @@
                             <td style="display: none">{{tool.name}}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editTool(tool)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteTool(tool.id)"><i class="fa fa-trash"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="deleteTool(tool.id)" style="display: none"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
                         </tbody>

@@ -34,7 +34,7 @@
                     </tr>
                     <tr v-if="workshop">
                         <td>Mechanic</td>
-                        <td>{{job.user}}</td>
+                        <td>{{job.mechanic}}</td>
                     </tr>
                     <tr>
                         <td>Date Start</td>
@@ -65,7 +65,7 @@
                     </div>
                 <hr>
                 <div class="tools" v-if="workshop">
-                    <span v-for="tool in tools"><input type="checkbox" class="tool" checked>{{tool}}</span>
+                    <span v-for="tool in tools"><input type="checkbox" class="tool">{{tool}}</span>
                 </div>
                 <table class="customers" v-if="workshop">
                     <tr>
@@ -82,7 +82,7 @@
                     </tr>
 
                 </table>
-                <hr>
+                <hr v-if="workshop">
                 <table class="customers" v-if="workshop">
                     <tr>
                         <th>Items Required</th>
@@ -212,7 +212,67 @@
                 </table>
 
                 <br>
-                <div style="display: flex">
+                <div style="display: flex" v-if="workshop">
+                    <table class="customers" style="width: 50%">
+                        <tr>
+                            <td>Labour /Con</td>
+                            <td>{{job.labour_cost | number}}</td>
+                        </tr>
+                        <tr>
+                            <td>Miscellaneous</td>
+                            <td v-if="has_othercharges">{{other_charges.cost | number}}</td>
+                            <td v-if="!has_othercharges"></td>
+                        </tr>
+                        <tr>
+                            <td>Stock</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Cost</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Total Due (Excl)</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Foreman's sign</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Remarks</td>
+                            <td></td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-left: 40px;">
+                        <table class="customers" style="height: 100%;">
+                            <tr>
+                                <td>Cost at</td>
+                                <td style="opacity:0">uuuuuuuuuuuuuuuuuuuuuu</td>
+                            </tr>
+                            <tr>
+                            <td>Time Taken</td>
+                            <td>{{hours_spent}} hrs</td>
+                            </tr>
+                            <tr>
+                            <td>Date Completed</td>
+                            <td>{{job.complete_date}}</td>
+                            </tr>
+                            <tr>
+                            <td>Out Inspection</td>
+                            <td></td>
+                            </tr>
+                            <tr>
+                                <td>Driver's Sign</td>
+                                <td></td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </div>
+
+                <div style="display: flex" v-if="!workshop">
                 <table class="customers" style="width: 50%">
                     <tr>
                         <td>STORE ISSUES TOTAL VALUE</td>
@@ -250,7 +310,7 @@
                     </div>
                 </div>
                 <br>
-                <p style="text-align: center;">This JOB CARD is NOT Valid without Manager's Signature</p>
+                <p style="text-align: center;" v-if="!workshop">This JOB CARD is NOT Valid without Manager's Signature</p>
 
             </div>
             <div class="row print">
@@ -286,7 +346,8 @@
                 category:'',
                 checklists:{},
                 tools:[],
-                items:[]
+                items:[],
+                hours_spent:0
             }
         },
         created() {
@@ -336,7 +397,6 @@
                         let req = res.data.find(r => r.id == this.job.requisition_id);
                         this.requisition = req;
                         if (req.type =='Internal'){
-                            console.log('internal')
                             this.requisition_type = 'Internal';
                             this.requisitions_internal = JSON.parse(req.inventory_items_internal);
 
@@ -357,7 +417,6 @@
                             })
                         }
                            if (req.type =='External'){
-                               console.log('external')
                                this.requisition_type = 'External';
                                this.requisitions_external = JSON.parse(req.inventory_items_external);
                                axios.get('parts')
@@ -388,7 +447,7 @@
                       let datetimeA = moment(initialdate + " " + start_time);
                       let datetimeB = moment(enddate + " " + end_time);
                       let time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
-
+                      this.hours_spent = Math.ceil(time_in_minutes/60);
                       if (this.job.job_type_id !== '') {
                           axios.get('job-types')
                               .then(res => {

@@ -50,10 +50,10 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" v-if="jobs.length">
                                     <label>Jobcard</label>
                                     <select v-model="form.job_card_id" class="form-control">
-                                        <option :value="job.id" v-for="job in jobcards" :key="job.id">{{job.card_no}}</option>
+                                        <option :value="job.id" v-for="job in jobs" :key="job.id">{{job.card_no}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -165,7 +165,9 @@
                 filtered_customers:[],
                 customer_types:{},
                 jobcards:{},
-                show_customer:false
+                show_customer:false,
+                fuels:{},
+                jobs:{}
             }
         },
         created() {
@@ -180,9 +182,19 @@
             this.getParts();
             this.getCustomerTypes();
             this.getJobcards();
+            this.getFuels();
 
         },
+       watch:{
+         'form.vehicle_id'(){
+             this.jobs = {};
+             axios.get('job-card')
+                 .then(res => {
+                     this.jobs = res.data.filter(f => f.machine_id ==this.form.vehicle_id);
+                 })
 
+         }
+       },
         mounted: function () {
             var self = this;
             $('#datepicker').datepicker({
@@ -206,6 +218,12 @@
             }
         },
         methods: {
+            getFuels(){
+              axios.get('fuel')
+              .then(res => {
+                  this.fuels = res.data
+              })
+            },
             getJobcards(){
               axios.get('job-card')
               .then(res => {
@@ -355,6 +373,8 @@
                     this.show_customer = true;
                     this.editedCustomers();
                     this.form.asset_type ==='other' ? this.other =true : this.company = true;
+
+
                 }
             },
             editedCustomers(){
