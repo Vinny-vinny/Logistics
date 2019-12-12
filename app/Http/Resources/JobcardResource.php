@@ -44,7 +44,7 @@ class JobcardResource extends JsonResource
             'driver' => $this->machine->user->name,
             'machine' => $this->machine->code,
             'plate_no' => $this->machine->plate_no,
-            'mechanic' => $this->mechanic ? $this->mechanic->name :'',
+            'mechanic' => $this->mechanic ? $this->mechanic->name    :'',
             'track_name' => $this->trackby->name,
             'make' => $this->machine->make,
             'status' => $this->status,

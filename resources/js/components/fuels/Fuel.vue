@@ -192,7 +192,6 @@
                  .then(res => {
                      this.jobs = res.data.filter(f => f.machine_id ==this.form.vehicle_id);
                  })
-
          }
        },
         mounted: function () {

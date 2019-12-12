@@ -63,7 +63,7 @@
                         </tr>
                     </table>
                     </div>
-                <hr>
+                <hr v-if="workshop">
                 <div class="tools" v-if="workshop">
                     <span v-for="tool in tools"><input type="checkbox" class="tool">{{tool}}</span>
                 </div>
