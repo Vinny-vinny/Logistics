@@ -49,7 +49,7 @@ class Jobcard extends Model
 
     public function fuel()
     {
-        return $this->belongsTo(Fuel::class,'machine_id','vehicle_id');
+        return $this->belongsTo(Fuel::class,'id','job_card_id');
     }
 
     public function mechanic()

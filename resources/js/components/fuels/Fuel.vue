@@ -97,7 +97,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Authorized By</label>
-                                    <input type="text" class="form-control" :value="username()" disabled>
+                                    <input type="text" class="form-control" v-model="username" disabled>
                                 </div>
                                 <div class="form-group">
                                     <label>Invoice No</label>
@@ -167,7 +167,8 @@
                 jobcards:{},
                 show_customer:false,
                 fuels:{},
-                jobs:{}
+                jobs:{},
+                username:User.name()
             }
         },
         created() {
@@ -235,9 +236,6 @@
                     this.customer_types = res.data;
                 })
             },
-           username(){
-             return  User.name();
-           },
             getRate(){
            for (let i=0; i < this.fuel_types.length; i++){
                if (this.fuel_types[i]['id'] === this.form.fuel_type_id){
@@ -345,6 +343,7 @@
             save() {
                 delete this.form.id;
                 this.form.fuel_on = this.convertDate(this.form.fuel_on);
+                this.form.authorized_by = User.id();
                 axios.post('fuel', this.form)
                     .then(res => eventBus.$emit('listFuels', res.data))
                     .catch(error => error.response)
@@ -370,6 +369,10 @@
                     this.previous_odometer = this.$store.state.fuels.previous_odometer;
                     this.show_rate = true;
                     this.show_customer = true;
+                    axios.get(`users/${this.form.authorized_by}`)
+                    .then(res => {
+                        this.username = res.data.name;
+                    })
                     this.editedCustomers();
                     this.form.asset_type ==='other' ? this.other =true : this.company = true;
 

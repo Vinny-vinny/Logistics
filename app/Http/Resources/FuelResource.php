@@ -23,7 +23,7 @@ class FuelResource extends JsonResource
             'vehicle_id' => $this->vehicle_id,
             'customer_id' => $this->customer_id,
             'expense_id' => $this->expense_id,
-            'vehicle' => $this->vehicle->code ,
+            'vehicle' => $this->vehicle->plate_no ,
             'fuel_type_id' => $this->fuel_type_id,
             'fuel_type' => $this->fueltype->name,
             'invoice_no' => $this->invoice_no,

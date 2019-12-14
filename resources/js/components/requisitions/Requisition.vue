@@ -26,9 +26,7 @@
                         </div>
                         <div class="form-group">
                             <label>Requested By</label>
-                            <select class="form-control" v-model="form.requested_by" required>
-                                <option :value="user.id" v-for="user in users" :key="user.id">{{user.name}}</option>
-                            </select>
+                            <input type="text" v-model="username" class="form-control" disabled>
                         </div>
                         <div class="form-group">
                             <label>Department</label>
@@ -147,7 +145,8 @@
                 qty:'',
                 part:'',
                 unit_price:'',
-                users:{}
+                users:{},
+                username:User.name()
             }
         },
         created(){
@@ -247,12 +246,11 @@
                     }
                 }
                 this.form.requested_on = this.convertDate(this.form.requested_on);
-
-
                 this.edit_requisition ? this.update() : this.save();
             },
             save(){
                 delete this.form.id;
+                this.form.requested_by = User.id();
                 axios.post('requisitions',this.form)
                     .then(res =>{
                       eventBus.$emit('listReqs',res.data)
@@ -273,6 +271,10 @@
             listen(){
                 if (this.edit){
                     this.form = this.$store.state.requisitions;
+                    axios.get(`users/${this.form.requested_by}`)
+                    .then(res =>{
+                       this.username = res.data.name;
+                    })
                     if (this.form.type === 'Internal'){
                         this.form.inventory_items_internal = JSON.parse(this.form.inventory_items_internal);
                     }
