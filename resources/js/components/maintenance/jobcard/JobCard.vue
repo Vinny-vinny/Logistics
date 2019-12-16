@@ -506,10 +506,7 @@
                                 this.rqs.push(rq.data[i]);
                             }
                         }
-
                     })
-
-
             },
             getDetails() {
                 this.show_inventory = true;
@@ -774,13 +771,13 @@
                     this.filtered_customers = [];
                     this.Customers();
                     this.ServiceTypes();
-
-
+                     setTimeout(()=>{
+                         console.log(this.balances)
+                     },300)
                     if (this.form.requisition_id) {
                         this.disable_rq = true;
                         this.show_inventory = true;
                         this.editedRequisitions();
-                        console.log(this.rqs)
                     }
 
                 }

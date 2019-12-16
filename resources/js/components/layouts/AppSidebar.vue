@@ -32,7 +32,7 @@
                         </ul>
                 </li>
                 <li><router-link to="/fuel"><i class="fa fa-database"></i> <span>Fuel</span></router-link></li>
-                <li class="treeview">
+                <li class="treeview" style="display: none">
                     <a href="#"><i class="fa fa-bar-chart"></i> <span>Reports</span>
                         <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>

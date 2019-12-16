@@ -4,8 +4,9 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border" style="display: flex">
-                    <h2 class="box-title">STORES REQUISITION NOTE</h2>
+                <div  style="display:flex">
+                    <img src="/images/lewa.jpg" alt="Lewa Logo">
+                    <h2  style="margin-left: 20px;">STORES REQUISITION NOTE</h2>
                     <p style="margin-left:100px">SR: {{requisition.req_no}}</p>
                 </div>
                 <div class="box-body" id="printMe">
@@ -129,15 +130,16 @@
                axios.post('/generate-requisition',this.form)
                 .then(res => {
                     this.requisition = res.data;
-                })
-                axios.get('/users/1')
-                .then(res => {
                     this.print();
-                   // this.$router.push('/requisitions')
                 })
+
             },
             print(){
-                window.print();
+                setTimeout(()=>{
+                    window.print();
+                    eventBus.$emit('hide_form');
+                },200)
+
             }
 
         }

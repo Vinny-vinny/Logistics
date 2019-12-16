@@ -18,6 +18,7 @@
                             <th>#</th>
                             <th>Machine</th>
                             <th>Driver</th>
+                            <th>Department</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -26,6 +27,7 @@
                             <td>{{job.card_no}}</td>
                             <td>{{job.machine}}</td>
                             <td>{{job.driver}}</td>
+                            <td>{{job.project}}</td>
                               <td>
                                 <button class="btn btn-success btn-sm" @click="editJobcard(job)"><i class="fa fa-edit"></i></button>
                                 <router-link :to="{path:'/job-card/'+job.id}" class="btn btn-info btn-sm"><i class=" fa fa-eye"></i></router-link>
@@ -69,8 +71,8 @@
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)
                     .then(() =>{
-                        this.editing=true;
-                        this.add_jobcard=true;
+                            this.editing=true;
+                            this.add_jobcard=true;
                     })
 
             },

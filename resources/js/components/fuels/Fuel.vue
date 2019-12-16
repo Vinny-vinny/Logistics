@@ -36,7 +36,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Fuel Type</label>
-                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control" required>
+                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control" disabled>
                                         <option :value="fuel.id" v-for="fuel in fuel_types" :key="fuel.id">
                                             {{fuel.name}}
                                         </option>
@@ -58,7 +58,6 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-
                                 <div class="form-group" style="margin-left:100px;">
                                     <table width="100%">
                                         <tr>
@@ -90,7 +89,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customer">
-                                    <label>Customers</label>
+                                    <label>Customer</label>
                                     <select class="form-control" v-model="form.customer_id" required>
                                         <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
                                     </select>

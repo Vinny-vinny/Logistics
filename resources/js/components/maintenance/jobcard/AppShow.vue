@@ -4,7 +4,19 @@
     <section class="content">
         <!-- Default box -->
         <div class="box">
-            <h2 style="text-align: center;margin-right: 300px;">{{job.category}} Job Card</h2>
+            <div  style="display:flex">
+                <img src="/images/lewa.jpg" alt="Lewa Logo">
+                <h2  style="margin-top: 50px;margin-left: 20px;">{{job.category}} Job Card</h2>
+               <div style="height: 100%;margin-left: 100px">
+              <table v-if="customer">
+                <tr><td><b>{{customer.name}}</b></td></tr>
+                <tr v-if="customer.address"><td><b>Address</b>: &nbsp;&nbsp;&nbsp;{{customer.address}}</td></tr>
+                <tr v-if="customer.telephone"><td><b>Telephone</b>: &nbsp;&nbsp;&nbsp;{{customer.telephone}}</td></tr>
+                <tr v-if="customer.box_no"><td><b>Postal Address</b>: &nbsp;&nbsp;&nbsp;{{customer.box_no}}</td></tr>
+                <tr v-if="customer.fax"><td><b>Fax</b>: &nbsp;&nbsp;&nbsp;{{customer.fax}}</td></tr>
+            </table>
+               </div>
+            </div>
             <div class="box-body" id="printMe">
                 <div style="display: flex">
                 <table class="customers">
@@ -292,7 +304,7 @@
                     </tr>
                 </table>
 
-                    <div style="margin-left: 40px">
+                    <div style="margin-left: 40px; height:100%;margin-top: -20px;">
                         <p style="margin-bottom:0">This information is accurate to my knowledge</p>
                 <table class="customers">
                     <tr>
@@ -347,11 +359,14 @@
                 checklists:{},
                 tools:[],
                 items:[],
-                hours_spent:0
+                hours_spent:0,
+                customer:{},
+                requisitions:{}
             }
         },
         created() {
           this.getJob();
+          this.getRequisitions();
         },
         computed:{
           workshop(){
@@ -359,10 +374,21 @@
           }
         },
         methods:{
+            getRequisitions(){
+              axios.get('requisitions')
+              .then(res => {
+                  this.requisitions = res.data;
+              })
+            },
             getJob(){
               axios.get('job-card')
               .then(res => {
                   this.job = res.data.find(j => j.id == this.$route.params['id']);
+                  axios.get('customers')
+                  .then(res => {
+                     this.customer = res.data.find(c => c.id == this.job.customer_id);
+                     console.log(this.customer);
+                  });
                   this.category = this.job.category.toLowerCase().trim();
                   //checklist configuration
                   if (this.category == 'workshop'){
@@ -507,6 +533,9 @@
     }
     @media print {
         .print {
+            display: none;
+        }
+        .main-footer{
             display: none;
         }
     }

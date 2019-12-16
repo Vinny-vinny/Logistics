@@ -88,7 +88,7 @@ class JobcardController extends Controller
         $request['card_no'] = substr('LEWA-' . $id . '-' . Machine::find($request->machine_id)->code, 0, 20);
 
         $jobcard = Jobcard::find($id);
-        $jobcard->update($request->except(['service_types','files','driver','machine','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist']));
+        $jobcard->update($request->except(['service_types','files','driver','machine','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist']));
         Machine::find($request->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),

@@ -4,10 +4,12 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border" style="display: flex">
-                    <h2 class="box-title">STORES REQUISITION NOTE</h2>
+                <div  style="display:flex">
+                    <img src="/images/lewa.jpg" alt="Lewa Logo">
+                    <h2  style="margin-left: 20px;">STORES REQUISITION NOTE</h2>
                     <p style="margin-left:100px">SR: {{requisition.req_no}}</p>
                 </div>
+
                 <div class="box-body" id="printMe">
                     <div style="display: flex">
                         <table class="customers">

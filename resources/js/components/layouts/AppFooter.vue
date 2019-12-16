@@ -1,7 +1,7 @@
 <template>
     <!-- Main Footer -->
     <footer class="main-footer" style="max-height: 100px;text-align: center">
-        <strong>Copyright © {{date()}} <a href="#">Logistics</a>.</strong> All rights reserved.
+        <strong>Copyright © {{date()}} <a href="#">LEWA</a>.</strong> All rights reserved.
     </footer>
 
 </template>

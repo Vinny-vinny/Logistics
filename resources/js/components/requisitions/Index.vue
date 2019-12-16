@@ -1,13 +1,14 @@
 <template>
     <div>
-        <requisition v-if="add_requisition" :edit="editing"></requisition>
+        <requisition v-if="add_requisition && !show_form" :edit="editing"></requisition>
+        <requisition-form v-if="show_form && !add_requisition"></requisition-form>
         <!-- Main content -->
-        <section class="content" v-if="!add_requisition">
+        <section class="content" v-if="!add_requisition && !show_form">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                    <router-link to="/requisition-form" class="btn btn-success pull-right">Print Requisition Form</router-link>
+                    <button class="btn btn-success pull-right" @click="show_form =true">Print Requisition Form</button>
                     <button class="btn btn-primary pull-right mr" @click="add_requisition=true">Add Requisition</button>
                 </div>
                 <div class="box-body">
@@ -43,6 +44,7 @@
 </template>
 <script>
     import Requisition from "./Requisition";
+    import RequisitionForm from "./RequisitionForm";
     export default {
         data(){
             return {
@@ -56,14 +58,13 @@
             this.listen();
             this.getRequisitions();
         },
-        mounted(){
-            this.initDatable();
-        },
+
         methods:{
             getRequisitions(){
                 axios.get('requisitions')
                     .then(res => this.tableData = res.data)
                     .catch(error => Exception.handle(error))
+                this.initDatable();
             },
             editRequisition(rq){
                 this.$store.dispatch('updateRequisition',rq)
@@ -106,6 +107,11 @@
                     this.tableData.unshift(rq);
                     this.initDatable();
                 });
+                eventBus.$on('hide_form',() =>{
+                this.show_form = false;
+                this.getRequisitions();
+
+                })
             },
             initDatable(){
                 setTimeout(()=>{
@@ -127,7 +133,8 @@
             },
         },
         components:{
-            Requisition
+            Requisition,
+            RequisitionForm
         }
     }
 </script>

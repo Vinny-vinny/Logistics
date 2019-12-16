@@ -4,8 +4,18 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h2 class="box-title">Fuel Issue Docket</h2>
+                <div  style="display:flex">
+                    <img src="/images/lewa.jpg" alt="Lewa Logo">
+                    <h2  style="margin-left: 20px;">Fuel Issue Docket</h2>
+                    <div style="height: 100%;margin-left: 100px">
+                        <table>
+                            <tr><td><b>&nbsp;&nbsp;&nbsp; {{customer.name}}</b></td></tr>
+                            <tr v-if="customer.address"><td><b>Address</b>: &nbsp;&nbsp;&nbsp;{{customer.address}}</td></tr>
+                            <tr v-if="customer.telephone"><td><b>Telephone</b>: &nbsp;&nbsp;&nbsp;{{customer.telephone}}</td></tr>
+                            <tr v-if="customer.box_no"><td><b>Postal Address</b>: &nbsp;&nbsp;&nbsp;{{customer.box_no}}</td></tr>
+                            <tr v-if="customer.fax"><td><b>Fax</b>: &nbsp;&nbsp;&nbsp;{{customer.fax}}</td></tr>
+                        </table>
+                    </div>
                 </div>
                 <p style="text-align: center;margin-right: 300px;font-size: 16px">Number: {{fuel.fuel_no}}</p>
                 <div class="box-body" id="printMe">
@@ -88,7 +98,8 @@
               fuel:{},
               expenses:{},
                 other_expenses:[],
-                total_cost:0
+                total_cost:0,
+                customer:{}
             }
         },
         created(){
@@ -99,8 +110,10 @@
               axios.get('fuel')
                 .then(res => {
                     this.fuel = res.data.find(f => f.id == this.$route.params['id']);
-
-                    console.log(this.fuel);
+                    axios.get('customers')
+                    .then(res => {
+                     this.customer = res.data.find(c => c.id == this.fuel.customer_id);
+                    })
                 })
             },
             print(){

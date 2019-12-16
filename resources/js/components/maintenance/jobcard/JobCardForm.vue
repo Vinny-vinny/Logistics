@@ -4,9 +4,11 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h2 class="box-title float-center">Job Card Form: #{{job_card}}</h2>
+                <div  style="display:flex">
+                    <img src="/images/lewa.jpg" alt="Lewa Logo">
+                    <h2 style="margin-left:100px">Job Card Form: #{{job_card}}</h2>
                 </div>
+
                 <div class="box-body">
                <div class="row">
                <div class="col-md-6">
@@ -99,7 +101,6 @@
         },
        mounted(){
          this.jobInfo();
-
        },
         computed:{
             service_type(){
@@ -113,25 +114,22 @@
                         let job_details = res.data.find(job => job.id == this.$route.params['id']);
                         this.job_card = job_details.card_no;
                         this.jobcard_type = job_details.service_type;
-
                         axios.get('machines')
                             .then(res => {
                                 this.machine = res.data.find(vehicle => vehicle.id = job_details.machine_id).code;
                             });
-
                         axios.get('track-by')
                             .then(res => {
                                 this.track_by = res.data.find(track => track.id == job_details.track_by_id).name;
                             });
-                        axios.get('users')
-                            .then(res => {
-                              this.print();
-                            });
+                       this.print();
                     });
 
             },
             print() {
-              window.print();
+              setTimeout(()=>{
+                  window.print();
+              },200)
               this.$router.push('/job-card');
             }
         }
