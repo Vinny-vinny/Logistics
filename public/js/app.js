@@ -9476,7 +9476,7 @@ __webpack_require__.r(__webpack_exports__);
           autoFill: true,
           colReorder: true
         });
-      }, 1000);
+      }, 500);
     }
   },
   components: {
