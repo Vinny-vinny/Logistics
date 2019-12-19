@@ -3185,15 +3185,14 @@ __webpack_require__.r(__webpack_exports__);
     this.getCustomers();
     this.listen();
   },
-  mounted: function mounted() {
-    this.initDatable();
-  },
   methods: {
     getCustomers: function getCustomers() {
       var _this = this;
 
       axios.get('customers').then(function (res) {
         _this.tableData = res.data;
+
+        _this.initDatable();
       });
     },
     editCustomer: function editCustomer(customer) {
@@ -3272,7 +3271,7 @@ __webpack_require__.r(__webpack_exports__);
           autoFill: true,
           colReorder: true
         });
-      }, 1000);
+      }, 500);
     }
   },
   components: {
