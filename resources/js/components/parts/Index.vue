@@ -57,14 +57,13 @@
             this.getParts();
             this.getWarehouses();
         },
-        mounted(){
-            this.initDatable();
-        },
+      
         methods:{
             getWarehouses(){
               axios.get('warehouse')
                   .then(res => {
                      this.warehouses = res.data
+
                   })
             },
             importParts(){
@@ -78,7 +77,10 @@
             },
             getParts(){
                 axios.get('parts')
-                    .then(res => this.tableData = res.data)
+                    .then(res =>{
+                     this.tableData = res.data
+                     this.initDatable();
+                     })
                     .catch(error => Exception.handle(error))
             },
             editPart(part){

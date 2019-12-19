@@ -9381,9 +9381,6 @@ __webpack_require__.r(__webpack_exports__);
     this.getParts();
     this.getWarehouses();
   },
-  mounted: function mounted() {
-    this.initDatable();
-  },
   methods: {
     getWarehouses: function getWarehouses() {
       var _this = this;
@@ -9408,7 +9405,9 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       axios.get('parts').then(function (res) {
-        return _this3.tableData = res.data;
+        _this3.tableData = res.data;
+
+        _this3.initDatable();
       })["catch"](function (error) {
         return Exception.handle(error);
       });
