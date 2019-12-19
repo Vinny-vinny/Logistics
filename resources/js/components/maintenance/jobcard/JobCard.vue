@@ -17,18 +17,23 @@
                                     <label class="radio-inline"><input type="radio" name="service_type"
                                                                        value="External" v-model="form.service_type">External</label>
                                 </div>
+                                    <div class="form-group">
+                                    <label>Project</label>
+                                    <select v-model="form.asset_category_id" required class="form-control" @change="subProject()">
+                                        <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
+                                    </select>
+                                </div>
                                 <div class="form-group">
-                                    <label>Vehicle/Chasis #</label>
-                                    <select name="machine_id" class="form-control" v-model="form.machine_id"
-                                            @change="getAssetDetails()" required>
-                                        <option :value="machine.id" v-for="machine in machines" :key="machine.id">
-                                            {{machine.code}}
+                                    <label>Vehicle</label>
+                                    <select name="vehicle_id" class="form-control" v-model="form.machine_id"
+                                              @change="getAssetDetails()" required>
+                                        <option :value="vehicle.id" v-for="vehicle in subprojects" :key="vehicle.id">
+                                          {{vehicle.code}}
                                         </option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Track By:</label> {{track_name}}
-
                                 </div>
                                 <div class="form-group">
                                     <label>Category</label>
@@ -77,7 +82,7 @@
                                 <div class="form-group">
                                     <label>Service Type</label>
                                     <select name="service_type_id" class="form-control" v-model="form.service_type_id"
-                                            @change="nextReadings()" required>
+                                            @change="nextReadings()">
                                         <option :value="service.id" v-for="service in service_types" :key="service.id">
                                             {{service.name}}
                                         </option>
@@ -144,15 +149,7 @@
                                     <label>Next {{track_name}} Maintenance</label>
                                     <input type="number" step="0.001" class="form-control" v-model="form.next_readings"
                                            required :disabled="!show_next_readings">
-                                </div>
-                                <div class="form-group" v-if="serviceType">
-                                    <label>Department</label>
-                                    <select class="form-control" v-model="form.project_id">
-                                        <option :value="project.id" v-for="project in projects" :key="project.id">
-                                            {{project.code}} - {{project.name}}
-                                        </option>
-                                    </select>
-                                </div>
+                                </div>                            
 
                                 <div class="form-group">
                                     <label>Lobour Cost</label>
@@ -328,7 +325,7 @@
                     next_service_date: '',
                     current_readings: '',
                     service_type: 'Internal',
-                    project_id: '',
+                    asset_category_id: '',
                     job_type_id: '',
                     cost_code: '',
                     customer_id: '',
@@ -379,7 +376,8 @@
                 disable_rq: false,
                 filtered_rq: '',
                 customer_types: {},
-                rqs:[]
+                rqs:[],
+                subprojects:{}
             }
         },
         watch: {
@@ -464,6 +462,7 @@
             this.getRequisitions();
             this.filteredRqs();
             this.getCustomerTypes();
+            this.subProject();
 
         },
         filters: {
@@ -492,6 +491,13 @@
 
         },
         methods: {
+             subProject(){
+            this.subprojects = {};
+           setTimeout(()=>{
+ this.subprojects = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+           },500)  
+
+            },
             getCustomerTypes() {
                 axios.get('customer-types')
                     .then(res => {
@@ -569,10 +575,10 @@
                     })
             },
             getProjects() {
-                axios.get('projects')
-                    .then(res => {
-                        this.projects = res.data
-                    })
+               axios.get('asset-category')
+              .then(res => {
+                  this.projects = res.data;
+              })
             },
             addService(i) {
                 this.form.service_required.push({
@@ -633,8 +639,9 @@
             },
 
             getAssetDetails() {
-                this.machines.forEach(machine => {
-                    if (machine.id === this.form.machine_id) {
+                setTimeout(()=>{
+              this.machines.forEach(machine => {
+                    if (machine.id === this.form.machine_id) {                    
                         this.make = machine.make;
                         this.previous_readings = machine.current_readings;
                         this.form.track_by_id = machine.track_by_id;
@@ -654,6 +661,7 @@
                     }
                     return;
                 })
+                },300)
             },
             saveJobcard() {
                 for (let i = 0; i < this.machines.length; i++) {

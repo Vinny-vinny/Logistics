@@ -18,6 +18,7 @@ class CreateFuelsTable extends Migration
             $table->float('litres');
             $table->integer('fuel_type_id');
             $table->string('fuel_no');
+            $table->integer('asset_category_id')->nullable();
             $table->integer('vehicle_id')->nullable();
             $table->integer('customer_id')->nullable();
             $table->string('requested_by')->nullable();

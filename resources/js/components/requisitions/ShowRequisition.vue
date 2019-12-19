@@ -45,7 +45,7 @@
                         <tr v-for="item in items">
                             <td>{{item.description}}</td>
                             <td>{{item.qty}}</td>
-                            <td>co343</td>
+                            <td></td>
                         </tr>
 
                     </table>

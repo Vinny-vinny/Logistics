@@ -34,11 +34,11 @@
                     </tr>
                     <tr>
                         <td>Cost Center</td>
-                        <td></td>
+                        <td>{{job.cost_center}}</td>
                     </tr>
                     <tr v-if="workshop">
                         <td>Reg or Project</td>
-                        <td>{{job.plate_no}}</td>
+                        <td>{{job.project}}</td>
                     </tr>
                     <tr v-if="workshop">
                         <td>Inspector</td>
@@ -280,7 +280,6 @@
                                 <td></td>
                             </tr>
                         </table>
-
                     </div>
                 </div>
 
@@ -303,7 +302,6 @@
                         <td>{{project_cost | number}}</td>
                     </tr>
                 </table>
-
                     <div style="margin-left: 40px; height:100%;margin-top: -20px;">
                         <p style="margin-bottom:0">This information is accurate to my knowledge</p>
                 <table class="customers">

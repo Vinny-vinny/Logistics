@@ -1,7 +1,7 @@
 <template>
     <div>
         <job-card v-if="add_jobcard" :edit="editing"></job-card>
-        <job-form v-if="show_form" :printJob="show_form"></job-form>
+        <job-form v-if="show_form" :printJob="show_form"></job-form>        
         <!-- Main content -->
         <section class="content" v-if="!add_jobcard && !show_form">
             <!-- Default box -->
@@ -18,7 +18,7 @@
                             <th>#</th>
                             <th>Machine</th>
                             <th>Driver</th>
-                            <th>Department</th>
+                            <th>Project</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -42,14 +42,14 @@
 </template>
 <script>
     import JobCard from "./JobCard";
-    import JobForm from "./JobForm";
+    import JobForm from "./JobForm";   
     export default {
         data(){
             return {
                 tableData: [],
                 add_jobcard: false,
                 editing: false,
-                show_form:false
+                show_form:false,               
             }
         },
         created(){
@@ -143,7 +143,7 @@
         },
         components:{
             JobCard,
-            JobForm
+            JobForm            
         }
     }
 </script>

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\JobcardCategory;
 use Illuminate\Http\Request;
-use App\Http\Resources\TransactionResource;
+use App\Transaction;
 
-class JobcardCategoryController extends Controller
+class TransactionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +14,19 @@ class JobcardCategoryController extends Controller
      */
     public function index()
     {
-        return response()->json(TransactionResource::collection(JobcardCategory::all()));
+        return response()->json(Transaction::all());   
+
+
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -26,10 +37,29 @@ class JobcardCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        
-        $category = JobcardCategory::create($request->except(['transaction_id']));
-        $category->transaction_types()->attach($request->get('transaction_id'));
-        return response()->json(new TransactionResource($category));
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
     }
 
     /**
@@ -41,10 +71,7 @@ class JobcardCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $category = JobcardCategory::find($id);
-        $category->update($request->except(['transaction_id','transaction_type']));
-        $category->transaction_types()->sync($request->get('transaction_id'));
-        return response()->json(new TransactionResource(JobcardCategory::find($id)));
+        //
     }
 
     /**
@@ -55,7 +82,6 @@ class JobcardCategoryController extends Controller
      */
     public function destroy($id)
     {
-        JobcardCategory::destroy($id);
-        return response()->json($id);
+        //
     }
 }

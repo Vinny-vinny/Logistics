@@ -52,6 +52,19 @@ Vue.filter('number', function(value) {
 import Exception from "./helpers/Exception";
 window.Exception = Exception;
 
+import 'vue-select/dist/vue-select.css';
+import vSelect from 'vue-select';
+// Set the components prop default to return our fresh components
+vSelect.props.components.default = () => ({
+    Deselect: {
+        render: createElement => createElement('span', '❌'),
+    },
+    OpenIndicator: {
+        render: createElement => createElement('span', '🔽'),
+    },
+});
+
+
 import router from './routes/router';
 import store from "./store/store";
 

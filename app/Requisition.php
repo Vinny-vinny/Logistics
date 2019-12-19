@@ -15,6 +15,6 @@ class Requisition extends Model
 
     public function project()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(AssetCategory::class,'project_id');
     }
 }

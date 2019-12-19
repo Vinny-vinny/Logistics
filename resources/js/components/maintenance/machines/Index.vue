@@ -7,8 +7,8 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Machines</h3>
-                    <button class="btn btn-success pull-right" @click="importMachines()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_machine=true">Add Machine</button>
+                    <button  style="display:none" class="btn btn-success pull-right" @click="importMachines()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
+                    <button style="display:none" class="btn btn-primary pull-right mr" @click="add_machine=true">Add Machine</button>
                     </div>
                 <div class="box-body">
                     <table class="table table-striped dt">

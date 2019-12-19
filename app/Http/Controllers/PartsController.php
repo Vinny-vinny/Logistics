@@ -41,15 +41,27 @@ class PartsController extends Controller
     {
         //
     }
-    public function importParts($wh)
+    public function importParts()
     {
-        $parts = WhseStk::join('WhseMst','WhseStk.WHWhseID','=','WhseMst.WhseLink')
-            ->join('StkItem','WhseStk.WHStockLink','=','StkItem.StockLink')
-            ->select("StkItem.StockLink","StkItem.Code","StkItem.Description_1","StkItem.AveUCst")
-            ->where('WhseMst.Code',$wh)
-            ->get();
-           Part::truncate();
-        return $this->storeParts($parts);
+        $parts = WhseStk::select("StockLink","Code","Description_1","AveUCst","ItemGroup")->get();
+        $existing = Part::get();
+        $found_parts = [];
+        if ($existing->count() < 1){
+            return $this->storeParts($parts);
+        }
+        $ids = $existing->map(function($part){
+            return  $part->stock_link;
+        });
+
+        foreach ($parts as $part){
+            if (!in_array($part->StockLink,$ids->all())){
+                $found_parts[] = $part;
+            }
+        }
+        if(!$found_parts){
+            return response()->json([]);
+        }
+        return $this->storeParts($found_parts);
     }
     function storeParts($assets){
         $faker = Faker::create();
@@ -60,6 +72,7 @@ class PartsController extends Controller
                 'description' => $asset->Description_1,
                 'cost' => $asset->AveUCst==0 ? $faker->unique()->numberBetween(10,2000) : $asset->AveUCst,
                 'stock_link' => $asset->StockLink,
+                'item_group' => $asset->ItemGroup
                 ]);
 
         }

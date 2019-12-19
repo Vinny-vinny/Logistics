@@ -20,11 +20,15 @@ class DatabaseSeeder extends Seeder
          $this->call(FuelSupplierSeeder::class);
          $this->call(ExpiryDateSeeder::class);
          $this->call(CategorySeeder::class);
+         $this->call(TransactionSeeder::class);
          $this->call(JobcardCategorySeeder::class);
          $this->call(MechanicSeeder::class);
          $this->call(JobTypeSeeder::class);
          $this->call(CustomerTypesSeeder::class);
          $this->call(ChecklistToolSeeder::class);
+         $this->call(StkCategorySeeder::class);         
+         $this->call(AssetCategorySeeder::class);
+         $this->call(AssetsSeeder::class);
 
 
     }

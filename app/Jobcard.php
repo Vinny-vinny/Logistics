@@ -39,7 +39,7 @@ class Jobcard extends Model
 
     public function project()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(AssetCategory::class,'asset_category_id');
     }
 
     public function requisition()

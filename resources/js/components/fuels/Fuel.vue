@@ -12,10 +12,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label>Project</label>
+                                    <select v-model="form.asset_category_id" required class="form-control" @change="subProject()">
+                                        <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label>Vehicle</label>
                                     <select name="vehicle_id" class="form-control" v-model="form.vehicle_id"
                                             @change="getFuelType()" required>
-                                        <option :value="vehicle.id" v-for="vehicle in vehicles" :key="vehicle.id">
+                                        <option :value="vehicle.id" v-for="vehicle in subprojects" :key="vehicle.id">
                                           {{vehicle.code}}
                                         </option>
                                     </select>
@@ -36,9 +42,9 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Fuel Type</label>
-                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control" disabled>
-                                        <option :value="fuel.id" v-for="fuel in fuel_types" :key="fuel.id">
-                                            {{fuel.name}}
+                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control" @change="fuelRate()">
+                                        <option :value="fuel.id" v-for="fuel in stks" :key="fuel.id">
+                                            {{fuel.code}} - {{fuel.description}}
                                         </option>
                                     </select>
                                 </div>
@@ -141,6 +147,7 @@
                     job_card_id:'',
                     asset_type:'',
                     store_man:'',
+                    asset_category_id:'',
                     rate:0,
                     id: ''
                 },
@@ -167,7 +174,10 @@
                 show_customer:false,
                 fuels:{},
                 jobs:{},
-                username:User.name()
+                username:User.name(),
+                projects:{},
+                subprojects:{},
+                stks:{}
             }
         },
         created() {
@@ -183,6 +193,9 @@
             this.getCustomerTypes();
             this.getJobcards();
             this.getFuels();
+            this.getProjects();
+            this.getStk();
+             
 
         },
        watch:{
@@ -217,6 +230,27 @@
             }
         },
         methods: {
+            getStk(){
+                setTimeout(()=>{
+             this.stks = this.parts.filter(p => p.code == 'LA0012' || p.code == 'LA0018');
+            console.log(this.stks);
+                },3000)
+               
+            
+            },
+            subProject(){
+            this.subprojects = {};
+            this.subprojects = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+            console.log('walla')          
+            
+
+            },
+            getProjects(){
+              axios.get('asset-category')
+              .then(res => {
+                  this.projects = res.data;
+              })
+            },
             getFuels(){
               axios.get('fuel')
               .then(res => {
@@ -234,13 +268,15 @@
                 .then(res => {
                     this.customer_types = res.data;
                 })
-            },
-            getRate(){
-           for (let i=0; i < this.fuel_types.length; i++){
-               if (this.fuel_types[i]['id'] === this.form.fuel_type_id){
-                  this.form.rate = this.fuel_types[i]['rate'];
-               }
-           }
+            },            
+            fuelRate(){
+            setTimeout(()=>{
+                let item =this.stks.find(s => s.id == this.form.fuel_type_id);
+                this.form.rate = item.cost;
+                this.fuel_type = item.description;
+                console.log(this.form.rate);
+            },100)
+
             },
             customerTypes(){
                 this.filtered_customers = [];
@@ -268,21 +304,14 @@
                 axios.get('parts')
                     .then(res => {
                         this.parts = res.data
+
                     })
 
             },
             getFuelType() {
                 this.vehicles.forEach(vehicle => {
                     if (vehicle.id === this.form.vehicle_id) {
-                        this.fuel_types.forEach(fuel => {
-                            if (fuel.id === vehicle.fuel_type_id) {
-                                this.fuel_type = fuel.name;
-                                this.form.rate = fuel.rate
-                                this.form.fuel_type_id = fuel.id;
-                                this.show_fuel_type = true;
-                                this.previous_odometer = vehicle.odometer_readings;
-                            }
-                        })
+                         this.previous_odometer = vehicle.odometer_readings;                                  
                     }
                 })
             },
@@ -373,9 +402,12 @@
                         this.username = res.data.name;
                     })
                     this.editedCustomers();
-                    this.form.asset_type ==='other' ? this.other =true : this.company = true;
-
-
+                    this.form.asset_type ==='other' ? this.other =true : this.company = true;        
+                     this.subprojects = {};
+                     
+                   setTimeout(()=>{
+                    this.subprojects = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+                   },1000)
                 }
             },
             editedCustomers(){

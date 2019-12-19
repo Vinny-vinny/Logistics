@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class WhseStk extends Model
 {
     protected $connection ='sqlsrv2';
-    protected $table = 'WhseStk';
+    protected $table = 'StkItem';
 }

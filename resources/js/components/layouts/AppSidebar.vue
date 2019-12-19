@@ -57,7 +57,7 @@
                         <li><router-link to="/service-types">Service Types</router-link></li>
                         <li><router-link to="/expense">Other Charges</router-link></li>
                         <li><router-link to="/parts">Parts</router-link></li>
-                        <li><router-link to="/projects">Projects</router-link></li>
+                        <li><router-link to="/projects" style="display:none">Projects</router-link></li>
                         <li><router-link to="/customers">Customers</router-link></li>
                         <li><router-link to="/mechanics">Mechanics</router-link></li>
                         <li><router-link to="/categories">Categories</router-link></li>

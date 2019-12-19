@@ -22,11 +22,12 @@ class RequisitionResource extends JsonResource
             'description' => $this->description,
             'where_to_charge' => $this->where_to_charge,
             'project_id' => $this->project_id,
-            'project' => $this->project ? $this->project->code : '',
+            'project' => $this->project ? $this->project->name : '',
             'requested_by' => $this->requested_by,
             'person_requested' => $this->user->name,
             'inventory_items_internal' => $this->inventory_items_internal,
             'inventory_items_external' => $this->inventory_items_external,
+            'group_name' => $this->group_name,
             'type' => $this->type,
             'used' => $this->used,
             'req_no' => $this->req_no

@@ -23,9 +23,9 @@ class FuelResource extends JsonResource
             'vehicle_id' => $this->vehicle_id,
             'customer_id' => $this->customer_id,
             'expense_id' => $this->expense_id,
-            'vehicle' => $this->vehicle->plate_no ,
+            'vehicle' => $this->vehicle->code ,
             'fuel_type_id' => $this->fuel_type_id,
-            'fuel_type' => $this->fueltype->name,
+            'fuel_type' => $this->fueltype->description,
             'invoice_no' => $this->invoice_no,
             'fuel_on' => $this->fuel_on,
             'date_fueled' => Carbon::parse($this->fuel_on)->format('d/m/Y'),
@@ -41,7 +41,8 @@ class FuelResource extends JsonResource
             'current_readings' => $this->vehicle->current_readings,
             'previous_odometer' => $this->vehicle ? $this->vehicle->odometer_readings :'',
             'store_man' => $this->store_man,
-            'fuel_no' => $this->fuel_no
+            'fuel_no' => $this->fuel_no,
+            'asset_category_id' => $this->asset_category_id
              ];
     }
 }

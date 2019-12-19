@@ -8,13 +8,17 @@
                     <img src="/images/lewa.jpg" alt="Lewa Logo">
                     <h2 style="margin-left:100px">Job Card Form: #{{job_card}}</h2>
                 </div>
-
                 <div class="box-body">
                <div class="row">
-               <div class="col-md-6">
-                   <div class="form-group">
-                       <label>Vehicle/Chasis: </label> #{{machine}}
+               <div class="col-md-6">             
+                 <div class="form-group">
+                       <label>Project</label>
+                       <input type="text" class="form-control" :value="project">
                    </div>
+                   <div class="form-group">
+                       <label>Vehicle </label>
+                       <input type="text" class="form-control" :value="machine">
+                   </div>               
                    <div class="form-group">
                        <label>Category</label>
                        <input type="text" class="form-control">
@@ -72,13 +76,8 @@
                    <div class="form-group">
                        <label>Next {{track_by}} Maintenance</label>
                        <input type="text" class="form-control">
-                   </div>
-                   <div class="form-group" v-if="service_type">
-                       <label>Department</label>
-                       <input type="text" class="form-control">
-                   </div>
+                   </div>                  
                </div>
-
                </div>
                     <!-- OUTPUT -->
                     <button @click="print" class="btn btn-primary" id="button-container">Print Form</button>
@@ -90,13 +89,14 @@
 
 <script>
     export default {
-        props:['printForm'],
+        props:['printJobForm'],
         data(){
            return {
                job_card:'',
                machine:'',
                track_by:'',
-               jobcard_type:''
+               jobcard_type:'',
+               project:''
            }
         },
        mounted(){
@@ -113,6 +113,7 @@
                     .then(res =>{
                         let job_details = res.data.find(job => job.id == this.$route.params['id']);
                         this.job_card = job_details.card_no;
+                        this.project = job_details.project;
                         this.jobcard_type = job_details.service_type;
                         axios.get('machines')
                             .then(res => {
@@ -129,9 +130,13 @@
             print() {
               setTimeout(()=>{
                   window.print();
-              },200)
+              },500);
+              
+              setTimeout(()=>{
               this.$router.push('/job-card');
+            },1000)           
             }
+            
         }
     }
 </script>

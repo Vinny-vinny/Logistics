@@ -15,7 +15,7 @@ class Fuel extends Model
 
     public function fueltype()
     {
-        return $this->belongsTo(FuelType::class,'fuel_type_id');
+        return $this->belongsTo(Part::class,'fuel_type_id');
     }
 
     public function expense()
