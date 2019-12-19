@@ -55,14 +55,13 @@
             this.getCustomers();
             this.listen();
         },
-        mounted(){
-            this.initDatable();
-        },
+        
         methods:{
             getCustomers(){
                 axios.get('customers')
                     .then(res => {
                         this.tableData = res.data
+                        this.initDatable();
                     })
             },
             editCustomer(customer){
@@ -131,7 +130,7 @@
                         colReorder: true,
 
                     });
-                },1000)
+                },500)
             },
         },
     components:{
