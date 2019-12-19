@@ -8,19 +8,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Parts</h3>
                     <button class="btn btn-primary pull-right" @click="add_part=true">Add Part</button>
-                    <button class="btn btn-success pull-right mr" @click="show_warehouse=true">{{importing ? 'Importing...':'Import from Sage'}}</button>
-                    <div class="box-body" v-if="show_warehouse">
-                        <form @submit.prevent="importParts()">
-                             <div class="form-group">
-                                 <label>Select Warehouse</label>
-                                 <select name="wh" class="form-control" required v-model="warehouse">
-                                     <option :value="wh.Code" v-for="wh in warehouses" :key="wh.Code">{{wh.Name}}</option>
-                                 </select>
-                             </div>
-                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
-                        </form>
-                </div>
-                </div>
+                    <button class="btn btn-success pull-right mr" @click="importParts()">{{importing ? 'Importing...':'Import from Sage'}}</button>                </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
@@ -81,8 +69,7 @@
             },
             importParts(){
                 this.importing = true;
-                this.show_warehouse = false;
-                axios.get(`import-parts/${this.warehouse}`)
+                axios.get(`import-parts`)
                     .then(res =>{
                        this.importing = false;
                        this.$toastr.s('Parts successfully imported.');

@@ -31,7 +31,8 @@ class CustomerController extends Controller
     }
     public function importCustomers()
     {
-        $customers = SageCustomer::select("DCLink","Account","Name","Contact_Person","EMail")->get();
+        $customers = SageCustomer::select("DCLink","Account","Name","Contact_Person","EMail",
+            "Physical1","Physical2","Telephone","Telephone2","Fax1","Fax2","Tax_Number","Post1","Post2")->get();
         $existing = Customer::get();
         $found_customers = [];
         if ($existing->count() < 1){
@@ -60,6 +61,11 @@ class CustomerController extends Controller
                 'name' => $customer->Name ? $customer->Name : $faker->name,
                 'contact_person' => $customer->Contact_Person ?  $customer->Contact_Person : $faker->name,
                 'email' => $customer->EMail ? $customer->EMail : $faker->email,
+                'address' => $customer->Physical1 ? $customer->Physical1 : $customer->Physical2,
+                'box_no' => $customer->Post1 ? $customer->Post1 : $customer->Post2,
+                'fax' => $customer->Fax1 ? $customer->Fax1 : $customer->Fax2,
+                'tax_no' => $customer->Tax_Number,
+                'telephone' => $customer->Telephone ? $customer->Telephone : $customer->Telephone2,
                 'customer_type_id' => CustomerType::all()->random()->id
             ]);
 

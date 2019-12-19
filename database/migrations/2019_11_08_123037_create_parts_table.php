@@ -19,6 +19,7 @@ class CreatePartsTable extends Migration
             $table->string('description');
             $table->float('cost');
             $table->integer('stock_link')->nullable();
+            $table->string('item_group')->nullable();
             $table->timestamps();
         });
     }

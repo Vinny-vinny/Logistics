@@ -39,12 +39,27 @@ class Jobcard extends Model
 
     public function project()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(AssetCategory::class,'asset_category_id');
     }
 
     public function requisition()
     {
         return $this->belongsTo(Requisition::class);
+    }
+
+    public function fuel()
+    {
+        return $this->belongsTo(Fuel::class,'id','job_card_id');
+    }
+
+    public function mechanic()
+    {
+        return $this->belongsTo(Mechanic::class);
+    }
+
+    public function checklist()
+    {
+        return $this->belongsTo(AssignChecklist::class,'id','jobcard_id');
     }
 
 }

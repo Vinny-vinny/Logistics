@@ -37,9 +37,9 @@ class JobcardController extends Controller
     {
         $request['time_in'] = Carbon::parse($request->time_in)->format('H:i');
         $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
-
+        $card_no = Jobcard::count()+1;
+        $request['card_no'] =  substr('LEWA-' . $card_no . '-' . Machine::find($request->machine_id)->code, 0, 20);
         $jobcard = Jobcard::create($request->except(['files']));
-        $jobcard->update(['card_no' => substr('LEWA-' . $jobcard->id . '-' . Machine::find($jobcard->machine_id)->code, 0, 20)]);
         Machine::find($jobcard->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),
@@ -48,6 +48,15 @@ class JobcardController extends Controller
         ]);
         $request->requisition_id ? Requisition::find($request->requisition_id)->update(['used' => 1]) : '';
         return response()->json(new JobcardResource($jobcard));
+    }
+    //Auto generate Jobcard
+    public function generateJobcard(Request $request)
+    {
+        $request['track_by_id'] = Machine::find($request->machine_id)->track_by_id;
+        $jobcard_no = Jobcard::count()+1;
+        $request['card_no'] = substr('LEWA-' . $jobcard_no . '-' . Machine::find($request->machine_id)->code, 0, 20);
+        $card = Jobcard::create($request->all());
+        return response()->json($card);
     }
     /**
      * Display the specified resource.
@@ -79,7 +88,7 @@ class JobcardController extends Controller
         $request['card_no'] = substr('LEWA-' . $id . '-' . Machine::find($request->machine_id)->code, 0, 20);
 
         $jobcard = Jobcard::find($id);
-        $jobcard->update($request->except(['service_types','files','driver','machine','make','customer_type','track_name','category','previous_readings','inventory_items']));
+        $jobcard->update($request->except(['service_types','files','driver','machine','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist','cost_center']));
         Machine::find($request->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),

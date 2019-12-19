@@ -32,7 +32,7 @@
                         </ul>
                 </li>
                 <li><router-link to="/fuel"><i class="fa fa-database"></i> <span>Fuel</span></router-link></li>
-                <li class="treeview">
+                <li class="treeview" style="display: none">
                     <a href="#"><i class="fa fa-bar-chart"></i> <span>Reports</span>
                         <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
@@ -55,14 +55,15 @@
                         <li><router-link to="/fuel-types">Fuel Types</router-link></li>
                         <li><router-link to="/track-by">Track By</router-link></li>
                         <li><router-link to="/service-types">Service Types</router-link></li>
-                        <li><router-link to="/expense">Expenses</router-link></li>
+                        <li><router-link to="/expense">Other Charges</router-link></li>
                         <li><router-link to="/parts">Parts</router-link></li>
-                        <li><router-link to="/projects">Projects</router-link></li>
+                        <li><router-link to="/projects" style="display:none">Projects</router-link></li>
                         <li><router-link to="/customers">Customers</router-link></li>
                         <li><router-link to="/mechanics">Mechanics</router-link></li>
                         <li><router-link to="/categories">Categories</router-link></li>
                         <li><router-link to="/job-type">Job types</router-link></li>
                         <li><router-link to="/jobcard-category">Jobcard Categories</router-link></li>
+                        <li><router-link to="/checklist-tool">Checklist Tools</router-link></li>
                     </ul>
                 </li>
             </ul>

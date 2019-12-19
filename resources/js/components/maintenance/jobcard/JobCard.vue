@@ -5,60 +5,76 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">{{edit_jobcard ? 'Update Jobcard' : 'New Jobcard'}}</h3>
+                    <h3 class="box-title">{{edit_jobcard ?'Update Jobcard: #'+form.card_no: 'New Jobcard'}}</h3>
                 </div>
                 <div class="box-body">
                     <form @submit.prevent="saveJobcard()" enctype="multipart/form-data" id="jobcard">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="radio-inline"><input type="radio" name="service_type" value="internal"
+                                    <label class="radio-inline"><input type="radio" name="service_type" value="Internal"
                                                                        v-model="form.service_type">Internal</label>
                                     <label class="radio-inline"><input type="radio" name="service_type"
-                                                                       value="external" v-model="form.service_type">External</label>
+                                                                       value="External" v-model="form.service_type">External</label>
+                                </div>
+                                    <div class="form-group">
+                                    <label>Project</label>
+                                    <select v-model="form.asset_category_id" required class="form-control" @change="subProject()">
+                                        <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Vehicle/Chasis #</label>
-                                    <select name="machine_id" class="form-control" v-model="form.machine_id"
-                                            @change="getAssetDetails()" required>
-                                        <option :value="machine.id" v-for="machine in machines" :key="machine.id">
-                                            {{machine.code}}
+                                    <label>Vehicle</label>
+                                    <select name="vehicle_id" class="form-control" v-model="form.machine_id"
+                                              @change="getAssetDetails()" required>
+                                        <option :value="vehicle.id" v-for="vehicle in subprojects" :key="vehicle.id">
+                                          {{vehicle.code}}
                                         </option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Track By:</label> {{track_name}}
-
                                 </div>
                                 <div class="form-group">
                                     <label>Category</label>
                                     <select class="form-control" required v-model="form.jobcard_category_id">
-                                        <option :value="category.id" v-for="category in job_categories" :key="category.id">{{category.name}}</option>
+                                        <option :value="category.id" v-for="category in job_categories"
+                                                :key="category.id">{{category.name}}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Job Type</label>
                                     <select class="form-control" required v-model="form.job_type_id">
-                                        <option :value="job_type.id" v-for="job_type in job_types" :key="job_type.id">{{job_type.name}} - {{job_type.currency}} {{job_type.hourly_rate}}</option>
+                                        <option :value="job_type.id" v-for="job_type in job_types" :key="job_type.id">
+                                            {{job_type.name}} - {{job_type.currency}} {{job_type.hourly_rate}}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Customer Type</label>
-                                    <select class="form-control" v-model="form.customer_type_id" required @change="customerType()">
-                                        <option :value="type.id" v-for="type in customer_types" :key="type.id">{{type.name}}</option>
+                                    <select class="form-control" v-model="form.customer_type_id" required
+                                            @change="customerType()">
+                                        <option :value="type.id" v-for="type in customer_types" :key="type.id">
+                                            {{type.name}}
+                                        </option>
 
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customers">
                                     <label>Customer</label>
                                     <select class="form-control" required v-model="form.customer_id">
-                                        <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
+                                        <option :value="customer.id" v-for="customer in filtered_customers"
+                                                :key="customer.id">{{customer.name}}
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Mechanic</label>
                                     <select class="form-control" required v-model="form.mechanic_id">
-                                        <option :value="mechanic.id" v-for="mechanic in mechanics" :key="mechanic.id">{{mechanic.name}}</option>
+                                        <option :value="mechanic.id" v-for="mechanic in mechanics" :key="mechanic.id">
+                                            {{mechanic.name}}
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -66,7 +82,7 @@
                                 <div class="form-group">
                                     <label>Service Type</label>
                                     <select name="service_type_id" class="form-control" v-model="form.service_type_id"
-                                            @change="nextReadings()" required>
+                                            @change="nextReadings()">
                                         <option :value="service.id" v-for="service in service_types" :key="service.id">
                                             {{service.name}}
                                         </option>
@@ -106,7 +122,6 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Make & Model: </label> {{make}}
-
                                 </div>
                                 <div class="form-group">
                                     <label>Assigned To: </label> {{driver}}
@@ -134,12 +149,11 @@
                                     <label>Next {{track_name}} Maintenance</label>
                                     <input type="number" step="0.001" class="form-control" v-model="form.next_readings"
                                            required :disabled="!show_next_readings">
-                                </div>
-                                <div class="form-group" v-if="serviceType">
-                                    <label>Department</label>
-                                    <select class="form-control" v-model="form.project_id">
-                                        <option :value="project.id" v-for="project in projects" :key="project.id">{{project.code}} - {{project.name}}</option>
-                                    </select>
+                                </div>                            
+
+                                <div class="form-group">
+                                    <label>Lobour Cost</label>
+                                    <input type="text" class="form-control" v-model="form.labour_cost" disabled>
                                 </div>
 
                             </div>
@@ -186,23 +200,28 @@
                             <div class="col-md-11">
                                 <div class="form-group">
                                     <label>Requisitions</label>
-                                    <select class="form-control" v-model="form.requisition_id" @change="getDetails()" :disabled="disable_rq">
-                                        <option :value="rq.id" v-for="rq in filtered_rq" :key="rq.id">{{rq.description}}</option>
+                                    <select class="form-control" v-model="form.requisition_id" @change="getDetails()"
+                                            :disabled="disable_rq">
+                                        <option :value="rq.id" v-for="rq in rqs" :key="rq.id">
+                                            {{rq.req_no}}
+                                        </option>
                                     </select>
                                 </div>
-                                <div class="form-group" v-if="show_inventory">
+
+                                <div class="form-group" v-if="show_inventory && filtered_rq=='Internal'">
                                     <label>Inventory Items</label>
                                     <table style="width:100%">
                                         <tr>
                                             <th align="right">Part</th>
                                             <th align="right">Quantity</th>
-                                            <th align="right">Price Inclusive VAT</th>
-                                            <th align="right">Price Exclusive VAT</th>
-                                            <th></th>
+                                            <th align="right">Unit Cost</th>
+                                            <th align="right">Total Cost</th>
+                                            <th align="right">Total Cost Inclusive VAT</th>
+
                                         </tr>
-                                        <tr v-for="(m,i) in filtered_items">
+                                        <tr v-for="(m,i) in filtered_items_internal">
                                             <td>
-                                                <select class="form-control i_p" v-model="m.part" disabled>                             >
+                                                <select class="form-control i_p" v-model="m.part" disabled> >
                                                     <option :value="p.id" v-for="p in parts" :key="p.id">
                                                         {{p.code}} - {{p.description}}
                                                     </option>
@@ -212,11 +231,58 @@
                                             <td><input type="number" class="form-control cost" v-model="m.quantity"
                                                        placeholder="Quantity" disabled></td>
                                             <td>
-                                                <input type="number" class="form-control rq_pi" v-model="m.price_inclusive"
-                                                       placeholder="Price Inclusive VAT" disabled></td>
+                                                <input type="number" class="form-control rq_pi"
+                                                       v-model="m.unit_cost"
+                                                       placeholder="Unit Cost" disabled></td>
+
                                             <td>
-                                                <input type="number" class="form-control rq_pe" v-model="m.price_exclusive"
-                                                       placeholder="Price Exclusive VAT" disabled></td>
+                                                <input type="number" class="form-control rq_pi"
+                                                       v-model="m.total_cost"
+                                                       placeholder="Total Cost" disabled></td>
+                                            <td>
+                                                <input type="number" class="form-control rq_pe"
+                                                       v-model="m.total_cost_inclusive"
+                                                       placeholder="Total Cost Inclusive VAT" disabled></td>
+
+
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="form-group" v-if="show_inventory && filtered_rq=='External'">
+                                    <label>Inventory Items</label>
+                                    <table style="width:100%">
+                                        <tr>
+                                            <th align="right">Part</th>
+                                            <th align="right">Quantity</th>
+                                            <th align="right">Unit Price</th>
+                                            <th align="right">Total Price</th>
+                                            <th align="right">Total Price Inclusive VAT</th>
+
+                                        </tr>
+                                        <tr v-for="(m,i) in filtered_items_external">
+                                            <td>
+                                                <select class="form-control i_p" v-model="m.part" disabled> >
+                                                    <option :value="p.id" v-for="p in parts" :key="p.id">
+                                                        {{p.code}} - {{p.description}}
+                                                    </option>
+
+                                                </select>
+                                            </td>
+                                            <td><input type="number" class="form-control cost" v-model="m.quantity"
+                                                       placeholder="Quantity" disabled></td>
+                                            <td>
+                                                <input type="number" class="form-control rq_pi"
+                                                       v-model="m.unit_price"
+                                                       placeholder="Unit Price" disabled></td>
+
+                                            <td>
+                                                <input type="number" class="form-control rq_pi"
+                                                       v-model="m.total_price"
+                                                       placeholder="Total Price" disabled></td>
+                                            <td>
+                                                <input type="number" class="form-control rq_pe"
+                                                       v-model="m.total_price_inclusive"
+                                                       placeholder="Total Price Inclusive VAT" disabled></td>
 
 
                                         </tr>
@@ -248,8 +314,8 @@
                     machine_id: '',
                     track_by_id: '',
                     service_type_id: '',
-                    jobcard_category_id:'',
-                    mechanic_id:'',
+                    jobcard_category_id: '',
+                    mechanic_id: '',
                     actual_date: '',
                     completion_date: '',
                     time_in: '',
@@ -258,12 +324,13 @@
                     next_readings: 0,
                     next_service_date: '',
                     current_readings: '',
-                    service_type: 'internal',
-                    project_id:'',
-                    job_type_id:'',
-                    cost_code:'',
-                    customer_id:'',
-                    requisition_id:'',
+                    service_type: 'Internal',
+                    asset_category_id: '',
+                    job_type_id: '',
+                    cost_code: '',
+                    customer_id: '',
+                    requisition_id: '',
+                    labour_cost: 0,
                     id: '',
                     maintenance: [{category: '', description: '', root_cause: ''}],
 
@@ -290,33 +357,36 @@
                 parts: {},
                 categories: {},
                 status: 1,
-                projects:{},
-                job_categories:{},
-                mechanics:{},
-                job_types:{},
-                customer_type:'',
-                customers:{},
-                filtered_customers:[],
-                show_customers:false,
-                part_qty:'',
-                part_id:'',
-                exp_qty:'',
-                exp_id:'',
-                requisitions:{},
-                show_inventory:false,
-                filtered_items:[],
-                disable_rq:false,
-                filtered_rq:[],
-                customer_types:{}
+                projects: {},
+                job_categories: {},
+                mechanics: {},
+                job_types: {},
+                customer_type: '',
+                customers: {},
+                filtered_customers: [],
+                show_customers: false,
+                part_qty: '',
+                part_id: '',
+                exp_qty: '',
+                exp_id: '',
+                requisitions: {},
+                show_inventory: false,
+                filtered_items_internal: [],
+                filtered_items_external: [],
+                disable_rq: false,
+                filtered_rq: '',
+                customer_types: {},
+                rqs:[],
+                subprojects:{}
             }
         },
         watch: {
-            getCost(){
-                for (let p=0; p < this.parts.length; p++){
-                    for (let i=0; i < this.form.service_required.length; i++){
-                        if (this.form.service_required[i]['qty'] !=='' && this.form.service_required[i]['part'] !==''){
-                            if (this.form.service_required[i]['part'] === this.parts[p]['id']){
-                                this.form.service_required[i]['price_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.service_required[i]['qty']).toFixed(2);
+            getCost() {
+                for (let p = 0; p < this.parts.length; p++) {
+                    for (let i = 0; i < this.form.service_required.length; i++) {
+                        if (this.form.service_required[i]['qty'] !== '' && this.form.service_required[i]['part'] !== '') {
+                            if (this.form.service_required[i]['part'] === this.parts[p]['id']) {
+                                this.form.service_required[i]['price_inclusive'] = ((this.parts[p]['cost'] * 116 / 100) * this.form.service_required[i]['qty']).toFixed(2);
                                 this.form.service_required[i]['price_exclusive'] = (this.parts[p]['cost'] * this.form.service_required[i]['qty']).toFixed(2);
                             }
                         }
@@ -324,8 +394,8 @@
                 }
             },
             'form.current_readings'() {
-                    this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
-                    this.show_next_readings = false;
+                this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
+                this.show_next_readings = false;
             },
             timeframe() {
                 if (this.form.actual_date !== '' && this.form.completion_date !== '') {
@@ -342,13 +412,33 @@
                         return this.$toastr.e('Sorry, Next service date cannot be less than completion date.');
                     }
                 }
-                if (this.form.actual_date !== '' && this.form.completion_date !== '' && this.form.time_in !== '' || this.form.time_out !== '') {
+                if (this.form.actual_date !== '' && this.form.completion_date !== '' && this.form.time_in !== '' && this.form.time_out !== '') {
                     if (moment(this.form.actual_date).format('YYYY-MM-DD') === moment(this.form.completion_date).format('YYYY-MM-DD')) {
                         if (moment(this.form.time_in, 'h:mm A').format('HH:mm') > moment(this.form.time_out, 'h:mm A').format('HH:mm')) {
                             this.form.time_out = '';
                             return this.$toastr.e('Sorry, time in cannot be greater than time out.');
                         }
                     }
+                    //Labour calculation = hrs* job type
+                    let initialdate = moment(this.form.actual_date).format('YYYY-MM-DD');
+                    let enddate = moment(this.form.completion_date).format('YYYY-MM-DD');
+                    let start_time = moment(this.form.time_in, "HH:mm:ss").format("hh:mm")
+                    let end_time = moment(this.form.time_out, "HH:mm:ss").format("hh:mm");
+
+                    let datetimeA = moment(initialdate + " " + start_time);
+                    let datetimeB = moment(enddate + " " + end_time);
+                    let time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
+
+                    if (this.form.job_type_id !== '') {
+                     axios.get('job-types')
+                        .then(res => {
+                            this.job_types = res.data;
+                            let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
+                            this.form.labour_cost = time_in_minutes / 60 * cost;
+                        })
+
+                    }
+
                 }
             }
         },
@@ -360,7 +450,7 @@
             this.getMachines();
             this.getUsers();
             this.getTracks();
-             this.getServiceTypes();
+            this.getServiceTypes();
             this.getBalances();
             this.getParts();
             this.getCategories();
@@ -372,6 +462,7 @@
             this.getRequisitions();
             this.filteredRqs();
             this.getCustomerTypes();
+            this.subProject();
 
         },
         filters: {
@@ -380,7 +471,7 @@
             }
         },
         computed: {
-            partItems(){
+            partItems() {
                 return this.service_required;
             },
             actualMileage() {
@@ -389,94 +480,115 @@
                 }
             },
             serviceType() {
-                return this.form.service_type === 'internal';
+                return this.form.service_type === 'Internal';
             },
             timeframe() {
-                return [this.form.actual_date, this.form.time_in, this.form.completion_date, this.form.time_out, this.form.next_service_date].join();
+                return [this.form.actual_date, this.form.time_in, this.form.completion_date, this.form.time_out, this.form.next_service_date, this.form.job_type_id].join();
             },
-            getCost(){
-               return [this.part_qty, this.part_id,this.form.service_required].join();
+            getCost() {
+                return [this.part_qty, this.part_id, this.form.service_required].join();
             },
 
         },
         methods: {
-            getCustomerTypes(){
-              axios.get('customer-types')
-              .then(res => {
-                  this.customer_types = res.data;
-              })
-            },
-            filteredRqs(){
-               axios.get('requisitions')
-                   .then(rq => {
-                       for (let i=0; i< rq.data.length; i++){
-                           console.log(rq.data[i])
-                           if (rq.data[i]['used'] ==0){
-                               this.filtered_rq.push(rq.data[i]);
-                           }
-                       }
-                   })
-
+             subProject(){
+            this.subprojects = {};
+           setTimeout(()=>{
+ this.subprojects = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+           },500)  
 
             },
-            getDetails(){
+            getCustomerTypes() {
+                axios.get('customer-types')
+                    .then(res => {
+                        this.customer_types = res.data;
+                    })
+            },
+            filteredRqs() {
+                axios.get('requisitions')
+                    .then(rq => {
+                        for (let i = 0; i < rq.data.length; i++) {
+                            if (rq.data[i]['used'] == 0 && rq.data[i]['type'] !==null) {
+                                this.rqs.push(rq.data[i]);
+                            }
+                        }
+                    })
+            },
+            getDetails() {
                 this.show_inventory = true;
-                this.filtered_items = [];
-                for (let i=0; i < this.requisitions.length; i++){
-                    if (this.requisitions[i]['id'] === this.form.requisition_id){
-                        this.filtered_items = JSON.parse(this.requisitions[i]['inventory_items']);
+                this.filtered_items_internal = [];
+                this.filtered_items_external = [];
+                for (let i = 0; i < this.requisitions.length; i++) {
+                    if (this.requisitions[i]['id'] === this.form.requisition_id) {
+                        if(this.requisitions[i]['type'] ==='Internal'){
+                            this.filtered_rq ='Internal';
+                                this.filtered_items_internal = JSON.parse(this.requisitions[i]['inventory_items_internal']);
+                            return;
+                        }
+                        if(this.requisitions[i]['type'] ==='External'){
+                            this.filtered_rq ='External';
+                            this.filtered_items_external = JSON.parse(this.requisitions[i]['inventory_items_external']);
+                            return;
+                        }
 
                     }
                 }
 
             },
-            getRequisitions(){
-              axios.get('requisitions')
-                  .then(rq => {
-                      this.requisitions = rq.data
-                  })
+            getRequisitions() {
+                axios.get('requisitions')
+                    .then(rq => {
+                        this.requisitions = rq.data
+                    })
             },
-            customerType(){
+            customerType() {
                 this.filtered_customers = [];
-                  this.show_customers = true;
-                  for (let j=0; j<this.customers.length; j++){
-                      if (this.customers[j]['customer_type_id'] === this.form.customer_type_id){
-                          this.filtered_customers.push(this.customers[j]);
-                      }
-                  }
+                this.show_customers = true;
+                for (let j = 0; j < this.customers.length; j++) {
+                    if (this.customers[j]['customer_type_id'] === this.form.customer_type_id) {
+                        this.filtered_customers.push(this.customers[j]);
+                    }
+                }
             },
-            getCustomers(){
-              axios.get('customers')
-                  .then(customers => {
-                      this.customers = customers.data;
-                  })
+            getCustomers() {
+                axios.get('customers')
+                    .then(customers => {
+                        this.customers = customers.data;
+                    })
             },
-            getJobtypes(){
-              axios.get('job-types')
-                  .then(res => {
-                      this.job_types = res.data;
-                  })
+            getJobtypes() {
+                axios.get('job-types')
+                    .then(res => {
+                        this.job_types = res.data;
+                    })
             },
-            getMechanics(){
-              axios.get('mechanics')
-                  .then(res => {
-                      this.mechanics = res.data;
-                  })
+            getMechanics() {
+                axios.get('mechanics')
+                    .then(res => {
+                        this.mechanics = res.data;
+                    })
             },
-            getJobCategories(){
-              axios.get('jobcard-category')
-                  .then(category => {
-                      this.job_categories = category.data;
-                  })
+            getJobCategories() {
+                axios.get('jobcard-category')
+                    .then(category => {
+                        this.job_categories = category.data;
+                    })
             },
-            getProjects(){
-              axios.get('projects')
-                  .then(res => {
-                      this.projects = res.data
-                  })
+            getProjects() {
+               axios.get('asset-category')
+              .then(res => {
+                  this.projects = res.data;
+              })
             },
             addService(i) {
-                this.form.service_required.push({category: '', part: '', qty: '', description: '',price_inclusive:'',price_exclusive:''});
+                this.form.service_required.push({
+                    category: '',
+                    part: '',
+                    qty: '',
+                    description: '',
+                    price_inclusive: '',
+                    price_exclusive: ''
+                });
             },
             removeService(i) {
                 this.form.service_required.splice(i, 1);
@@ -509,11 +621,11 @@
                     })
             },
             nextReadings() {
-                    this.services.forEach(service => {
-                        if (service.id === this.form.service_type_id) {
-                            this.service_after = service.service_after;
-                        }
-                    })
+                this.services.forEach(service => {
+                    if (service.id === this.form.service_type_id) {
+                        this.service_after = service.service_after;
+                    }
+                })
 
             },
             initDate() {
@@ -527,8 +639,9 @@
             },
 
             getAssetDetails() {
-                this.machines.forEach(machine => {
-                    if (machine.id === this.form.machine_id) {
+                setTimeout(()=>{
+              this.machines.forEach(machine => {
+                    if (machine.id === this.form.machine_id) {                    
                         this.make = machine.make;
                         this.previous_readings = machine.current_readings;
                         this.form.track_by_id = machine.track_by_id;
@@ -548,12 +661,13 @@
                     }
                     return;
                 })
+                },300)
             },
             saveJobcard() {
-                for (let i=0;i<this.machines.length;i++){
-                    if (this.machines[i]['id'] === this.form.machine_id){
+                for (let i = 0; i < this.machines.length; i++) {
+                    if (this.machines[i]['id'] === this.form.machine_id) {
                         console.log(`current ${this.machines[i]['current_readings']}  entered  ${this.form.current_readings}`)
-                        if (this.machines[i]['current_readings'] > this.form.current_readings){
+                        if (this.machines[i]['current_readings'] > this.form.current_readings) {
                             return this.$toastr.e(`Sorry, Current ${this.track_name} readings cannot be less than previous readings.`);
                         }
                     }
@@ -665,49 +779,66 @@
                     this.filtered_customers = [];
                     this.Customers();
                     this.ServiceTypes();
-
-
-                    if (this.form.requisition_id){
+                     setTimeout(()=>{
+                         console.log(this.balances)
+                     },300)
+                    if (this.form.requisition_id) {
                         this.disable_rq = true;
                         this.show_inventory = true;
                         this.editedRequisitions();
                     }
+
                 }
             },
-            editedRequisitions(){
-              axios.get('requisitions')
-                  .then(rq => {
-                      this.filtered_items = [];
-                      this.filtered_rq = [];
-                      for (let i=0; i < rq.data.length; i++){
-                          if (rq.data[i]['id'] === this.form.requisition_id){
-                              this.filtered_items = JSON.parse(rq.data[i]['inventory_items']);
-                              this.filtered_rq.push(rq.data[i])
-                          }
-                      }
-                  })
+            editedRequisitions() {
+                this.rqs = [];
+                axios.get('requisitions')
+                    .then(rq => {
+                        this.filtered_items_internal = [];
+                        this.filtered_items_external = [];
+                        for (let i = 0; i < rq.data.length; i++) {
+                            if (rq.data[i]['type'] !=null){
+                                if (rq.data[i]['id'] == this.form.requisition_id){
+                                    this.rqs.splice(rq.data[i],1);
+                                }
+                               this.rqs.push(rq.data[i]);
+                            }
+                            if (rq.data[i]['id'] === this.form.requisition_id) {
+                                if(rq.data[i]['type'] ==='Internal'){
+                                    this.filtered_rq ='Internal';
+                                    this.filtered_items_internal = JSON.parse(rq.data[i]['inventory_items_internal']);
+                                    //return;
+                                }
+                                if(rq.data[i]['type'] ==='External'){
+                                    this.filtered_rq ='External';
+                                    this.filtered_items_external = JSON.parse(rq.data[i]['inventory_items_external']);
+                                 //return;
+                                }
+                            }
+                        }
+                    })
             },
-            ServiceTypes(){
+            ServiceTypes() {
                 axios.get('service-types')
                     .then(res => {
-                        for (let i=0;i<res.data.length;i++){
-                            if (res.data[i]['id'] === this.form.service_type_id){
+                        for (let i = 0; i < res.data.length; i++) {
+                            if (res.data[i]['id'] === this.form.service_type_id) {
                                 this.service_after = res.data[i]['service_after'];
                                 this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
                             }
                         }
                     });
             },
-            Customers(){
+            Customers() {
                 axios.get('customers')
                     .then(res => {
-                        this.customers =res.data;
-                            this.show_customers = true;
-                            for (let j=0; j<this.customers.length; j++){
-                                if (this.customers[j]['customer_type_id'] === this.form.customer_type_id){
-                                    this.filtered_customers.push(this.customers[j]);
-                                }
+                        this.customers = res.data;
+                        this.show_customers = true;
+                        for (let j = 0; j < this.customers.length; j++) {
+                            if (this.customers[j]['customer_type_id'] === this.form.customer_type_id) {
+                                this.filtered_customers.push(this.customers[j]);
                             }
+                        }
                     })
             }
         },
@@ -718,9 +849,10 @@
 </script>
 
 <style>
-     .i_p{
-         margin-bottom: 8px;
-     }
+    .i_p {
+        margin-bottom: 8px;
+    }
+
     .qty, .cost {
         margin-left: 5px;
         margin-bottom: 8px;
@@ -760,28 +892,34 @@
         margin-left: 2px;
         margin-bottom: 8px;
     }
-    .p_in{
-     margin-left:10px;
-     margin-bottom: 8px;
+
+    .p_in {
+        margin-left: 10px;
+        margin-bottom: 8px;
 
     }
-    .p_ex{
-        margin-left:15px;
-        margin-bottom: 8px;
-    }
-    .p_in_2{
-        margin-left:8px;
-        margin-bottom: 8px;
-    }
-    .p_ex_2{
-        margin-left:10px;
-        margin-bottom: 8px;
-    }
-    .rq_pi{
+
+    .p_ex {
         margin-left: 15px;
         margin-bottom: 8px;
     }
-    .rq_pe{
+
+    .p_in_2 {
+        margin-left: 8px;
+        margin-bottom: 8px;
+    }
+
+    .p_ex_2 {
+        margin-left: 10px;
+        margin-bottom: 8px;
+    }
+
+    .rq_pi {
+        margin-left: 15px;
+        margin-bottom: 8px;
+    }
+
+    .rq_pe {
         margin-left: 20px;
         margin-bottom: 8px;
     }
@@ -810,7 +948,7 @@
     }
 
 
-    .cool{
+    .cool {
         border: #339FFF solid 2px;
         padding: 15px;
     }

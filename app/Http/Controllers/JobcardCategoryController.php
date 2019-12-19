@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\JobcardCategory;
 use Illuminate\Http\Request;
+use App\Http\Resources\TransactionResource;
 
 class JobcardCategoryController extends Controller
 {
@@ -14,7 +15,7 @@ class JobcardCategoryController extends Controller
      */
     public function index()
     {
-        return response()->json(JobcardCategory::all());
+        return response()->json(TransactionResource::collection(JobcardCategory::all()));
     }
 
     /**
@@ -25,8 +26,10 @@ class JobcardCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $category = JobcardCategory::create($request->all());
-        return response()->json($category);
+        
+        $category = JobcardCategory::create($request->except(['transaction_id']));
+        $category->transaction_types()->attach($request->get('transaction_id'));
+        return response()->json(new TransactionResource($category));
     }
 
     /**
@@ -38,8 +41,10 @@ class JobcardCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        JobcardCategory::find($id)->update($request->all());
-        return response()->json(JobcardCategory::find($id));
+        $category = JobcardCategory::find($id);
+        $category->update($request->except(['transaction_id','transaction_type']));
+        $category->transaction_types()->sync($request->get('transaction_id'));
+        return response()->json(new TransactionResource(JobcardCategory::find($id)));
     }
 
     /**

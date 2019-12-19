@@ -6,8 +6,8 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Expenses</h3>
-                    <button class="btn btn-primary pull-right" @click="add_expense=true">Add Expense</button>
+                    <h3 class="box-title">Other Charges</h3>
+                    <button class="btn btn-primary pull-right" @click="add_expense=true">Add Other Charges</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">

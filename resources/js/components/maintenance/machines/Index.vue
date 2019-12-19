@@ -7,17 +7,15 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Machines</h3>
-                    <button class="btn btn-success pull-right" @click="importMachines()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_machine=true">Add Machine</button>
+                    <button  style="display:none" class="btn btn-success pull-right" @click="importMachines()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
+                    <button style="display:none" class="btn btn-primary pull-right mr" @click="add_machine=true">Add Machine</button>
                     </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-                            <th>#</th>
                             <th>Code</th>
                             <th>Make</th>
-                            <th>Description</th>
                             <th>Chasis #</th>
                             <th>Assigned To</th>
                             <th>Track By</th>
@@ -26,10 +24,8 @@
                         </thead>
                         <tbody>
                         <tr v-for="machine in tableData">
-                            <td>{{machine.id}}</td>
                             <td>{{machine.code}}</td>
                             <td>{{machine.make}}</td>
-                            <td>{{machine.description}}</td>
                             <td>{{machine.chasis_no}}</td>
                             <td>{{machine.assign_to_id}}</td>
                             <td>{{machine.track_name}}</td>
@@ -60,14 +56,11 @@
             this.listen();
             this.getMachines();
         },
-        mounted(){
-            this.initDatable();
-        },
         methods:{
             getMachines(){
                 axios.get('machines')
                     .then(res => {
-                        this.tableData = res.data
+                        this.tableData = res.data;
                         this.initDatable();
                     })
                     .catch(error => Exception.handle(error))

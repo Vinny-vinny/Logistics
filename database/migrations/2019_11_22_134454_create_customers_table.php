@@ -20,6 +20,11 @@ class CreateCustomersTable extends Migration
             $table->string('name')->nullable();
             $table->string('contact_person')->nullable();
             $table->string('email')->nullable();
+            $table->string('address')->nullable();
+            $table->string('box_no')->nullable();
+            $table->string('fax')->nullable();
+            $table->string('tax_no')->nullable();
+            $table->string('telephone')->nullable();
             $table->integer('customer_type_id')->nullable();
             $table->timestamps();
         });

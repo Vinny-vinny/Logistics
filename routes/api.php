@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::apiResource('job-card','JobcardController');
 Route::post('close-jobcard/{id}','JobcardController@closeJobcard');
+Route::post('generate-job','JobcardController@generateJobcard');
 Route::apiResource('machines','MachineController');
 Route::get('import-machines','MachineController@importMachines');
 Route::apiResource('users','UserController');
@@ -39,14 +40,19 @@ Route::apiResource('external-services','ExternalServiceController');
 Route::apiResource('parts','PartsController');
 Route::apiResource('categories','CategoriesController');
 Route::apiResource('warehouse','WarehouseController');
-Route::get('import-parts/{warehouse}','PartsController@importParts');
+Route::get('import-parts','PartsController@importParts');
 Route::apiResource('projects','ProjectController');
 Route::apiResource('customers','CustomerController');
 Route::apiResource('customer-types','CustomerTypeController');
 Route::apiResource('jobcard-category','JobcardCategoryController');
 Route::apiResource('mechanics','MechanicsController');
 Route::apiResource('requisitions','RequisitionController');
+Route::apiResource('checklist-tool','ChecklistToolController');
+Route::post('generate-requisition','RequisitionController@autoGenerate');
+Route::apiResource('stk-groups','StkCategoryController');
 Route::apiResource('job-types','JobTypesController');
+Route::apiResource('transactions','TransactionController');
+Route::apiResource('asset-category','AssetCategoryController');
 Route::get('import-projects','ProjectController@importProjects');
 Route::get('import-customers','CustomerController@importCustomers');
 Route::post('job-report','ReportsController@JobReport');

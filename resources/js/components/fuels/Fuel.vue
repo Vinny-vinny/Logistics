@@ -12,10 +12,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label>Project</label>
+                                    <select v-model="form.asset_category_id" required class="form-control" @change="subProject()">
+                                        <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label>Vehicle</label>
                                     <select name="vehicle_id" class="form-control" v-model="form.vehicle_id"
                                             @change="getFuelType()" required>
-                                        <option :value="vehicle.id" v-for="vehicle in vehicles" :key="vehicle.id">
+                                        <option :value="vehicle.id" v-for="vehicle in subprojects" :key="vehicle.id">
                                           {{vehicle.code}}
                                         </option>
                                     </select>
@@ -36,30 +42,28 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Fuel Type</label>
-                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control" required>
-                                        <option :value="fuel.id" v-for="fuel in fuel_types" :key="fuel.id">
-                                            {{fuel.name}}
+                                    <select name="fuel_type_id" v-model="form.fuel_type_id" class="form-control" @change="fuelRate()">
+                                        <option :value="fuel.id" v-for="fuel in stks" :key="fuel.id">
+                                            {{fuel.code}} - {{fuel.description}}
                                         </option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Other Services</label>
+                                    <label>Other Charges</label>
                                     <select name="expense_id" class="form-control" v-model="form.expense_id" @change="genExpenses()">
                                         <option :value="expense.id" v-for="expense in expenses" :key="expense.id">
                                             {{expense.name}}
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" v-if="jobs.length">
                                     <label>Jobcard</label>
-                                    <select v-model="form.jobcard_id" class="form-control">
-                                        <option :value="job.id" v-for="job in jobcards" :key="job.id">{{job.card_no}}</option>
+                                    <select v-model="form.job_card_id" class="form-control">
+                                        <option :value="job.id" v-for="job in jobs" :key="job.id">{{job.card_no}}</option>
                                     </select>
                                 </div>
                             </div>
-
                             <div class="col-md-6">
-
                                 <div class="form-group" style="margin-left:100px;">
                                     <table width="100%">
                                         <tr>
@@ -91,14 +95,14 @@
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customer">
-                                    <label>Customers</label>
+                                    <label>Customer</label>
                                     <select class="form-control" v-model="form.customer_id" required>
                                         <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Authorized By</label>
-                                    <input type="text" class="form-control" :value="username()" disabled>
+                                    <input type="text" class="form-control" v-model="username" disabled>
                                 </div>
                                 <div class="form-group">
                                     <label>Invoice No</label>
@@ -108,12 +112,14 @@
                                     <label>Requested By</label>
                                     <input type="text" class="form-control" v-model="form.requested_by" required>
                                 </div>
+                                <div class="form-group">
+                                    <label>Store Man</label>
+                                    <input type="text" class="form-control" v-model="form.store_man" required>
+                                </div>
                             </div>
                             </div>
-
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-
                     </form>
                 </div>
             </div>
@@ -138,8 +144,10 @@
                     requested_by:'',
                     odometer_readings: '',
                     customer_type_id:'',
-                    jobcard_id:'',
+                    job_card_id:'',
                     asset_type:'',
+                    store_man:'',
+                    asset_category_id:'',
                     rate:0,
                     id: ''
                 },
@@ -163,7 +171,13 @@
                 filtered_customers:[],
                 customer_types:{},
                 jobcards:{},
-                show_customer:false
+                show_customer:false,
+                fuels:{},
+                jobs:{},
+                username:User.name(),
+                projects:{},
+                subprojects:{},
+                stks:{}
             }
         },
         created() {
@@ -178,9 +192,21 @@
             this.getParts();
             this.getCustomerTypes();
             this.getJobcards();
+            this.getFuels();
+            this.getProjects();
+            this.getStk();
+             
 
         },
-
+       watch:{
+         'form.vehicle_id'(){
+             this.jobs = {};
+             axios.get('job-card')
+                 .then(res => {
+                     this.jobs = res.data.filter(f => f.machine_id ==this.form.vehicle_id);
+                 })
+         }
+       },
         mounted: function () {
             var self = this;
             $('#datepicker').datepicker({
@@ -204,6 +230,33 @@
             }
         },
         methods: {
+            getStk(){
+                setTimeout(()=>{
+             this.stks = this.parts.filter(p => p.code == 'LA0012' || p.code == 'LA0018');
+            console.log(this.stks);
+                },3000)
+               
+            
+            },
+            subProject(){
+            this.subprojects = {};
+            this.subprojects = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+            console.log('walla')          
+            
+
+            },
+            getProjects(){
+              axios.get('asset-category')
+              .then(res => {
+                  this.projects = res.data;
+              })
+            },
+            getFuels(){
+              axios.get('fuel')
+              .then(res => {
+                  this.fuels = res.data
+              })
+            },
             getJobcards(){
               axios.get('job-card')
               .then(res => {
@@ -215,16 +268,15 @@
                 .then(res => {
                     this.customer_types = res.data;
                 })
-            },
-           username(){
-             return  User.name();
-           },
-            getRate(){
-           for (let i=0; i < this.fuel_types.length; i++){
-               if (this.fuel_types[i]['id'] === this.form.fuel_type_id){
-                  this.form.rate = this.fuel_types[i]['rate'];
-               }
-           }
+            },            
+            fuelRate(){
+            setTimeout(()=>{
+                let item =this.stks.find(s => s.id == this.form.fuel_type_id);
+                this.form.rate = item.cost;
+                this.fuel_type = item.description;
+                console.log(this.form.rate);
+            },100)
+
             },
             customerTypes(){
                 this.filtered_customers = [];
@@ -252,21 +304,14 @@
                 axios.get('parts')
                     .then(res => {
                         this.parts = res.data
+
                     })
 
             },
             getFuelType() {
                 this.vehicles.forEach(vehicle => {
                     if (vehicle.id === this.form.vehicle_id) {
-                        this.fuel_types.forEach(fuel => {
-                            if (fuel.id === vehicle.fuel_type_id) {
-                                this.fuel_type = fuel.name;
-                                this.form.rate = fuel.rate
-                                this.form.fuel_type_id = fuel.id;
-                                this.show_fuel_type = true;
-                                this.previous_odometer = vehicle.odometer_readings;
-                            }
-                        })
+                         this.previous_odometer = vehicle.odometer_readings;                                  
                     }
                 })
             },
@@ -326,6 +371,7 @@
             save() {
                 delete this.form.id;
                 this.form.fuel_on = this.convertDate(this.form.fuel_on);
+                this.form.authorized_by = User.id();
                 axios.post('fuel', this.form)
                     .then(res => eventBus.$emit('listFuels', res.data))
                     .catch(error => error.response)
@@ -351,8 +397,17 @@
                     this.previous_odometer = this.$store.state.fuels.previous_odometer;
                     this.show_rate = true;
                     this.show_customer = true;
+                    axios.get(`users/${this.form.authorized_by}`)
+                    .then(res => {
+                        this.username = res.data.name;
+                    })
                     this.editedCustomers();
-                    this.form.asset_type ==='other' ? this.other =true : this.company = true;
+                    this.form.asset_type ==='other' ? this.other =true : this.company = true;        
+                     this.subprojects = {};
+                     
+                   setTimeout(()=>{
+                    this.subprojects = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+                   },1000)
                 }
             },
             editedCustomers(){

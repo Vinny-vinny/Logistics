@@ -72,22 +72,16 @@
                                     </div>
                                 </div>
 
-<!--                                <div class="row">-->
-<!--                                    <div class="col-md-6">-->
-<!--                                        <div class="form-group" v-if="selected_next_maintenance">-->
-<!--                                            <label>Next {{track_type}} Maintenance</label>-->
-<!--                                            <input type="number" step="0.001" class="form-control" v-model="form.next_readings"-->
-<!--                                                   required disabled>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                    <div class="col-md-6">-->
+                                        <div class="form-group" v-if="selected_next_maintenance && show_next_readings">
+                                            <label>Next {{track_type}} due for service</label>
+                                            <input type="number" step="0.001" class="form-control" v-model="form.next_readings" disabled>
+                                        </div>
                                         <div class="form-group" v-if="selected_next_maintenance">
                                             <label>Remind before (No. of {{track_type}})</label>
                                             <input type="number" class="form-control" v-model="form.reminder_before"
                                                    required>
                                         </div>
-<!--                                    </div>-->
-<!--                                </div>-->
+
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -181,7 +175,8 @@
                 service_types:[],
                 services:[],
                 show_service:false,
-                fuel_types:{}
+                fuel_types:{},
+                show_next_readings:false
             }
         },
 
@@ -216,7 +211,7 @@
             },
         readings(){
             return [this.form.next_readings,this.form.reminder_before].join();
-        },
+        }
     },
         methods: {
             getFuelTypes(){
@@ -386,10 +381,18 @@
                         this.show_file = true;
                     }
 
+                   axios.get('machines')
+                    .then(res => {
+                        let machine = res.data.find(m => m.id === this.form.id);
+                        if (machine.next_readings >=0 && machine.next_readings > machine.current_readings){
+                         this.show_next_readings = true;
+                         this.form.next_readings = machine.next_readings;
+                        }
+                    })
                     axios.get('service-types')
                         .then(res => {
                             for (let i=0;i<res.data.length;i++){
-                                  if (res.data[i]['track_by_id'] === this.$store.state.machine.track_by_id){
+                                   if (res.data[i]['track_by_id'] === this.$store.state.machine.track_by_id){
                                   this.service_types.push(res.data[i]);
                                 }
                             }

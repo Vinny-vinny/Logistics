@@ -23,4 +23,9 @@ class JobcardCategory extends Model
     {
         return $this->belongsTo(JobcardCategory::class,'id');
     }
+
+    public function transaction_types()
+    {
+        return $this->belongsToMany(Transaction::class,'jobcard_category_transaction');
+    }
 }

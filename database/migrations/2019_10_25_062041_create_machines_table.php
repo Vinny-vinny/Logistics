@@ -17,8 +17,15 @@ class CreateMachinesTable extends Migration
             $table->bigIncrements('id');
             $table->integer('asset_no')->nullable();
             $table->string('code');
-            $table->string('description');
+            $table->string('description')->nullable();
+            $table->string('fleet')->nullable();
             $table->string('make')->nullable();
+            $table->string('model')->nullable();
+            $table->string('body_type')->nullable();
+            $table->string('log_book')->nullable();
+            $table->string('color')->nullable();
+            $table->string('cost_center')->nullable();
+            $table->integer('asset_category_id')->nullable();
             $table->integer('track_by_id')->nullable();
             $table->date('warranty')->nullable();
             $table->string('plate_no')->nullable();

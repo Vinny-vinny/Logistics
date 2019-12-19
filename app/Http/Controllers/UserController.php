@@ -30,6 +30,10 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function show($id)
+    {
+        return response()->json(User::find($id));
+ }
 
     /**
      * Update the specified resource in storage.

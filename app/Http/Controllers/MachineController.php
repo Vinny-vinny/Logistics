@@ -87,11 +87,12 @@ class MachineController extends Controller
     {
          $assets = SageAsset::join('_btblFAAssetType','_btblFAAsset.iAssetTypeNo','=','_btblFAAssetType.idAssetTypeNo')
             ->join('_btblFAAssetSerialNo','_btblFAAsset.cAssetCode','=','_btblFAAssetSerialNo.cAssetCode')
-        ->select("_btblFAAsset.idAssetNo","_btblFAAsset.cAssetCode","_btblFAAsset.cAssetDesc","_btblFAAsset.ufFACurrentKMReading","_btblFAAsset.ufFAMachineHours","_btblFAAsset.ulFATrackBy","_btblFAAsset.ucFAChasisnumber","_btblFAAsset.ucFAEnginenumber"
-,"_btblFAAsset.ucFAYearofmake","_btblFAAsset.ucFARegyear","_btblFAAsset.ucFAMake","_btblFAAsset.fInsuredValue",'_btblFAAssetSerialNo.cSerialNo')
-            ->where("_btblFAAsset.iAssetTypeNo", 2)
-            ->orWhere("_btblFAAsset.iAssetTypeNo", 7)
+        ->select("_btblFAAsset.idAssetNo","_btblFAAsset.cAssetCode","_btblFAAsset.cAssetDesc"
+,"_btblFAAsset.fInsuredValue",'_btblFAAssetSerialNo.cSerialNo')
+       //     ->where("_btblFAAsset.iAssetTypeNo", 2)
+       //     ->orWhere("_btblFAAsset.iAssetTypeNo", 7)
             ->get();
+
         $existing = Machine::get();
         $found_assets = [];
         if ($existing->count() < 1){
@@ -120,14 +121,14 @@ class MachineController extends Controller
                 'code' => $asset->cAssetCode,
                 'asset_no' => $asset->idAssetNo,
                 'description' => $asset->cAssetDesc,
-                'make' => $asset->ucFAMake ? $asset->ucFAMake : $faker->randomElement(['Nissan Murano','Kia Sorento','Honda CR-V','Lexus RX 350','Infiniti QX60']),
+                'make' => $faker->randomElement(['Nissan Murano','Kia Sorento','Honda CR-V','Lexus RX 350','Infiniti QX60']),
                 'warranty' => $warranty->format('Y-m-d'),
-                'current_readings' => $asset->ufFACurrentKMReading ?$asset->ufFACurrentKMReading : 0,
+                'current_readings' => 0,
                 'assign_to' => User::all()->random()->id,
                 'year_of_make' => date('Y') - 5,
-                'engine_no' => $asset->ucFAEnginenumber ? $asset->ucFAEnginenumber : $faker->randomDigit,
-                'year_of_reg' => $asset->ucFARegyear ? $asset->ucFARegyear : date('Y')- 5,
-                'chasis_no' => $asset->ucFAChasisnumber ? $asset->ucFAChasisnumber : $faker->word,
+                'engine_no' => $faker->randomDigit,
+                'year_of_reg' => date('Y')- 5,
+                'chasis_no' => $faker->word,
                 'status' => $asset->fInsuredValue,
                 'next_service_date' => Carbon::now()->addMonths(5)->format('Y-m-d'),
                 'track_by_id' => TrackBy::all()->random()->id,

@@ -16,4 +16,5 @@ class CheckList extends Model
     {
         return $this->hasMany(ChecklistFile::class);
     }
+
 }

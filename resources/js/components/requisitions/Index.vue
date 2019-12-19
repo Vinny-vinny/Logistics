@@ -1,19 +1,21 @@
 <template>
     <div>
-        <requisition v-if="add_requisition" :edit="editing"></requisition>
+        <requisition v-if="add_requisition && !show_form" :edit="editing"></requisition>
+        <requisition-form v-if="show_form && !add_requisition"></requisition-form>
         <!-- Main content -->
-        <section class="content" v-if="!add_requisition">
+        <section class="content" v-if="!add_requisition && !show_form">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                    <button class="btn btn-primary pull-right" @click="add_requisition=true">Add Requisition</button>
+                    <button class="btn btn-success pull-right" @click="show_form =true">Print Requisition Form</button>
+                    <button class="btn btn-primary pull-right mr" @click="add_requisition=true">Add Requisition</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-                            <th>#</th>
+                            <th>Req #</th>
                             <th>Description</th>
                             <th>Requested On</th>
                             <th>Requested By</th>
@@ -23,15 +25,15 @@
                         </thead>
                         <tbody>
                         <tr v-for="rq in tableData">
-                            <td>{{rq.id}}</td>
+                            <td>{{rq.req_no}}</td>
                             <td>{{rq.description}}</td>
                             <td>{{rq.date_requested}}</td>
                             <td>{{rq.person_requested}}</td>
                             <td>{{rq.project}}</td>
                             <td>
-                                <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>
-                            </td>
+                               <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
+                               <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
+<!--                               <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -42,26 +44,27 @@
 </template>
 <script>
     import Requisition from "./Requisition";
+    import RequisitionForm from "./RequisitionForm";
     export default {
         data(){
             return {
                 tableData: [],
                 add_requisition: false,
-                editing: false
+                editing: false,
+                show_form:false
             }
         },
         created(){
             this.listen();
             this.getRequisitions();
         },
-        mounted(){
-            this.initDatable();
-        },
+
         methods:{
             getRequisitions(){
                 axios.get('requisitions')
                     .then(res => this.tableData = res.data)
                     .catch(error => Exception.handle(error))
+                this.initDatable();
             },
             editRequisition(rq){
                 this.$store.dispatch('updateRequisition',rq)
@@ -82,7 +85,7 @@
                     .catch(error => Exception.handle(error))
             },
             listen(){
-                eventBus.$on('listRequisitions',(rq) =>{
+                eventBus.$on('listReqs',(rq) =>{
                     this.tableData.unshift(rq);
                     this.add_requisition =false;
                     this.initDatable();
@@ -104,6 +107,11 @@
                     this.tableData.unshift(rq);
                     this.initDatable();
                 });
+                eventBus.$on('hide_form',() =>{
+                this.show_form = false;
+                this.getRequisitions();
+
+                })
             },
             initDatable(){
                 setTimeout(()=>{
@@ -125,7 +133,8 @@
             },
         },
         components:{
-            Requisition
+            Requisition,
+            RequisitionForm
         }
     }
 </script>

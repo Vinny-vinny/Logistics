@@ -26,6 +26,10 @@ import Mechanics from "../components/mechanics/Index";
 import JobType from "../components/maintenance/jobtypes/Index";
 import Types from "../components/fuels/types/Index";
 import Requisition from "../components/requisitions/Index";
+import JobCardForm from "../components/maintenance/jobcard/JobCardForm";
+import ShowRequisition from "../components/requisitions/ShowRequisition";
+import RequisitionForm from "../components/requisitions/RequisitionForm";
+import Tool from "../components/checklists/tools/Index";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -52,7 +56,6 @@ const routes = [
     {path:'/job-card/:id',component:AppShow, beforeEnter: guard},
     {path:'/external-service',component:ExternalService, beforeEnter: guard},
     {path:'/jobcard-report',component:JobcardReport, beforeEnter: guard},
-    {path:'/fuel-report',component:FuelReport, beforeEnter: guard},
     {path:'/parts',component:Parts, beforeEnter: guard},
     {path:'/categories',component:Category, beforeEnter: guard},
     {path:'/projects',component:projects, beforeEnter: guard},
@@ -62,6 +65,10 @@ const routes = [
     {path:'/fuel-types',component:Types, beforeEnter: guard},
     {path:'/jobcard-category',component:JobCategory, beforeEnter: guard},
     {path:'/requisitions',component:Requisition, beforeEnter: guard},
+    {path:'/jobcard-form/:id',component:JobCardForm, beforeEnter: guard},
+    {path:'/requisition/:id',component:ShowRequisition, beforeEnter: guard},
+    {path:'/requisition-form',component:RequisitionForm, beforeEnter: guard},
+    {path:'/checklist-tool',component:Tool, beforeEnter: guard}
 ];
 
 export default new VueRouter({

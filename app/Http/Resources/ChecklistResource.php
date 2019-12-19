@@ -19,7 +19,6 @@ class ChecklistResource extends JsonResource
             'expiry_type_id' => $this->expiry_type_id,
             'expiry_type' => $this->expirytype->name,
             'duration_no' => $this->duration_no,
-            'files' => $this->checklist_files,
             'name' => $this->name,
             'checklists' => $this->checklists,
             'duration_type' => $this->expirytype->name,

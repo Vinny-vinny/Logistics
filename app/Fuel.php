@@ -15,17 +15,22 @@ class Fuel extends Model
 
     public function fueltype()
     {
-        return $this->belongsTo(FuelType::class,'fuel_type_id');
-    }
-
-    public function supplier()
-    {
-        return $this->belongsTo(FuelSupplier::class,'supplier_id');
+        return $this->belongsTo(Part::class,'fuel_type_id');
     }
 
     public function expense()
     {
         return $this->belongsTo(Expense::class);
+    }
+
+    public function user()
+    {
+     return $this->belongsTo(User::class,'authorized_by');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 
 }

@@ -17,17 +17,16 @@ class FuelReportResource extends JsonResource
     {
         return [
             'Vehicle' => $this->vehicle_name ? $this->vehicle_name : $this->vehicle->code,
-            'fuel_on' => Carbon::parse($this->fuel_on)->format('d/m/y'),
+            'fuel_on' => Carbon::parse($this->fuel_on)->format('d/m/Y'),
             'Litres' => $this->litres,
-            'Currency' => $this->currency ? $this->currency : $this->supplier->currency,
             'Fuel Type' => $this->fueltype->name,
             'Invoice No' => $this->invoice_no,
-            'Rate' => $this->supplier ? $this->supplier->price : $this->rate,
+            'Rate' => $this->fueltype->rate,
             'Cash Sale No' => $this->cash_sale_no,
-            'Supplier' => $this->supplier_name ? $this->supplier_name : $this->supplier->name,
+            'Customer' => $this->customer->name,
             'Previous Odometer Readings' => $this->vehicle ? $this->vehicle->odometer_readings :'',
             'Current Odometer readings' => $this->odometer_readings,
-            'Driver' => $this->driver_name ? $this->driver_name : $this->vehicle->user->name,
+            'Requested by' => $this->requested_by,
         ];
     }
 }

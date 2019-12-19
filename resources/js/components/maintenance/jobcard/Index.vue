@@ -1,31 +1,33 @@
 <template>
     <div>
         <job-card v-if="add_jobcard" :edit="editing"></job-card>
+        <job-form v-if="show_form" :printJob="show_form"></job-form>        
         <!-- Main content -->
-        <section class="content" v-if="!add_jobcard">
+        <section class="content" v-if="!add_jobcard && !show_form">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Job Card</h3>
-                    <button class="btn btn-primary pull-right" @click="add_jobcard=true">Add Job Card</button>
+                    <button class="btn btn-success pull-right" @click="show_form=true">Print Job Card Form</button>
+                    <button class="btn btn-primary pull-right mr" @click="add_jobcard=true">Add Job Card</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Card #</th>
                             <th>Machine</th>
                             <th>Driver</th>
+                            <th>Project</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="job in tableData">
-                            <td>{{job.id}}</td>
                             <td>{{job.card_no}}</td>
                             <td>{{job.machine}}</td>
                             <td>{{job.driver}}</td>
+                            <td>{{job.project}}</td>
                               <td>
                                 <button class="btn btn-success btn-sm" @click="editJobcard(job)"><i class="fa fa-edit"></i></button>
                                 <router-link :to="{path:'/job-card/'+job.id}" class="btn btn-info btn-sm"><i class=" fa fa-eye"></i></router-link>
@@ -40,18 +42,19 @@
 </template>
 <script>
     import JobCard from "./JobCard";
+    import JobForm from "./JobForm";   
     export default {
         data(){
             return {
                 tableData: [],
                 add_jobcard: false,
-                editing: false
+                editing: false,
+                show_form:false,               
             }
         },
         created(){
             this.listen();
             this.getJobs();
-            console.log(moment('6.00pm','h:mm A').format('HH:mm') > moment('5:00pm','h:mm A').format('HH:mm'))
         },
         mounted(){
             this.initDatable();
@@ -59,14 +62,17 @@
         methods:{
             getJobs(){
                 axios.get('job-card')
-                    .then(res => this.tableData = res.data)
+                    .then(res =>{
+                        this.tableData = res.data;
+                    })
                     .catch(error => Exception.handle(error))
+                this.initDatable();
             },
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)
                     .then(() =>{
-                        this.editing=true;
-                        this.add_jobcard=true;
+                            this.editing=true;
+                            this.add_jobcard=true;
                     })
 
             },
@@ -102,8 +108,17 @@
                             this.tableData.splice(i,1);
                         }
                     }
-                    console.log(job);
                     this.tableData.unshift(job);
+                    this.initDatable();
+                });
+                eventBus.$on('close_form',() => {
+                    this.show_form = false;
+                    this.getJobs();
+                    this.initDatable();
+                });
+                eventBus.$on('cancel_job',() =>{
+                    this.show_form = false;
+                    this.getJobs();
                     this.initDatable();
                 });
             },
@@ -127,7 +142,8 @@
             },
         },
         components:{
-            JobCard
+            JobCard,
+            JobForm            
         }
     }
 </script>
