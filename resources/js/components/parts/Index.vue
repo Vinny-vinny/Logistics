@@ -140,7 +140,7 @@
                         colReorder: true,
 
                     });
-                },1000)
+                },500)
             },
         },
         components:{
