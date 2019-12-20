@@ -58,7 +58,6 @@
                                         <option :value="type.id" v-for="type in customer_types" :key="type.id">
                                             {{type.name}}
                                         </option>
-
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customers">
@@ -157,7 +156,7 @@
                                 </div>
 
                             </div>
-                        </div>
+                        </div>                      
 
                         <div class="row">
                             <div class="col-md-12">
@@ -330,7 +329,7 @@
                     cost_code: '',
                     customer_id: '',
                     requisition_id: '',
-                    labour_cost: 0,
+                    labour_cost: 0,                  
                     id: '',
                     maintenance: [{category: '', description: '', root_cause: ''}],
 
@@ -377,7 +376,9 @@
                 filtered_rq: '',
                 customer_types: {},
                 rqs:[],
-                subprojects:{}
+                subprojects:{},
+                transactions:{}           
+
             }
         },
         watch: {
@@ -490,11 +491,11 @@
             },
 
         },
-        methods: {
-             subProject(){
+        methods: {      
+             subProject(){       
             this.subprojects = {};
            setTimeout(()=>{
- this.subprojects = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+           this.subprojects = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
            },500)  
 
             },
@@ -508,7 +509,7 @@
                 axios.get('requisitions')
                     .then(rq => {
                         for (let i = 0; i < rq.data.length; i++) {
-                            if (rq.data[i]['used'] == 0 && rq.data[i]['type'] !==null) {
+                            if (rq.data[i]['used'] == 0 || rq.data[i]['used'] == null && rq.data[i]['type'] !==null) {
                                 this.rqs.push(rq.data[i]);
                             }
                         }
@@ -597,8 +598,9 @@
                 if (confirm('Do you really want to close?')) {
                     axios.post(`close-jobcard/${this.form.id}`)
                         .then(res => {
-                            this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
-                            eventBus.$emit('cancel');
+                            console.log(res.data);
+                            // this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
+                            // eventBus.$emit('cancel');
                         })
                 }
             },
@@ -706,6 +708,7 @@
                 this.form.maintenance = JSON.stringify(this.form.maintenance);
 
                 axios.post('job-card', this.form).then(res => {
+                    
                     this.$toastr.s('Jobcard created Successfully.');
                     eventBus.$emit('listJobcards', res.data)
                 })
@@ -786,8 +789,7 @@
                         this.disable_rq = true;
                         this.show_inventory = true;
                         this.editedRequisitions();
-                    }
-
+                    }                      
                 }
             },
             editedRequisitions() {

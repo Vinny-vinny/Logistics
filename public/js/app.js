@@ -6033,7 +6033,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['edit'],
@@ -6109,7 +6108,8 @@ __webpack_require__.r(__webpack_exports__);
       filtered_rq: '',
       customer_types: {},
       rqs: [],
-      subprojects: {}
+      subprojects: {},
+      transactions: {}
     };
   },
   watch: {
@@ -6258,7 +6258,7 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get('requisitions').then(function (rq) {
         for (var i = 0; i < rq.data.length; i++) {
-          if (rq.data[i]['used'] == 0 && rq.data[i]['type'] !== null) {
+          if (rq.data[i]['used'] == 0 || rq.data[i]['used'] == null && rq.data[i]['type'] !== null) {
             _this4.rqs.push(rq.data[i]);
           }
         }
@@ -6351,13 +6351,10 @@ __webpack_require__.r(__webpack_exports__);
       this.form.service_required.splice(i, 1);
     },
     close: function close() {
-      var _this11 = this;
-
       if (confirm('Do you really want to close?')) {
         axios.post("close-jobcard/".concat(this.form.id)).then(function (res) {
-          _this11.$toastr.s("Jobcard ".concat(_this11.$store.state.job_card.card_no, " was successfully closed."));
-
-          eventBus.$emit('cancel');
+          console.log(res.data); // this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
+          // eventBus.$emit('cancel');
         });
       }
     },
@@ -6372,25 +6369,25 @@ __webpack_require__.r(__webpack_exports__);
       this.form.maintenance.splice(i, 1);
     },
     getCategories: function getCategories() {
-      var _this12 = this;
+      var _this11 = this;
 
       axios.get('categories').then(function (category) {
-        _this12.categories = category.data;
+        _this11.categories = category.data;
       });
     },
     getParts: function getParts() {
-      var _this13 = this;
+      var _this12 = this;
 
       axios.get('parts').then(function (res) {
-        _this13.parts = res.data;
+        _this12.parts = res.data;
       });
     },
     nextReadings: function nextReadings() {
-      var _this14 = this;
+      var _this13 = this;
 
       this.services.forEach(function (service) {
-        if (service.id === _this14.form.service_type_id) {
-          _this14.service_after = service.service_after;
+        if (service.id === _this13.form.service_type_id) {
+          _this13.service_after = service.service_after;
         }
       });
     },
@@ -6408,30 +6405,30 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getAssetDetails: function getAssetDetails() {
-      var _this15 = this;
+      var _this14 = this;
 
       setTimeout(function () {
-        _this15.machines.forEach(function (machine) {
-          if (machine.id === _this15.form.machine_id) {
-            _this15.make = machine.make;
-            _this15.previous_readings = machine.current_readings;
-            _this15.form.track_by_id = machine.track_by_id;
+        _this14.machines.forEach(function (machine) {
+          if (machine.id === _this14.form.machine_id) {
+            _this14.make = machine.make;
+            _this14.previous_readings = machine.current_readings;
+            _this14.form.track_by_id = machine.track_by_id;
 
-            _this15.tracks.forEach(function (track) {
+            _this14.tracks.forEach(function (track) {
               if (track.id === machine.track_by_id) {
-                _this15.track_name = track.name;
-                _this15.show_track_by = true;
+                _this14.track_name = track.name;
+                _this14.show_track_by = true;
               }
             });
 
-            _this15.users.forEach(function (user) {
+            _this14.users.forEach(function (user) {
               if (user.id === machine.assign_to) {
-                _this15.driver = user.name;
+                _this14.driver = user.name;
                 return;
               }
             });
 
-            _this15.service_types = machine.service_types;
+            _this14.service_types = machine.service_types;
           }
 
           return;
@@ -6477,7 +6474,7 @@ __webpack_require__.r(__webpack_exports__);
       this.saveJob();
     },
     saveJob: function saveJob() {
-      var _this16 = this;
+      var _this15 = this;
 
       delete this.form.id;
       this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
@@ -6485,7 +6482,7 @@ __webpack_require__.r(__webpack_exports__);
       this.form.actual_date = this.convertDate(this.form.actual_date);
       this.form.maintenance = JSON.stringify(this.form.maintenance);
       axios.post('job-card', this.form).then(function (res) {
-        _this16.$toastr.s('Jobcard created Successfully.');
+        _this15.$toastr.s('Jobcard created Successfully.');
 
         eventBus.$emit('listJobcards', res.data);
       })["catch"](function (error) {
@@ -6499,14 +6496,14 @@ __webpack_require__.r(__webpack_exports__);
       return [date.getFullYear(), mnth, day].join("-");
     },
     update: function update() {
-      var _this17 = this;
+      var _this16 = this;
 
       this.form.next_service_date = this.convertDate(this.form.next_service_date);
       this.form.actual_date = this.convertDate(this.form.actual_date);
       this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
       this.form.maintenance = JSON.stringify(this.form.maintenance);
       axios.patch("job-card/".concat(this.form.id), this.form).then(function (res) {
-        _this17.$toastr.s('Jobcard updated Successfully.');
+        _this16.$toastr.s('Jobcard updated Successfully.');
 
         eventBus.$emit('updateJobcard', res.data);
       })["catch"](function (error) {
@@ -6514,45 +6511,45 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getMachines: function getMachines() {
-      var _this18 = this;
+      var _this17 = this;
 
       axios.get('machines').then(function (machines) {
-        _this18.machines = machines.data;
+        _this17.machines = machines.data;
       });
     },
     getTracks: function getTracks() {
-      var _this19 = this;
+      var _this18 = this;
 
       axios.get('track-by').then(function (tracks) {
-        _this19.tracks = tracks.data;
+        _this18.tracks = tracks.data;
       });
     },
     getServiceTypes: function getServiceTypes() {
-      var _this20 = this;
+      var _this19 = this;
 
       axios.get('service-types').then(function (service_types) {
-        _this20.services = service_types.data;
+        _this19.services = service_types.data;
       });
     },
     getBalances: function getBalances() {
-      var _this21 = this;
+      var _this20 = this;
 
       axios.get('fuel-balance').then(function (balance) {
-        _this21.balances = balance.data;
+        _this20.balances = balance.data;
       });
     },
     getUsers: function getUsers() {
-      var _this22 = this;
+      var _this21 = this;
 
       axios.get('users').then(function (users) {
-        _this22.users = users.data;
+        _this21.users = users.data;
       });
     },
     cancel: function cancel() {
       eventBus.$emit('cancel');
     },
     listen: function listen() {
-      var _this23 = this;
+      var _this22 = this;
 
       if (this.edit) {
         this.form = this.$store.state.job_card;
@@ -6570,7 +6567,7 @@ __webpack_require__.r(__webpack_exports__);
         this.Customers();
         this.ServiceTypes();
         setTimeout(function () {
-          console.log(_this23.balances);
+          console.log(_this22.balances);
         }, 300);
 
         if (this.form.requisition_id) {
@@ -6581,58 +6578,58 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     editedRequisitions: function editedRequisitions() {
-      var _this24 = this;
+      var _this23 = this;
 
       this.rqs = [];
       axios.get('requisitions').then(function (rq) {
-        _this24.filtered_items_internal = [];
-        _this24.filtered_items_external = [];
+        _this23.filtered_items_internal = [];
+        _this23.filtered_items_external = [];
 
         for (var i = 0; i < rq.data.length; i++) {
           if (rq.data[i]['type'] != null) {
-            if (rq.data[i]['id'] == _this24.form.requisition_id) {
-              _this24.rqs.splice(rq.data[i], 1);
+            if (rq.data[i]['id'] == _this23.form.requisition_id) {
+              _this23.rqs.splice(rq.data[i], 1);
             }
 
-            _this24.rqs.push(rq.data[i]);
+            _this23.rqs.push(rq.data[i]);
           }
 
-          if (rq.data[i]['id'] === _this24.form.requisition_id) {
+          if (rq.data[i]['id'] === _this23.form.requisition_id) {
             if (rq.data[i]['type'] === 'Internal') {
-              _this24.filtered_rq = 'Internal';
-              _this24.filtered_items_internal = JSON.parse(rq.data[i]['inventory_items_internal']); //return;
+              _this23.filtered_rq = 'Internal';
+              _this23.filtered_items_internal = JSON.parse(rq.data[i]['inventory_items_internal']); //return;
             }
 
             if (rq.data[i]['type'] === 'External') {
-              _this24.filtered_rq = 'External';
-              _this24.filtered_items_external = JSON.parse(rq.data[i]['inventory_items_external']); //return;
+              _this23.filtered_rq = 'External';
+              _this23.filtered_items_external = JSON.parse(rq.data[i]['inventory_items_external']); //return;
             }
           }
         }
       });
     },
     ServiceTypes: function ServiceTypes() {
-      var _this25 = this;
+      var _this24 = this;
 
       axios.get('service-types').then(function (res) {
         for (var i = 0; i < res.data.length; i++) {
-          if (res.data[i]['id'] === _this25.form.service_type_id) {
-            _this25.service_after = res.data[i]['service_after'];
-            _this25.form.next_readings = parseFloat(_this25.form.current_readings) + parseFloat(_this25.service_after);
+          if (res.data[i]['id'] === _this24.form.service_type_id) {
+            _this24.service_after = res.data[i]['service_after'];
+            _this24.form.next_readings = parseFloat(_this24.form.current_readings) + parseFloat(_this24.service_after);
           }
         }
       });
     },
     Customers: function Customers() {
-      var _this26 = this;
+      var _this25 = this;
 
       axios.get('customers').then(function (res) {
-        _this26.customers = res.data;
-        _this26.show_customers = true;
+        _this25.customers = res.data;
+        _this25.show_customers = true;
 
-        for (var j = 0; j < _this26.customers.length; j++) {
-          if (_this26.customers[j]['customer_type_id'] === _this26.form.customer_type_id) {
-            _this26.filtered_customers.push(_this26.customers[j]);
+        for (var j = 0; j < _this25.customers.length; j++) {
+          if (_this25.customers[j]['customer_type_id'] === _this25.form.customer_type_id) {
+            _this25.filtered_customers.push(_this25.customers[j]);
           }
         }
       });
@@ -6931,10 +6928,6 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-multiselect */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.js");
-/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-multiselect/dist/vue-multiselect.min.css */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.css");
-/* harmony import */ var vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect_dist_vue_multiselect_min_css__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -6975,8 +6968,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
-
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['edit'],
   data: function data() {
@@ -6988,7 +6980,9 @@ __webpack_require__.r(__webpack_exports__);
       },
       edit_category: this.edit,
       transactions: [],
-      transaction: []
+      transaction: [],
+      inv_transactions: {},
+      stk_transactions: {}
     };
   },
   created: function created() {
@@ -6996,22 +6990,27 @@ __webpack_require__.r(__webpack_exports__);
     this.getTransactions();
   },
   methods: {
-    updateCategories: function updateCategories(value) {
-      console.log(value);
-      var transactions = [];
-      value.forEach(function (val) {
-        transactions.push(val.id);
-      });
-      this.form.transaction_id = transactions;
-    },
-    customLabel: function customLabel(option) {
-      return "".concat(option.code, " - ").concat(option.description);
-    },
     getTransactions: function getTransactions() {
       var _this = this;
 
       axios.get('transactions').then(function (res) {
         _this.transactions = res.data;
+        _this.inv_transactions = res.data;
+        _this.stk_transactions = res.data;
+      });
+    },
+    filterInvTR: function filterInvTR() {
+      var _this2 = this;
+
+      this.stk_transactions = this.transactions.filter(function (t) {
+        return t.transaction_id !== _this2.form.inv_tr_id;
+      });
+    },
+    filterStkTR: function filterStkTR() {
+      var _this3 = this;
+
+      this.inv_transactions = this.transactions.filter(function (t) {
+        return t.transaction_id !== _this3.form.stk_tr_id;
       });
     },
     saveCategory: function saveCategory() {
@@ -7026,10 +7025,10 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     update: function update() {
-      var _this2 = this;
+      var _this4 = this;
 
       axios.patch("jobcard-category/".concat(this.form.id), this.form).then(function (res) {
-        _this2.edit_category = false;
+        _this4.edit_category = false;
         eventBus.$emit('updateJobcardCategory', res.data);
       })["catch"](function (error) {
         return error.response;
@@ -7041,18 +7040,8 @@ __webpack_require__.r(__webpack_exports__);
     listen: function listen() {
       if (this.edit) {
         this.form = this.$store.state.jobcard_categories;
-        var ts = [];
-
-        for (var i = 0; i < this.$store.state.jobcard_categories.transaction_type.length; i++) {
-          ts.push(this.$store.state.jobcard_categories.transaction_type[i]);
-        }
-
-        this.transaction = ts;
       }
     }
-  },
-  components: {
-    Multiselect: vue_multiselect__WEBPACK_IMPORTED_MODULE_0___default.a
   }
 });
 
@@ -38619,34 +38608,127 @@ var render = function() {
                 })
               ]),
               _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "form-group" },
-                [
-                  _c("label", [_vm._v("Transaction")]),
-                  _vm._v(" "),
-                  _c("label", [_vm._v("Service Type")]),
-                  _vm._v(" "),
-                  _c("multiselect", {
-                    attrs: {
-                      options: _vm.transactions,
-                      multiple: true,
-                      "track-by": "id",
-                      "custom-label": _vm.customLabel,
-                      placeholder: "Select Transaction Types"
-                    },
-                    on: { input: _vm.updateCategories },
-                    model: {
-                      value: _vm.transaction,
-                      callback: function($$v) {
-                        _vm.transaction = $$v
-                      },
-                      expression: "transaction"
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", [_vm._v("INV TR Code")]),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.form.inv_tr_id,
+                        expression: "form.inv_tr_id"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    on: {
+                      change: [
+                        function($event) {
+                          var $$selectedVal = Array.prototype.filter
+                            .call($event.target.options, function(o) {
+                              return o.selected
+                            })
+                            .map(function(o) {
+                              var val = "_value" in o ? o._value : o.value
+                              return val
+                            })
+                          _vm.$set(
+                            _vm.form,
+                            "inv_tr_id",
+                            $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          )
+                        },
+                        function($event) {
+                          return _vm.filterInvTR()
+                        }
+                      ]
                     }
-                  })
-                ],
-                1
-              ),
+                  },
+                  _vm._l(_vm.inv_transactions, function(tr) {
+                    return _c(
+                      "option",
+                      {
+                        key: tr.transaction_id,
+                        domProps: { value: tr.transaction_id }
+                      },
+                      [
+                        _vm._v(
+                          _vm._s(tr.code) +
+                            "-" +
+                            _vm._s(tr.description) +
+                            "\n                                    "
+                        )
+                      ]
+                    )
+                  }),
+                  0
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-group" }, [
+                _c("label", [_vm._v("Stock TR Code")]),
+                _vm._v(" "),
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.form.stk_tr_id,
+                        expression: "form.stk_tr_id"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    on: {
+                      change: [
+                        function($event) {
+                          var $$selectedVal = Array.prototype.filter
+                            .call($event.target.options, function(o) {
+                              return o.selected
+                            })
+                            .map(function(o) {
+                              var val = "_value" in o ? o._value : o.value
+                              return val
+                            })
+                          _vm.$set(
+                            _vm.form,
+                            "stk_tr_id",
+                            $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          )
+                        },
+                        function($event) {
+                          return _vm.filterStkTR()
+                        }
+                      ]
+                    }
+                  },
+                  _vm._l(_vm.stk_transactions, function(stk) {
+                    return _c(
+                      "option",
+                      {
+                        key: stk.transaction_id,
+                        domProps: { value: stk.transaction_id }
+                      },
+                      [
+                        _vm._v(
+                          _vm._s(stk.code) +
+                            "-" +
+                            _vm._s(stk.description) +
+                            "\n                                    "
+                        )
+                      ]
+                    )
+                  }),
+                  0
+                )
+              ]),
               _vm._v(" "),
               _c(
                 "button",

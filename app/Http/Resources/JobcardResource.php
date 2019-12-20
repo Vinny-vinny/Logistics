@@ -56,7 +56,7 @@ class JobcardResource extends JsonResource
             'checklist_assigned' => $this->checklist_assigned,
             'service_types' => $this->machine->service_types,
             'labour_cost' => $this->labour_cost,
-            'closed_at' => $this->closed_at,
+            'closed_at' => $this->closed_at,           
             'fuel' => $this->fuel ? $this->fuel->id : '',
             'checklist' => $this->checklist ? $this->checklist->id :''
         ];

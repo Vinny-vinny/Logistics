@@ -8,6 +8,9 @@ use App\Jobcard;
 use App\JobcardFile;
 use App\Machine;
 use App\Requisition;
+use App\Part;
+use App\Customer;
+use App\JobcardCategory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
@@ -34,7 +37,8 @@ class JobcardController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {           
+     
         $request['time_in'] = Carbon::parse($request->time_in)->format('H:i');
         $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
         $card_no = Jobcard::count()+1;
@@ -101,8 +105,32 @@ class JobcardController extends Controller
 
     public function closeJobcard($id)
     {
-        Jobcard::find($id)->update(['closed_at' => date('Y-m-d H:i'), 'status' => 0]);
-        return response('closed');
+        $job = Jobcard::find($id);
+        $job_cat = JobcardCategory::find($job->jobcard_category_id);
+        $inv_date = date('Y-m-d H:i:s');
+        $inv_id =  $job_cat->inv_item ? $job_cat->inv_item->transaction_id : 0;
+        $stk_id =  $job_cat->stk_item ? $job_cat->stk_item->transaction_id : 0;        
+        $customer = Customer::find($job->customer_id);
+        $xml_data = [];
+        if ( $job->service_type =='Internal') {
+            foreach (json_decode($job->requisition->inventory_items_internal) as $value) {    
+             $stk = Part::find($value->part)->stock_link;        
+             $xml_data[] = "<root>
+       <row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><UNIT_COST_EXCL>$value->unit_cost</UNIT_COST_EXCL><QTY>$value->quantity</QTY><VAT_APPLICABLE>1</VAT_APPLICABLE><VAT_RATE>$inv_date</VAT_RATE><INV_DATE>0.16</INV_DATE></row>
+      </root>";
+        }
+        }
+       if ( $job->service_type =='External') {
+             foreach (json_decode($job->requisition->inventory_items_external) as $value) {  
+             $stk = Part::find($value->part)->stock_link; 
+             $xml_data[] = "<root>
+       <row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><UNIT_COST_EXCL>$value->unit_price</UNIT_COST_EXCL><QTY>$value->quantity</QTY><VAT_APPLICABLE>1</VAT_APPLICABLE><VAT_RATE>0.16</VAT_RATE><INV_DATE>$inv_date</INV_DATE></row>
+      </root>";
+        }
+        }
+      
+        //Jobcard::find($id)->update(['closed_at' => date('Y-m-d H:i'), 'status' => 0]);
+        return response($xml_data);
     }
 
     /**

@@ -27,8 +27,7 @@ class JobcardCategoryController extends Controller
     public function store(Request $request)
     {
         
-        $category = JobcardCategory::create($request->except(['transaction_id']));
-        $category->transaction_types()->attach($request->get('transaction_id'));
+        $category = JobcardCategory::create($request->all());     
         return response()->json(new TransactionResource($category));
     }
 
@@ -42,8 +41,7 @@ class JobcardCategoryController extends Controller
     public function update(Request $request, $id)
     {
         $category = JobcardCategory::find($id);
-        $category->update($request->except(['transaction_id','transaction_type']));
-        $category->transaction_types()->sync($request->get('transaction_id'));
+        $category->update($request->all());      
         return response()->json(new TransactionResource(JobcardCategory::find($id)));
     }
 

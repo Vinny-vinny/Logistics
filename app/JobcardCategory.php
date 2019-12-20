@@ -28,4 +28,14 @@ class JobcardCategory extends Model
     {
         return $this->belongsToMany(Transaction::class,'jobcard_category_transaction');
     }
+
+    public function inv_item()
+    {
+        return $this->belongsTo(Transaction::class,'inv_tr_id','transaction_id');
+    }
+
+     public function stk_item()
+    {
+        return $this->belongsTo(Transaction::class,'stk_tr_id','transaction_id');
+    }
 }
