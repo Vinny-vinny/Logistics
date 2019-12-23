@@ -16,17 +16,14 @@ class FuelReportResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'Vehicle' => $this->vehicle_name ? $this->vehicle_name : $this->vehicle->code,
-            'fuel_on' => Carbon::parse($this->fuel_on)->format('d/m/Y'),
-            'Litres' => $this->litres,
-            'Fuel Type' => $this->fueltype->name,
-            'Invoice No' => $this->invoice_no,
-            'Rate' => $this->fueltype->rate,
-            'Cash Sale No' => $this->cash_sale_no,
-            'Customer' => $this->customer->name,
-            'Previous Odometer Readings' => $this->vehicle ? $this->vehicle->odometer_readings :'',
-            'Current Odometer readings' => $this->odometer_readings,
-            'Requested by' => $this->requested_by,
+            'Date' => Carbon::parse($this->fuel_on)->format('d/m/Y'),
+            'Item Code' => $this->fueltype->code,
+            'Item Description' => $this->fueltype->description,
+            'Reference' => $this->fuel_no,
+            'Quantity' => $this->litres, 
+            'Unit Cost' => $this->rate, 
+            'Amount' => $this->litres*$this->rate,
+            'Project' => $this->vehicle_name ? $this->vehicle_name : $this->vehicle->code,   
         ];
     }
 }

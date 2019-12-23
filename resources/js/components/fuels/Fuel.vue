@@ -70,7 +70,7 @@
                                             <td style="font-size:16px"><b>Fuel Type: </b>{{fuel_type}}</td>
                                         </tr>
                                         <tr>
-                                            <td style="font-size:16px"><b>Previous Odometer Readings: </b>{{previous_odometer | number}}
+                                            <td style="font-size:16px"><b>Previous Odometer Readings: </b>{{form.previous_odometer | number}}
                                             </td>
                                           </tr>
                                         <tr>
@@ -103,11 +103,7 @@
                                 <div class="form-group">
                                     <label>Authorized By</label>
                                     <input type="text" class="form-control" v-model="username" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label>Invoice No</label>
-                                    <input type="text" class="form-control" v-model="form.invoice_no">
-                                </div>
+                                </div>                              
                                 <div class="form-group">
                                     <label>Requested By</label>
                                     <input type="text" class="form-control" v-model="form.requested_by" required>
@@ -136,8 +132,7 @@
                     litres: '',
                     vehicle_id: '',
                     fuel_on: '',
-                    customer_id: '',
-                    invoice_no: '',
+                    customer_id: '',                  
                     expense_id: '',
                     fuel_type_id: '',
                     authorized_by: '',
@@ -148,6 +143,7 @@
                     asset_type:'',
                     store_man:'',
                     asset_category_id:'',
+                    previous_odometer: 0,
                     rate:0,
                     id: ''
                 },
@@ -163,8 +159,7 @@
                 fuel_type: '',
                 total: 0,
                 show_fuel_type: false,
-                show_rate: false,
-                previous_odometer: 0,
+                show_rate: false,             
                 parts: {},
                 total_expenses:0,
                 pa:{},
@@ -311,7 +306,7 @@
             getFuelType() {
                 this.vehicles.forEach(vehicle => {
                     if (vehicle.id === this.form.vehicle_id) {
-                         this.previous_odometer = vehicle.odometer_readings;                                  
+                         this.form.previous_odometer = vehicle.odometer_readings;                                  
                     }
                 })
             },
@@ -361,7 +356,7 @@
                 if (this.other && this.form.fuel_type_id ===''){
                     return this.$toastr.e('Select Fuel Type.');
                 }
-                if (this.form.odometer_readings < this.previous_odometer){
+                if (this.form.odometer_readings < this.form.previous_odometer){
                     return this.$toastr.e('Current Odometer Readings cannot be less than Previous Readings.');
                 }
                 this.other_fuel_asset ? this.form.asset_type = 'other' : this.form.asset_type = 'company';
@@ -394,7 +389,7 @@
                     this.show_fuel_type = true;
                     this.fuel_type = this.$store.state.fuels.fuel_type;
                     this.form.rate = this.$store.state.fuels.rate;
-                    this.previous_odometer = this.$store.state.fuels.previous_odometer;
+                    this.form.previous_odometer = this.$store.state.fuels.previous_odometer;
                     this.show_rate = true;
                     this.show_customer = true;
                     axios.get(`users/${this.form.authorized_by}`)

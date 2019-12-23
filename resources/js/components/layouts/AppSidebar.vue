@@ -32,7 +32,7 @@
                         </ul>
                 </li>
                 <li><router-link to="/fuel"><i class="fa fa-database"></i> <span>Fuel</span></router-link></li>
-                <li class="treeview" style="display: none">
+                <li class="treeview">
                     <a href="#"><i class="fa fa-bar-chart"></i> <span>Reports</span>
                         <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
@@ -40,7 +40,7 @@
                     </a>
                     <ul class="treeview-menu">
                          <li><router-link to="/jobcard-report">Job Cards</router-link></li>
-                        <li><router-link to="/fuel-report">Fuels</router-link></li>
+                        <li><router-link to="/fuel-report">Daily Fuel Issue</router-link></li>
                         </ul>
                 </li>
                 <li class="treeview">

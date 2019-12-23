@@ -3660,10 +3660,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['edit', 'other_fuel', 'add_fuel'],
@@ -3674,7 +3670,6 @@ __webpack_require__.r(__webpack_exports__);
         vehicle_id: '',
         fuel_on: '',
         customer_id: '',
-        invoice_no: '',
         expense_id: '',
         fuel_type_id: '',
         authorized_by: '',
@@ -3685,6 +3680,7 @@ __webpack_require__.r(__webpack_exports__);
         asset_type: '',
         store_man: '',
         asset_category_id: '',
+        previous_odometer: 0,
         rate: 0,
         id: ''
       },
@@ -3701,7 +3697,6 @@ __webpack_require__.r(__webpack_exports__);
       total: 0,
       show_fuel_type: false,
       show_rate: false,
-      previous_odometer: 0,
       parts: {},
       total_expenses: 0,
       pa: {},
@@ -3864,7 +3859,7 @@ __webpack_require__.r(__webpack_exports__);
 
       this.vehicles.forEach(function (vehicle) {
         if (vehicle.id === _this10.form.vehicle_id) {
-          _this10.previous_odometer = vehicle.odometer_readings;
+          _this10.form.previous_odometer = vehicle.odometer_readings;
         }
       });
     },
@@ -3919,7 +3914,7 @@ __webpack_require__.r(__webpack_exports__);
         return this.$toastr.e('Select Fuel Type.');
       }
 
-      if (this.form.odometer_readings < this.previous_odometer) {
+      if (this.form.odometer_readings < this.form.previous_odometer) {
         return this.$toastr.e('Current Odometer Readings cannot be less than Previous Readings.');
       }
 
@@ -3957,7 +3952,7 @@ __webpack_require__.r(__webpack_exports__);
         this.show_fuel_type = true;
         this.fuel_type = this.$store.state.fuels.fuel_type;
         this.form.rate = this.$store.state.fuels.rate;
-        this.previous_odometer = this.$store.state.fuels.previous_odometer;
+        this.form.previous_odometer = this.$store.state.fuels.previous_odometer;
         this.show_rate = true;
         this.show_customer = true;
         axios.get("users/".concat(this.form.authorized_by)).then(function (res) {
@@ -9979,8 +9974,6 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     jobCard: function jobCard() {
-      var _this = this;
-
       this.form.from = moment(this.form.from).format('YYYY-MM-DD');
       this.form.to = moment(this.form.to).format('YYYY-MM-DD');
 
@@ -9989,19 +9982,23 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       axios.post('job-report', this.form).then(function (res) {
-        console.log(res.data);
-        _this.show_job = true;
+        var allreqs = [];
 
-        _this.$store.dispatch('listJobReports', res.data);
+        for (var i = 0; i < res.data.length; i++) {
+          allreqs.push(res.data[i]['requistions']);
+        }
+
+        console.log(allreqs); // this.show_job = true;
+        //this.$store.dispatch('listJobReports',res.data)
       })["catch"](function (error) {
         return error.response;
       });
     },
     listen: function listen() {
-      var _this2 = this;
+      var _this = this;
 
       eventBus.$on('back', function () {
-        _this2.show_job = false;
+        _this.show_job = false;
       });
     }
   },
@@ -33649,8 +33646,9 @@ var render = function() {
                           _c("td", { staticStyle: { "font-size": "16px" } }, [
                             _c("b", [_vm._v("Previous Odometer Readings: ")]),
                             _vm._v(
-                              _vm._s(_vm._f("number")(_vm.previous_odometer)) +
-                                "\n                                        "
+                              _vm._s(
+                                _vm._f("number")(_vm.form.previous_odometer)
+                              ) + "\n                                        "
                             )
                           ])
                         ]),
@@ -33811,32 +33809,6 @@ var render = function() {
                             return
                           }
                           _vm.username = $event.target.value
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Invoice No")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.form.invoice_no,
-                          expression: "form.invoice_no"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "text" },
-                      domProps: { value: _vm.form.invoice_no },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.form, "invoice_no", $event.target.value)
                         }
                       }
                     })
@@ -34790,35 +34762,31 @@ var render = function() {
               1
             ),
             _vm._v(" "),
-            _c(
-              "li",
-              { staticClass: "treeview", staticStyle: { display: "none" } },
-              [
-                _vm._m(2),
+            _c("li", { staticClass: "treeview" }, [
+              _vm._m(2),
+              _vm._v(" "),
+              _c("ul", { staticClass: "treeview-menu" }, [
+                _c(
+                  "li",
+                  [
+                    _c("router-link", { attrs: { to: "/jobcard-report" } }, [
+                      _vm._v("Job Cards")
+                    ])
+                  ],
+                  1
+                ),
                 _vm._v(" "),
-                _c("ul", { staticClass: "treeview-menu" }, [
-                  _c(
-                    "li",
-                    [
-                      _c("router-link", { attrs: { to: "/jobcard-report" } }, [
-                        _vm._v("Job Cards")
-                      ])
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "li",
-                    [
-                      _c("router-link", { attrs: { to: "/fuel-report" } }, [
-                        _vm._v("Fuels")
-                      ])
-                    ],
-                    1
-                  )
-                ])
-              ]
-            ),
+                _c(
+                  "li",
+                  [
+                    _c("router-link", { attrs: { to: "/fuel-report" } }, [
+                      _vm._v("Daily Fuel Issue")
+                    ])
+                  ],
+                  1
+                )
+              ])
+            ]),
             _vm._v(" "),
             _c("li", { staticClass: "treeview" }, [
               _vm._m(3),
@@ -42192,13 +42160,13 @@ var render = function() {
               "tbody",
               _vm._l(_vm.fuels, function(fuel) {
                 return _c("tr", [
-                  _c("td", [_vm._v(_vm._s(fuel.Vehicle))]),
+                  _c("td", [_vm._v(_vm._s(fuel.Project))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(fuel.fuel_on))]),
+                  _c("td", [_vm._v(_vm._s(fuel.Date))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(fuel.Litres))]),
+                  _c("td", [_vm._v(_vm._s(fuel.Quantity))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(fuel.Rate))])
+                  _c("td", [_vm._v(_vm._s(fuel.Reference))])
                 ])
               }),
               0
@@ -42216,13 +42184,13 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("Vehicle")]),
+        _c("th", [_vm._v("Project")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Fuel On")]),
+        _c("th", [_vm._v("Date")]),
         _vm._v(" "),
         _c("th", [_vm._v("Litres")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Pump Price")])
+        _c("th", [_vm._v("Reference")])
       ])
     ])
   }
@@ -68555,6 +68523,10 @@ var routes = [{
 }, {
   path: '/jobcard-report',
   component: _components_reports_jobs_JobcardReport__WEBPACK_IMPORTED_MODULE_15__["default"],
+  beforeEnter: guard
+}, {
+  path: '/fuel-report',
+  component: _components_reports_fuels_FuelReport__WEBPACK_IMPORTED_MODULE_16__["default"],
   beforeEnter: guard
 }, {
   path: '/parts',

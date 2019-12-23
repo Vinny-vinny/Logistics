@@ -27,7 +27,7 @@ class JobcardController extends Controller
      */
     public function index()
     {
-        return response()->json(JobcardResource::collection(Jobcard::all()));
+      return response()->json(JobcardResource::collection(Jobcard::all()));
     }
 
     /**
@@ -106,30 +106,29 @@ class JobcardController extends Controller
     public function closeJobcard($id)
     {
         $job = Jobcard::find($id);
-        $job_cat = JobcardCategory::find($job->jobcard_category_id);
+        $job_cat = JobcardCategory::find($job->jobcard_category_id);       
         $inv_date = date('Y-m-d H:i:s');
         $inv_id =  $job_cat->inv_item ? $job_cat->inv_item->transaction_id : 0;
-        $stk_id =  $job_cat->stk_item ? $job_cat->stk_item->transaction_id : 0;        
+        $stk_id =  $job_cat->stk_item ? $job_cat->stk_item->transaction_id : 0; 
+        $line_desc =$job->requisition->description;       
         $customer = Customer::find($job->customer_id);
         $xml_data = [];
-        if ( $job->service_type =='Internal') {
-            foreach (json_decode($job->requisition->inventory_items_internal) as $value) {    
-             $stk = Part::find($value->part)->stock_link;        
-             $xml_data[] = "<root>
-       <row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><UNIT_COST_EXCL>$value->unit_cost</UNIT_COST_EXCL><QTY>$value->quantity</QTY><VAT_APPLICABLE>1</VAT_APPLICABLE><VAT_RATE>$inv_date</VAT_RATE><INV_DATE>0.16</INV_DATE></row>
-      </root>";
+
+        if ($job->requisition->type =='Internal') {
+            foreach (json_decode($job->requisition->inventory_items_internal) as $value) {  
+             $stk = Part::find($value->part)->stock_link;             
+             $incl_price = $value->unit_cost/16*100;    
+
+             $xml_data[] ="<root><row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><EXCL_PRICE>$value->unit_cost</EXCL_PRICE><INCL_PRICE>$incl_price</INCL_PRICE><QTY>$value->quantity</QTY><VAT_APPLICABLE>True</VAT_APPLICABLE><VAT_RATE>16</VAT_RATE><LINE_DISC>$line_desc</LINE_DISC><INV_DATE> $inv_date</INV_DATE><ORDER_NO>$job->card_no</ORDER_NO><PROJ_ID>0</PROJ_ID></row></root>";
         }
         }
-       if ( $job->service_type =='External') {
+       if ($job->requisition->type=='External') {
              foreach (json_decode($job->requisition->inventory_items_external) as $value) {  
-             $stk = Part::find($value->part)->stock_link; 
-             $xml_data[] = "<root>
-       <row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><UNIT_COST_EXCL>$value->unit_price</UNIT_COST_EXCL><QTY>$value->quantity</QTY><VAT_APPLICABLE>1</VAT_APPLICABLE><VAT_RATE>0.16</VAT_RATE><INV_DATE>$inv_date</INV_DATE></row>
-      </root>";
+             $stk = Part::find($value->part)->stock_link;  
+             $incl_price = $value->unit_price/16*100; 
+             $xml_data[] ="<root><row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><EXCL_PRICE>$value->unit_price</EXCL_PRICE><INCL_PRICE>$incl_price</INCL_PRICE><QTY>$value->quantity</QTY><VAT_APPLICABLE>True</VAT_APPLICABLE><VAT_RATE>16</VAT_RATE><LINE_DISC>$line_desc</LINE_DISC><INV_DATE>$inv_date</INV_DATE><ORDER_NO>$job->card_no</ORDER_NO><PROJ_ID>0</PROJ_ID></row></root>";
         }
-        }
-      
-        //Jobcard::find($id)->update(['closed_at' => date('Y-m-d H:i'), 'status' => 0]);
+        }   
         return response($xml_data);
     }
 

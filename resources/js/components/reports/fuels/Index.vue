@@ -18,18 +18,18 @@
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-                            <th>Vehicle</th>
-                            <th>Fuel On</th>
+                            <th>Project</th>
+                            <th>Date</th>
                             <th>Litres</th>
-                            <th>Pump Price</th>
+                            <th>Reference</th>
                             </tr>
                         </thead>
                         <tbody>
                         <tr v-for="fuel in fuels">
-                            <td>{{fuel.Vehicle}}</td>
-                            <td>{{fuel.fuel_on}}</td>
-                            <td>{{fuel.Litres}}</td>
-                            <td>{{fuel.Rate}}</td>
+                            <td>{{fuel.Project}}</td>
+                            <td>{{fuel.Date}}</td>
+                            <td>{{fuel.Quantity}}</td>
+                            <td>{{fuel.Reference}}</td>
                         </tr>
                         </tbody>
                     </table>

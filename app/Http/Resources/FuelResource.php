@@ -39,7 +39,7 @@ class FuelResource extends JsonResource
             'odometer_readings' => $this->odometer_readings,
             'track_by' => $this->vehicle->track->name,
             'current_readings' => $this->vehicle->current_readings,
-            'previous_odometer' => $this->vehicle ? $this->vehicle->odometer_readings :'',
+            'previous_odometer' => $this->previous_odometer,
             'store_man' => $this->store_man,
             'fuel_no' => $this->fuel_no,
             'asset_category_id' => $this->asset_category_id

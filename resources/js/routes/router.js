@@ -56,6 +56,7 @@ const routes = [
     {path:'/job-card/:id',component:AppShow, beforeEnter: guard},
     {path:'/external-service',component:ExternalService, beforeEnter: guard},
     {path:'/jobcard-report',component:JobcardReport, beforeEnter: guard},
+    {path:'/fuel-report',component:FuelReport, beforeEnter: guard},
     {path:'/parts',component:Parts, beforeEnter: guard},
     {path:'/categories',component:Category, beforeEnter: guard},
     {path:'/projects',component:projects, beforeEnter: guard},

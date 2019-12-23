@@ -50,11 +50,15 @@
                 if (this.form.from > this.form.to){
                     return this.$toastr.e('Date from cannot be greater than Date to.')
                 }
-                      axios.post('job-report',this.form)
+                 axios.post('job-report',this.form)
                     .then(res =>{
-                        console.log(res.data)
-                      this.show_job = true;
-                       this.$store.dispatch('listJobReports',res.data)
+                       let allreqs =[]; 
+                     for(let i=0;i<res.data.length;i++){
+                       allreqs.push(res.data[i]['requistions'])
+                     }
+                     console.log(allreqs);
+                     // this.show_job = true;
+                       //this.$store.dispatch('listJobReports',res.data)
                     })
                     .catch(error => error.response)
             },
