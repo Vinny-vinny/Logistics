@@ -39,7 +39,7 @@
               </span>
                     </a>
                     <ul class="treeview-menu">
-                         <li><router-link to="/jobcard-report">Job Cards</router-link></li>
+                         <li><router-link to="/jobcard-report">Stock Issue</router-link></li>
                         <li><router-link to="/fuel-report">Daily Fuel Issue</router-link></li>
                         </ul>
                 </li>

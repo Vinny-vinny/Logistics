@@ -9880,18 +9880,114 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      requistions: [],
+      parts: {},
+      projects: {}
+    };
+  },
   mounted: function mounted() {
     this.initDatable();
+    this.itemsIssued;
+    this.getParts();
+    this.getProjects();
   },
   computed: {
     jobs: function jobs() {
       return this.$store.state.jobs;
+    },
+    itemsIssued: function itemsIssued() {
+      var _this = this;
+
+      setTimeout(function () {
+        var jobs = _this.$store.state.jobs.filter(function (j) {
+          return j.requistions !== null;
+        });
+
+        var requistions = [];
+        var internal_reqs = [];
+        var external_reqs = [];
+
+        var _loop = function _loop(i) {
+          if (jobs[i]['requistions']['type'] == 'Internal') {
+            (function () {
+              var reqs_internal = JSON.parse(jobs[i]['requistions']['inventory_items_internal']);
+
+              var _loop2 = function _loop2(k) {
+                _this.requistions.push({
+                  'Item Code': _this.parts.find(function (p) {
+                    return p.id == reqs_internal[k]['part'];
+                  }).code,
+                  'Item Description': _this.parts.find(function (p) {
+                    return p.id == reqs_internal[k]['part'];
+                  }).description,
+                  'Reference': jobs[i]['Reference'],
+                  'Quantity': reqs_internal[k]['quantity'],
+                  'Unit Cost': reqs_internal[k]['unit_cost'],
+                  'Amount': reqs_internal[k]['total_cost'],
+                  'Project': _this.projects.find(function (p) {
+                    return jobs[i]['requistions']['project_id'] == p.id;
+                  }).name
+                });
+              };
+
+              for (var k = 0; k < reqs_internal.length; k++) {
+                _loop2(k);
+              }
+            })();
+          } else if (jobs[i]['requistions']['type'] == 'External') {
+            (function () {
+              var reqs_external = JSON.parse(jobs[i]['requistions']['inventory_items_external']);
+
+              var _loop3 = function _loop3(k) {
+                _this.requistions.push({
+                  'Item Code': _this.parts.find(function (p) {
+                    return p.id == reqs_external[k]['part'];
+                  }).code,
+                  'Item Description': _this.parts.find(function (p) {
+                    return p.id == reqs_external[k]['part'];
+                  }).description,
+                  'Reference': jobs[i]['Reference'],
+                  'Quantity': reqs_external[k]['quantity'],
+                  'Unit Cost': reqs_external[k]['unit_price'],
+                  'Amount': reqs_external[k]['total_price'],
+                  'Project': _this.projects.find(function (p) {
+                    return jobs[i]['requistions']['project_id'] == p.id;
+                  }).name
+                });
+              };
+
+              for (var k = 0; k < reqs_external.length; k++) {
+                _loop3(k);
+              }
+            })();
+          }
+        };
+
+        for (var i = 0; i < jobs.length; i++) {
+          _loop(i);
+        }
+      }, 1000);
     }
   },
   methods: {
+    getParts: function getParts() {
+      var _this2 = this;
+
+      axios.get('parts').then(function (res) {
+        _this2.parts = res.data;
+      });
+    },
+    getProjects: function getProjects() {
+      var _this3 = this;
+
+      axios.get('asset-category').then(function (res) {
+        _this3.projects = res.data;
+      });
+    },
     back: function back() {
       eventBus.$emit('back');
     },
@@ -9974,6 +10070,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     jobCard: function jobCard() {
+      var _this = this;
+
       this.form.from = moment(this.form.from).format('YYYY-MM-DD');
       this.form.to = moment(this.form.to).format('YYYY-MM-DD');
 
@@ -9982,23 +10080,18 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       axios.post('job-report', this.form).then(function (res) {
-        var allreqs = [];
+        _this.show_job = true;
 
-        for (var i = 0; i < res.data.length; i++) {
-          allreqs.push(res.data[i]['requistions']);
-        }
-
-        console.log(allreqs); // this.show_job = true;
-        //this.$store.dispatch('listJobReports',res.data)
+        _this.$store.dispatch('listJobReports', res.data);
       })["catch"](function (error) {
         return error.response;
       });
     },
     listen: function listen() {
-      var _this = this;
+      var _this2 = this;
 
       eventBus.$on('back', function () {
-        _this.show_job = false;
+        _this2.show_job = false;
       });
     }
   },
@@ -10010,17 +10103,15 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/requisitions/Index.vue?vue&type=script&lang=js&":
-/*!*****************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/requisitions/Index.vue?vue&type=script&lang=js& ***!
-  \*****************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/Index.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/reports/kmperhr/Index.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Requisition__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Requisition */ "./resources/js/components/requisitions/Requisition.vue");
-/* harmony import */ var _RequisitionForm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./RequisitionForm */ "./resources/js/components/requisitions/RequisitionForm.vue");
 //
 //
 //
@@ -10036,6 +10127,158 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      results: [],
+      fuels: [],
+      machines: {}
+    };
+  },
+  mounted: function mounted() {
+    this.kmPerHr;
+    this.getMachines();
+  },
+  computed: {
+    kmPerHr: function kmPerHr() {
+      var _this = this;
+
+      setTimeout(function () {
+        var km_object = {};
+        var other_km_obj = [];
+        var result = [];
+
+        for (var _i = 0; _i < _this.$store.state.km_hrs.length; _i++) {
+          if (!km_object[_this.$store.state.km_hrs[_i]['vehicle_id']]) {
+            km_object[_this.$store.state.km_hrs[_i]['vehicle_id']] = _this.$store.state.km_hrs[_i];
+          } else if (km_object[_this.$store.state.km_hrs[_i]['vehicle_id']]) {
+            other_km_obj.push(_this.$store.state.km_hrs[_i]);
+            km_object[_this.$store.state.km_hrs[_i]['vehicle_id']]['litres'] += _this.$store.state.km_hrs[_i]['litres'];
+          }
+        }
+
+        var myitems = other_km_obj.map(function (obj) {
+          return obj.vehicle_id;
+        });
+
+        for (var i in km_object) {
+          if (km_object.hasOwnProperty(i)) {
+            if (myitems.includes(km_object[i]['vehicle_id'])) {
+              var itm = other_km_obj.filter(function (j) {
+                return j.vehicle_id == km_object[i]['vehicle_id'];
+              });
+
+              _this.fuels.push({
+                'reg_no': _this.machines.find(function (m) {
+                  return m.id == km_object[i]['vehicle_id'];
+                }).code,
+                'start_odo': km_object[i]['odometer_readings'],
+                'end_odo': itm[itm.length - 1]['odometer_readings'],
+                'distance': itm[itm.length - 1]['odometer_readings'] - km_object[i]['odometer_readings'],
+                'fuel_used': km_object[i]['litres'],
+                'km_per_ltrs': ((itm[itm.length - 1]['odometer_readings'] - km_object[i]['odometer_readings']) / km_object[i]['litres']).toFixed(2)
+              });
+            } else if (!myitems.includes(km_object[i]['vehicle_id'])) {
+              _this.fuels.push({
+                'reg_no': _this.machines.find(function (m) {
+                  return m.id == km_object[i]['vehicle_id'];
+                }).code,
+                'start_odo': km_object[i]['previous_odometer'],
+                'end_odo': km_object[i]['odometer_readings'],
+                'distance': km_object[i]['odometer_readings'] - km_object[i]['previous_odometer'],
+                'fuel_used': km_object[i]['litres'],
+                'km_per_ltrs': ((km_object[i]['odometer_readings'] - km_object[i]['previous_odometer']) / km_object[i]['litres']).toFixed(2)
+              });
+            }
+          }
+        }
+
+        for (var k = 0; k < _this.fuels.length; k++) {
+          _this.results.push({
+            'Reg': _this.fuels[k]['reg_no'],
+            'Start Odo': _this.fuels[k]['start_odo'],
+            'End Odo': _this.fuels[k]['end_odo'],
+            'Distance': _this.fuels[k]['distance'],
+            'Fuel Used(Ltr)': _this.fuels[k]['fuel_used'],
+            'LTRS/HR & KM/LTR': _this.fuels[k]['km_per_ltrs']
+          });
+        }
+
+        _this.initDatable();
+      }, 1000);
+    }
+  },
+  methods: {
+    getMachines: function getMachines() {
+      var _this2 = this;
+
+      axios('machines').then(function (res) {
+        return _this2.machines = res.data;
+      });
+    },
+    back: function back() {
+      eventBus.$emit('back');
+    },
+    initDatable: function initDatable() {
+      setTimeout(function () {
+        $('.dt').DataTable({
+          "pagingType": "full_numbers",
+          "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+          order: [[0, 'asc'], [3, 'desc']],
+          responsive: true,
+          destroy: true,
+          retrieve: true,
+          autoFill: true,
+          colReorder: true
+        });
+      }, 1000);
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vuejs_datepicker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuejs-datepicker */ "./node_modules/vuejs-datepicker/dist/vuejs-datepicker.esm.js");
+/* harmony import */ var _reports_kmperhr_Index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../reports/kmperhr/Index */ "./resources/js/components/reports/kmperhr/Index.vue");
 //
 //
 //
@@ -10070,104 +10313,59 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      tableData: [],
-      add_requisition: false,
-      editing: false,
-      show_form: false
+      form: {
+        from: '',
+        to: ''
+      },
+      show_km: false,
+      machines: {}
     };
   },
   created: function created() {
     this.listen();
-    this.getRequisitions();
+    this.getMachines();
   },
   methods: {
-    getRequisitions: function getRequisitions() {
+    getMachines: function getMachines() {
       var _this = this;
 
-      axios.get('requisitions').then(function (res) {
-        return _this.tableData = res.data;
-      })["catch"](function (error) {
-        return Exception.handle(error);
+      axios.get('machines').then(function (res) {
+        _this.machines = res.data;
       });
-      this.initDatable();
     },
-    editRequisition: function editRequisition(rq) {
+    KmHr: function KmHr() {
       var _this2 = this;
 
-      this.$store.dispatch('updateRequisition', rq).then(function () {
-        _this2.editing = true;
-        _this2.add_requisition = true;
-      });
-    },
-    deleteRequisition: function deleteRequisition(id) {
-      var _this3 = this;
+      this.form.from = moment(this.form.from).format('YYYY-MM-DD');
+      this.form.to = moment(this.form.to).format('YYYY-MM-DD');
 
-      axios["delete"]("requisitions/".concat(id)).then(function (res) {
-        for (var i = 0; i < _this3.tableData.length; i++) {
-          if (_this3.tableData[i].id == res.data) {
-            _this3.tableData.splice(i, 1);
-          }
-        }
+      if (this.form.from > this.form.to) {
+        return this.$toastr.e('Date from cannot be greater than Date to.');
+      }
+
+      if (this.form.from == '' || this.form.to == '') {
+        return this.$toastr.e('Sorry,Date to and Date from cannot be empty.');
+      }
+
+      axios.post('km-per-hr', this.form).then(function (res) {
+        _this2.show_km = true;
+
+        _this2.$store.dispatch('listKMHRReports', res.data);
       })["catch"](function (error) {
-        return Exception.handle(error);
+        return error.response;
       });
     },
     listen: function listen() {
-      var _this4 = this;
+      var _this3 = this;
 
-      eventBus.$on('listReqs', function (rq) {
-        _this4.tableData.unshift(rq);
-
-        _this4.add_requisition = false;
-
-        _this4.initDatable();
+      eventBus.$on('back', function () {
+        _this3.show_km = false;
       });
-      eventBus.$on('cancel', function () {
-        _this4.add_requisition = false;
-        _this4.editing = false;
-
-        _this4.getRequisitions();
-
-        _this4.initDatable();
-      });
-      eventBus.$on('updateRequisition', function (rq) {
-        _this4.add_requisition = false;
-        _this4.editing = false;
-
-        for (var i = 0; i < _this4.tableData.length; i++) {
-          if (_this4.tableData[i].id == rq.id) {
-            _this4.tableData.splice(i, 1);
-          }
-        }
-
-        _this4.tableData.unshift(rq);
-
-        _this4.initDatable();
-      });
-      eventBus.$on('hide_form', function () {
-        _this4.show_form = false;
-
-        _this4.getRequisitions();
-      });
-    },
-    initDatable: function initDatable() {
-      setTimeout(function () {
-        $('.dt').DataTable({
-          "pagingType": "full_numbers",
-          "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-          order: [[0, 'asc'], [3, 'desc']],
-          responsive: true,
-          destroy: true,
-          retrieve: true,
-          autoFill: true,
-          colReorder: true
-        });
-      }, 1000);
     }
   },
   components: {
-    Requisition: _Requisition__WEBPACK_IMPORTED_MODULE_0__["default"],
-    RequisitionForm: _RequisitionForm__WEBPACK_IMPORTED_MODULE_1__["default"]
+    datepicker: vuejs_datepicker__WEBPACK_IMPORTED_MODULE_0__["default"],
+    'app-index': _reports_kmperhr_Index__WEBPACK_IMPORTED_MODULE_1__["default"]
   }
 });
 
@@ -10355,7 +10553,8 @@ __webpack_require__.r(__webpack_exports__);
       users: {},
       username: User.name(),
       stk_groups: {},
-      items: {}
+      items: {},
+      initial_unit_cost: ''
     };
   },
   created: function created() {
@@ -10384,7 +10583,8 @@ __webpack_require__.r(__webpack_exports__);
         for (var i = 0; i < this.form.inventory_items_external.length; i++) {
           if (this.form.inventory_items_external[i]['quantity'] !== '' && this.form.inventory_items_external[i]['part'] !== '') {
             if (this.form.inventory_items_external[i]['part'] === this.parts[p]['id']) {
-              this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost'];
+              this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']; // this.form.inventory_items_external[i]['unit_price'] = this.costing(this.parts[p]['id']);
+
               this.form.inventory_items_external[i]['total_price_inclusive'] = (this.form.inventory_items_external[i]['unit_price'] * 116 / 100 * this.form.inventory_items_external[i]['quantity']).toFixed(2);
               this.form.inventory_items_external[i]['total_price'] = (this.form.inventory_items_external[i]['unit_price'] * this.form.inventory_items_external[i]['quantity']).toFixed(2);
             }
@@ -10402,6 +10602,10 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    costing: function costing(cost) {
+      console.log(cost);
+      return cost;
+    },
     selectedGroup: function selectedGroup() {
       var _this = this;
 
@@ -34770,7 +34974,7 @@ var render = function() {
                   "li",
                   [
                     _c("router-link", { attrs: { to: "/jobcard-report" } }, [
-                      _vm._v("Job Cards")
+                      _vm._v("Stock Issue")
                     ])
                   ],
                   1
@@ -42232,7 +42436,7 @@ var render = function() {
                   "download-excel",
                   {
                     staticClass: "btn btn-primary pull-right",
-                    attrs: { data: _vm.jobs }
+                    attrs: { data: _vm.requistions }
                   },
                   [
                     _c("i", {
@@ -42268,15 +42472,13 @@ var render = function() {
               "tbody",
               _vm._l(_vm.jobs, function(job) {
                 return _c("tr", [
-                  _c("td", [_vm._v(_vm._s(job.Card))]),
+                  _c("td", [_vm._v(_vm._s(job.Reference))]),
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(job.Machine))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(job.Driver))]),
+                  _c("td", [_vm._v(_vm._s(job.Created))]),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(job.Customer))]),
-                  _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(job.Created))])
+                  _c("td", [_vm._v(_vm._s(job.service_date))])
                 ])
               }),
               0
@@ -42294,15 +42496,13 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("Card #")]),
+        _c("th", [_vm._v("Reference #")]),
         _vm._v(" "),
         _c("th", [_vm._v("Machine")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Driver")]),
+        _c("th", [_vm._v("Created At")]),
         _vm._v(" "),
-        _c("th", [_vm._v("Customer")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Created At")])
+        _c("th", [_vm._v("Actual Service Date")])
       ])
     ])
   }
@@ -42424,10 +42624,126 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/requisitions/Index.vue?vue&type=template&id=13dd56f6&scoped=true&":
-/*!*********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/requisitions/Index.vue?vue&type=template&id=13dd56f6&scoped=true& ***!
-  \*********************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/Index.vue?vue&type=template&id=380a2f5d&scoped=true&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/reports/kmperhr/Index.vue?vue&type=template&id=380a2f5d&scoped=true& ***!
+  \************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("section", { staticClass: "content" }, [
+      _c("div", { staticClass: "box" }, [
+        _c(
+          "div",
+          { staticClass: "box-header with-border" },
+          [
+            _c("h3", { staticClass: "box-title" }, [
+              _vm._v("KM Per Hr Reports")
+            ]),
+            _vm._v(" "),
+            _vm.fuels.length
+              ? _c(
+                  "download-excel",
+                  {
+                    staticClass: "btn btn-primary pull-right",
+                    attrs: { data: _vm.results }
+                  },
+                  [
+                    _c("i", {
+                      staticClass: "fa fa-file-excel-o",
+                      attrs: { "aria-hidden": "true" }
+                    }),
+                    _vm._v(" Download\n                ")
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-danger pull-right mr",
+                on: {
+                  click: function($event) {
+                    return _vm.back()
+                  }
+                }
+              },
+              [_vm._v("Back")]
+            )
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "box-body" }, [
+          _c("table", { staticClass: "table table-striped dt" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.fuels, function(fuel) {
+                return _c("tr", [
+                  _c("td", [_vm._v(_vm._s(fuel.reg_no))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(fuel.start_odo))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(fuel.end_odo))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(fuel.distance))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(fuel.fuel_used))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(fuel.km_per_ltrs))])
+                ])
+              }),
+              0
+            )
+          ])
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Reg No.")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Start Odometer")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("End Odometer")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Distance")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Fuel Used(Ltr)")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("LTRS/HR & KM/LTR")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true&":
+/*!**************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true& ***!
+  \**************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -42442,97 +42758,75 @@ var render = function() {
   return _c(
     "div",
     [
-      _vm.add_requisition && !_vm.show_form
-        ? _c("requisition", { attrs: { edit: _vm.editing } })
-        : _vm._e(),
+      _vm.show_km ? _c("app-index") : _vm._e(),
       _vm._v(" "),
-      _vm.show_form && !_vm.add_requisition ? _c("requisition-form") : _vm._e(),
-      _vm._v(" "),
-      !_vm.add_requisition && !_vm.show_form
+      !_vm.show_km
         ? _c("section", { staticClass: "content" }, [
             _c("div", { staticClass: "box" }, [
-              _c("div", { staticClass: "box-header with-border" }, [
-                _c("h3", { staticClass: "box-title" }, [
-                  _vm._v("Requisitions")
-                ]),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-success pull-right",
-                    on: {
-                      click: function($event) {
-                        _vm.show_form = true
-                      }
-                    }
-                  },
-                  [_vm._v("Print Requisition Form")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary pull-right mr",
-                    on: {
-                      click: function($event) {
-                        _vm.add_requisition = true
-                      }
-                    }
-                  },
-                  [_vm._v("Add Requisition")]
-                )
-              ]),
+              _vm._m(0),
               _vm._v(" "),
               _c("div", { staticClass: "box-body" }, [
-                _c("table", { staticClass: "table table-striped dt" }, [
-                  _vm._m(0),
-                  _vm._v(" "),
-                  _c(
-                    "tbody",
-                    _vm._l(_vm.tableData, function(rq) {
-                      return _c("tr", [
-                        _c("td", [_vm._v(_vm._s(rq.req_no))]),
+                _c(
+                  "form",
+                  {
+                    on: {
+                      submit: function($event) {
+                        $event.preventDefault()
+                        return _vm.KmHr()
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c("label", [_vm._v("From")]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(rq.description))]),
+                        _c("datepicker", {
+                          attrs: { required: "" },
+                          model: {
+                            value: _vm.form.from,
+                            callback: function($$v) {
+                              _vm.$set(_vm.form, "from", $$v)
+                            },
+                            expression: "form.from"
+                          }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "form-group" },
+                      [
+                        _c("label", [_vm._v("To")]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(rq.date_requested))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(rq.person_requested))]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(rq.project))]),
-                        _vm._v(" "),
-                        _c(
-                          "td",
-                          [
-                            _c(
-                              "button",
-                              {
-                                staticClass: "btn btn-success btn-sm",
-                                on: {
-                                  click: function($event) {
-                                    return _vm.editRequisition(rq)
-                                  }
-                                }
-                              },
-                              [_c("i", { staticClass: "fa fa-edit" })]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "router-link",
-                              {
-                                staticClass: "btn btn-success btn-info btn-sm",
-                                attrs: { to: { path: "/requisition/" + rq.id } }
-                              },
-                              [_c("i", { staticClass: "fa fa-eye" })]
-                            )
-                          ],
-                          1
-                        )
-                      ])
-                    }),
-                    0
-                  )
-                ])
+                        _c("datepicker", {
+                          attrs: { required: "" },
+                          model: {
+                            value: _vm.form.to,
+                            callback: function($$v) {
+                              _vm.$set(_vm.form, "to", $$v)
+                            },
+                            expression: "form.to"
+                          }
+                        })
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "submit" }
+                      },
+                      [_vm._v("Generate")]
+                    )
+                  ]
+                )
               ])
             ])
           ])
@@ -42546,20 +42840,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("Req #")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Description")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Requested On")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Requested By")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Project")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Actions")])
-      ])
+    return _c("div", { staticClass: "box-header with-border" }, [
+      _c("h3", { staticClass: "box-title" }, [_vm._v("Choose Period")])
     ])
   }
 ]
@@ -43264,7 +43546,7 @@ var render = function() {
                                 domProps: { value: item.unit_price },
                                 on: {
                                   keyup: function($event) {
-                                    _vm.unit_price = item.unit_price
+                                    _vm.unit_price = _vm.costing(item.part)
                                   },
                                   input: function($event) {
                                     if ($event.target.composing) {
@@ -67627,18 +67909,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/requisitions/Index.vue":
-/*!********************************************************!*\
-  !*** ./resources/js/components/requisitions/Index.vue ***!
-  \********************************************************/
-/*! exports provided: default */
+/***/ "./resources/js/components/reports/kmperhr/Index.vue":
+/*!***********************************************************!*\
+  !*** ./resources/js/components/reports/kmperhr/Index.vue ***!
+  \***********************************************************/
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Index_vue_vue_type_template_id_13dd56f6_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Index.vue?vue&type=template&id=13dd56f6&scoped=true& */ "./resources/js/components/requisitions/Index.vue?vue&type=template&id=13dd56f6&scoped=true&");
-/* harmony import */ var _Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Index.vue?vue&type=script&lang=js& */ "./resources/js/components/requisitions/Index.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Index_vue_vue_type_template_id_380a2f5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Index.vue?vue&type=template&id=380a2f5d&scoped=true& */ "./resources/js/components/reports/kmperhr/Index.vue?vue&type=template&id=380a2f5d&scoped=true&");
+/* harmony import */ var _Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Index.vue?vue&type=script&lang=js& */ "./resources/js/components/reports/kmperhr/Index.vue?vue&type=script&lang=js&");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -67648,49 +67931,118 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Index_vue_vue_type_template_id_13dd56f6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _Index_vue_vue_type_template_id_13dd56f6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _Index_vue_vue_type_template_id_380a2f5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Index_vue_vue_type_template_id_380a2f5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
-  "13dd56f6",
+  "380a2f5d",
   null
   
 )
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/requisitions/Index.vue"
+component.options.__file = "resources/js/components/reports/kmperhr/Index.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/requisitions/Index.vue?vue&type=script&lang=js&":
-/*!*********************************************************************************!*\
-  !*** ./resources/js/components/requisitions/Index.vue?vue&type=script&lang=js& ***!
-  \*********************************************************************************/
-/*! exports provided: default */
+/***/ "./resources/js/components/reports/kmperhr/Index.vue?vue&type=script&lang=js&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/reports/kmperhr/Index.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************/
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/requisitions/Index.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/Index.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/requisitions/Index.vue?vue&type=template&id=13dd56f6&scoped=true&":
-/*!***************************************************************************************************!*\
-  !*** ./resources/js/components/requisitions/Index.vue?vue&type=template&id=13dd56f6&scoped=true& ***!
-  \***************************************************************************************************/
+/***/ "./resources/js/components/reports/kmperhr/Index.vue?vue&type=template&id=380a2f5d&scoped=true&":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/components/reports/kmperhr/Index.vue?vue&type=template&id=380a2f5d&scoped=true& ***!
+  \******************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_13dd56f6_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=template&id=13dd56f6&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/requisitions/Index.vue?vue&type=template&id=13dd56f6&scoped=true&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_13dd56f6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_380a2f5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Index.vue?vue&type=template&id=380a2f5d&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/Index.vue?vue&type=template&id=380a2f5d&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_380a2f5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_13dd56f6_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Index_vue_vue_type_template_id_380a2f5d_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/reports/kmperhr/KmPerHr.vue":
+/*!*************************************************************!*\
+  !*** ./resources/js/components/reports/kmperhr/KmPerHr.vue ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _KmPerHr_vue_vue_type_template_id_25f949e0_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true& */ "./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true&");
+/* harmony import */ var _KmPerHr_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KmPerHr.vue?vue&type=script&lang=js& */ "./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _KmPerHr_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _KmPerHr_vue_vue_type_template_id_25f949e0_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _KmPerHr_vue_vue_type_template_id_25f949e0_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "25f949e0",
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/reports/kmperhr/KmPerHr.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_KmPerHr_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./KmPerHr.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_KmPerHr_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true&":
+/*!********************************************************************************************************!*\
+  !*** ./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true& ***!
+  \********************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_KmPerHr_vue_vue_type_template_id_25f949e0_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/reports/kmperhr/KmPerHr.vue?vue&type=template&id=25f949e0&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_KmPerHr_vue_vue_type_template_id_25f949e0_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_KmPerHr_vue_vue_type_template_id_25f949e0_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -68415,11 +68767,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_mechanics_Index__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ../components/mechanics/Index */ "./resources/js/components/mechanics/Index.vue");
 /* harmony import */ var _components_maintenance_jobtypes_Index__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ../components/maintenance/jobtypes/Index */ "./resources/js/components/maintenance/jobtypes/Index.vue");
 /* harmony import */ var _components_fuels_types_Index__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ../components/fuels/types/Index */ "./resources/js/components/fuels/types/Index.vue");
-/* harmony import */ var _components_requisitions_Index__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../components/requisitions/Index */ "./resources/js/components/requisitions/Index.vue");
+/* harmony import */ var _components_requisitions_Requisition__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ../components/requisitions/Requisition */ "./resources/js/components/requisitions/Requisition.vue");
 /* harmony import */ var _components_maintenance_jobcard_JobCardForm__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ../components/maintenance/jobcard/JobCardForm */ "./resources/js/components/maintenance/jobcard/JobCardForm.vue");
 /* harmony import */ var _components_requisitions_ShowRequisition__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ../components/requisitions/ShowRequisition */ "./resources/js/components/requisitions/ShowRequisition.vue");
 /* harmony import */ var _components_requisitions_RequisitionForm__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ../components/requisitions/RequisitionForm */ "./resources/js/components/requisitions/RequisitionForm.vue");
 /* harmony import */ var _components_checklists_tools_Index__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ../components/checklists/tools/Index */ "./resources/js/components/checklists/tools/Index.vue");
+/* harmony import */ var _components_reports_kmperhr_KmPerHr__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ../components/reports/kmperhr/KmPerHr */ "./resources/js/components/reports/kmperhr/KmPerHr.vue");
+
 
 
 
@@ -68562,7 +68916,7 @@ var routes = [{
   beforeEnter: guard
 }, {
   path: '/requisitions',
-  component: _components_requisitions_Index__WEBPACK_IMPORTED_MODULE_27__["default"],
+  component: _components_requisitions_Requisition__WEBPACK_IMPORTED_MODULE_27__["default"],
   beforeEnter: guard
 }, {
   path: '/jobcard-form/:id',
@@ -68579,6 +68933,10 @@ var routes = [{
 }, {
   path: '/checklist-tool',
   component: _components_checklists_tools_Index__WEBPACK_IMPORTED_MODULE_31__["default"],
+  beforeEnter: guard
+}, {
+  path: '/km-per-hr',
+  component: _components_reports_kmperhr_KmPerHr__WEBPACK_IMPORTED_MODULE_32__["default"],
   beforeEnter: guard
 }];
 /* harmony default export */ __webpack_exports__["default"] = (new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
@@ -68630,7 +68988,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     jobcard_categories: {},
     fuel_types: {},
     requisitions: {},
-    checklist_tool: {}
+    checklist_tool: {},
+    km_hrs: {}
   },
   mutations: {
     pathTo: function pathTo(state, to) {
@@ -68710,6 +69069,9 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     },
     updateTool: function updateTool(state, tool) {
       state.checklist_tool = tool;
+    },
+    listKMHRReports: function listKMHRReports(state, km) {
+      state.km_hrs = km;
     }
   },
   actions: {
@@ -68816,6 +69178,10 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuex__WEBPACK_IMPORTED_MODULE_1__
     updateTool: function updateTool(_ref26, tool) {
       var commit = _ref26.commit;
       commit('updateTool', tool);
+    },
+    listKMHRReports: function listKMHRReports(_ref27, km) {
+      var commit = _ref27.commit;
+      commit('listKMHRReports', km);
     }
   }
 }));

@@ -30,7 +30,8 @@ export default new Vuex.Store({
         jobcard_categories:{},
         fuel_types:{},
         requisitions:{},
-        checklist_tool:{}
+        checklist_tool:{},
+        km_hrs:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -110,6 +111,9 @@ export default new Vuex.Store({
         },
         updateTool(state,tool){
          state.checklist_tool = tool;
+        },
+        listKMHRReports(state,km){
+         state.km_hrs = km;
         }
     },
     actions:{
@@ -190,6 +194,9 @@ export default new Vuex.Store({
         },
         updateTool({commit},tool){
         commit('updateTool',tool);
+        },
+        listKMHRReports({commit},km){
+        commit('listKMHRReports',km);
         }
     }
 })

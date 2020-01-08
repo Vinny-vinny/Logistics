@@ -1,15 +1,15 @@
  <template>
     <div>
-        <app-index v-if="show_job"></app-index>
+        <app-index v-if="show_km"></app-index>
         <!-- Main content -->
-        <section class="content" v-if="!show_job">
+        <section class="content" v-if="!show_km">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Choose Period</h3>
                 </div>
                 <div class="box-body">
-                    <form @submit.prevent="jobCard()">
+                    <form @submit.prevent="KmHr()">
                         <div class="form-group">
                             <label>From</label>
                             <datepicker v-model="form.from" required></datepicker>
@@ -29,7 +29,7 @@
 
 <script>
     import datepicker from 'vuejs-datepicker';
-   import Index from '../../reports/jobs/Index';
+   import Index from '../../reports/kmperhr/Index';
     export default {
            data(){
             return {
@@ -37,29 +37,41 @@
                     from:'',
                     to:''
                     },
-                show_job: false
+                show_km: false,
+                machines:{}
             }
         },
         created(){
           this.listen();
+          this.getMachines();
         },
            methods:{
-            jobCard(){
+            getMachines(){
+            axios.get('machines')
+            .then(res => {
+                this.machines = res.data;
+            })
+            },
+            KmHr(){
                 this.form.from = moment(this.form.from).format('YYYY-MM-DD');
                 this.form.to = moment(this.form.to).format('YYYY-MM-DD');
                 if (this.form.from > this.form.to){
                     return this.$toastr.e('Date from cannot be greater than Date to.')
                 }
-                 axios.post('job-report',this.form)
-                    .then(res =>{                   
-                     this.show_job = true;
-                       this.$store.dispatch('listJobReports',res.data)
+                if (this.form.from =='' ||  this.form.to=='') {
+                    return this.$toastr.e('Sorry,Date to and Date from cannot be empty.');
+                }
+                 axios.post('km-per-hr',this.form)
+                    .then(res =>{  
+                       this.show_km = true;
+                       this.$store.dispatch('listKMHRReports',res.data)               
+                   
                     })
                     .catch(error => error.response)
             },
                listen(){
                 eventBus.$on('back', ()=>{
-                    this.show_job = false;
+                    this.show_km = false;
                 })
                }
           },

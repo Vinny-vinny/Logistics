@@ -66,7 +66,7 @@
                                     </select>
                                     </td>
                                     <td><input type="number" class="form-control qty" v-model="item.quantity"
-                                               placeholder="Qty"  @keyup="qty = item.quantity">
+                                               placeholder="Qty" @keyup="qty = item.quantity">
                                     </td>
                                     <td><input type="number" class="form-control p_in" step="0.001" v-model="item.unit_cost"
                                                placeholder="Unit Cost" disabled></td>
@@ -106,7 +106,7 @@
                                                placeholder="Qty"  @keyup="qty = item.quantity">
                                     </td>
                                     <td><input type="number" class="form-control p_in" step="0.001" v-model="item.unit_price"
-                                               placeholder="Unit Price" @keyup="unit_price = item.unit_price"></td>
+                                               placeholder="Unit Price" @keyup="unit_price = costing(item.part)"></td>
                                     <td><input type="number" class="form-control p_in_2" step="0.001" v-model="item.total_price"
                                                placeholder="Total Price" disabled></td>
                                     <td><input type="number" class="form-control p_ex_2" step="0.001" v-model="item.total_price_inclusive"
@@ -157,7 +157,8 @@
                 users:{},
                 username:User.name(),
                 stk_groups:{},
-                items:{}
+                items:{},
+                initial_unit_cost:''
             }
         },
         created(){
@@ -186,7 +187,8 @@
                     for (let i=0; i < this.form.inventory_items_external.length; i++){
                         if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){
                             if (this.form.inventory_items_external[i]['part'] === this.parts[p]['id']){
-                                this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']
+                               this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']
+                                // this.form.inventory_items_external[i]['unit_price'] = this.costing(this.parts[p]['id']);
                                 this.form.inventory_items_external[i]['total_price_inclusive'] = ((this.form.inventory_items_external[i]['unit_price']* 116/100) * this.form.inventory_items_external[i]['quantity']).toFixed(2);
                                 this.form.inventory_items_external[i]['total_price'] = (this.form.inventory_items_external[i]['unit_price'] * this.form.inventory_items_external[i]['quantity']).toFixed(2);
                             }
@@ -195,16 +197,20 @@
                 }
             }
         },
-        computed:{
+        computed:{            
           getExpenses(){
-              return [this.part,this.qty,this.form.inventory_items_internal].join();
+            return [this.part,this.qty,this.form.inventory_items_internal].join();
           },
             getExternal(){
-                return [this.part,this.qty,this.unit_price,this.form.inventory_items_external].join();
+             return [this.part,this.qty,this.unit_price,this.form.inventory_items_external].join();
             }
         },
 
         methods:{
+            costing(cost){
+            console.log(cost);
+            return cost;
+            },
             selectedGroup(){
               this.items = this.parts.filter(item => item.item_group == this.form.group_name);
 

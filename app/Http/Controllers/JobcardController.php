@@ -120,7 +120,7 @@ class JobcardController extends Controller
              $incl_price = $value->unit_cost/16*100;    
 
              $xml_data[] ="<root><row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><EXCL_PRICE>$value->unit_cost</EXCL_PRICE><INCL_PRICE>$incl_price</INCL_PRICE><QTY>$value->quantity</QTY><VAT_APPLICABLE>True</VAT_APPLICABLE><VAT_RATE>16</VAT_RATE><LINE_DISC>$line_desc</LINE_DISC><INV_DATE> $inv_date</INV_DATE><ORDER_NO>$job->card_no</ORDER_NO><PROJ_ID>0</PROJ_ID></row></root>";
-        }
+             }
         }
        if ($job->requisition->type=='External') {
              foreach (json_decode($job->requisition->inventory_items_external) as $value) {  

@@ -26,5 +26,11 @@ class ReportsController extends Controller
         $to = Carbon::parse($request->to)->endOfDay()->format('Y-m-d H:m:s');
         return response()->json(FuelReportResource::collection(Fuel::whereBetween('created_at',[$from,$to])->get()));
     }
+      public function KmPerHr(Request $request)
+    {
+        $from = Carbon::parse($request->from)->startOfDay()->format('Y-m-d H:m:s');
+        $to = Carbon::parse($request->to)->endOfDay()->format('Y-m-d H:m:s');
+        return response()->json(FuelResource::collection(Fuel::whereBetween('created_at',[$from,$to])->get()));
+    }
 }
 

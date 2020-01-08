@@ -17,7 +17,10 @@ class JobcardReportResource extends JsonResource
     {
         return [
             'requistions' => $this->requisition,           
-            'Created' => Carbon::parse($this->created_at)->format('m-d-Y')
+            'Created' => Carbon::parse($this->created_at)->format('m-d-Y'),
+            'Reference' => $this->card_no,
+            'Machine' =>  $this->machine->code,
+            'service_date' => Carbon::parse($this->actual_date)->format('d-m-Y')
 
         ];
     }
