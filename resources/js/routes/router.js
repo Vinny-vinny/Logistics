@@ -31,6 +31,9 @@ import ShowRequisition from "../components/requisitions/ShowRequisition";
 import RequisitionForm from "../components/requisitions/RequisitionForm";
 import Tool from "../components/checklists/tools/Index";
 import KmPerHr from "../components/reports/kmperhr/KmPerHr";
+import DieselAnalysis from "../components/reports/fuels/diesel/DieselAnalysis";
+import DepartmentConsumption from "../components/reports/fuels/dpt_consumption/DepartmentConsumption";
+import Partners from "../components/reports/fuels/partners/Partners";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -71,7 +74,10 @@ const routes = [
     {path:'/requisition/:id',component:ShowRequisition, beforeEnter: guard},
     {path:'/requisition-form',component:RequisitionForm, beforeEnter: guard},
     {path:'/checklist-tool',component:Tool, beforeEnter: guard},
-    {path:'/km-per-hr',component:KmPerHr, beforeEnter: guard}
+    {path:'/km-per-hr',component:KmPerHr, beforeEnter: guard},
+    {path:'/diesel-analysis',component:DieselAnalysis, beforeEnter: guard},
+    {path:'/dpt-consumption',component:DepartmentConsumption, beforeEnter: guard},
+    {path:'/partners',component:Partners, beforeEnter: guard}
 ];
 
 export default new VueRouter({

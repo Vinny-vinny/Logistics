@@ -29,7 +29,7 @@
 
 <script>
     import datepicker from 'vuejs-datepicker';
-    import Index from '../../reports/fuels/Index';
+    import Index from '../../../reports/fuels/dpt_consumption/Index';
     export default {
         data(){
             return {
@@ -37,26 +37,53 @@
                     from:'',
                     to:''
                 },
-                show_fuel: false
+                show_fuel: false,
+                departments:{}
             }
         },
         created(){
             this.listen();
+            this.getDepartments();
         },
         methods:{
+            getDepartments(){
+             axios.get('asset-category')
+             .then(res => this.departments = res.data);
+            },
             fuel(){
                 this.form.from = moment(this.form.from).format('YYYY-MM-DD');
                 this.form.to = moment(this.form.to).format('YYYY-MM-DD');
                 if (this.form.from > this.form.to){
                     return this.$toastr.e('Date from cannot be greater than Date to.')
                 }
-                 if (this.form.from =='' || this.form.to ==''){
+                   if (this.form.from =='' || this.form.to ==''){
                     return this.$toastr.e('Date from and Date to cannot be empty.')
                 }
-                axios.post('fuel-report',this.form)
+                axios.post('diesel-analysis',this.form)
                     .then(res =>{                      
+                        let dept_obj = {};
+                        let result = [];
+                        for(let i=0;i<res.data.length;i++){
+                            if(!dept_obj[res.data[i]['asset_category_id']]){                   
+                                dept_obj[res.data[i]['asset_category_id']] = res.data[i];  
+                                 dept_obj[res.data[i]['asset_category_id']]['total'] = res.data[i]['rate'] * res.data[i]['litres'];    
+                            }
+                            else if(dept_obj[res.data[i]['asset_category_id']]){               
+                              dept_obj[res.data[i]['asset_category_id']]['litres'] += res.data[i]['litres'];  
+                               dept_obj[res.data[i]['asset_category_id']]['total'] += (res.data[i]['rate'] * res.data[i]['litres']);   
+                            }
+                        }                       
+                        for(var i in dept_obj){
+                            if(dept_obj.hasOwnProperty(i)){
+                               result.push({
+                                'department': this.departments.find(d => d.id == dept_obj[i]['asset_category_id']).name,
+                                'qty': dept_obj[i]['litres'],
+                                'percentage': ((dept_obj[i]['litres']/dept_obj[i]['total'])*100).toFixed(2)  
+                               })
+                            }
+                        }                     
                         this.show_fuel = true;
-                        this.$store.dispatch('listFuelReports',res.data)
+                        this.$store.dispatch('listconsumptionReports',result)
                     })
                     .catch(error => error.response)
             },

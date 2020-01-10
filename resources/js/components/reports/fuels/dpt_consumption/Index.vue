@@ -9,7 +9,7 @@
                     <download-excel
                         v-if="fuels.length"
                         class="btn btn-primary pull-right"
-                        :data="daily_issues">
+                        :data="results">
                         <i class="fa fa-file-excel-o" aria-hidden="true"></i> Download
                     </download-excel>
                     <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
@@ -18,27 +18,18 @@
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Item Code</th>
-                            <th>Item Description</th>
-                            <th>Reference</th>
-                            <th>Quantity</th>
-                            <th>Unit Cost</th>
-                            <th>Amount</th>
-                            <th>Project</th>
+                            <th>Department</th>
+                            <th>QTY In Ltrs</th>
+                            <th style="display:none">QTY In Ltrs</th>
+                            <th>Percentage</th>                         
                             </tr>
                         </thead>
                         <tbody>
                         <tr v-for="fuel in fuels">
-                            <td>{{fuel.date}}</td>
-                            <td>{{fuel.item_code}}</td>
-                            <td>{{fuel.description}}</td>
-                            <td>{{fuel.reference}}</td>
-                            <td>{{fuel.quantity}}</td>
-                            <td>{{fuel.unit_cost}}</td>
-                            <td>{{fuel.amount}}</td>
-                            <td>{{fuel.project}}</td>
-
+                            <td>{{fuel.department}}</td>
+                            <td>{{fuel.qty}}</td>
+                            <td style="display:none">{{fuel.qty}}</td>
+                            <td>{{fuel.percentage}}</td>                          
                         </tr>
                         </tbody>
                     </table>
@@ -51,35 +42,31 @@
 
     export default {
         data(){
-        return {
-            daily_issues:[]
-        }
+         return {
+            results:[]
+         }
         },
         mounted(){
             this.initDatable();
-            this.dailyIssue();
+            this.consumptions();
         },
         computed:{
             fuels(){
-                return this.$store.state.fuel_reports;
-            }
+                return this.$store.state.department_consumptions;
+            },
+
         },
         methods:{
-            dailyIssue(){
+            consumptions(){
             setTimeout(()=>{
-             for(let i=0;i<this.fuels.length;i++){
-              this.daily_issues.push({
-                'Date': this.fuels[i]['date'],
-                'Item Code': this.fuels[i]['code'],
-                'Item Description': this.fuels[i]['description'],
-                'Reference': this.fuels[i]['reference'],
-                'Quantity': this.fuels[i]['quantity'],
-                'Unit Cost': this.fuels[i]['unit_cost'],
-                'Amount': this.fuels[i]['amount'],
-                'Project': this.fuels[i]['project']
-              });
-             }
-            },1000)
+            for(let i=0;i<this.fuels.length;i++){
+                this.results.push({
+                 'Department': this.fuels[i]['department'],
+                 'QTY In Ltrs': this.fuels[i]['qty'],
+                 'Percentage': this.fuels[i]['percentage']
+                });
+            }
+            },1000) 
             },
             back(){
                 eventBus.$emit('back');

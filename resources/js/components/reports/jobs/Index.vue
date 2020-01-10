@@ -5,7 +5,7 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Job Card Reports</h3>
+                    <h3 class="box-title">Stock Issue</h3>
                     <download-excel
                         v-if="jobs.length"
                         class="btn btn-primary pull-right"
@@ -18,19 +18,27 @@
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-                            <th>Reference #</th>
-                            <th>Machine</th>
-                            <th>Created At</th>
-                            <th>Actual Service Date</th>
+                            <th>Date</th>
+                            <th>Item Code</th>
+                            <th>Item Description</th>
+                            <th>Reference</th>
+                            <th>Quantity</th>
+                            <th>Unit Cost</th>
+                            <th>Amount</th>
+                            <th>Project</th>
                             
                             </tr>
                         </thead>
                         <tbody>
                         <tr v-for="job in jobs">
-                            <td>{{job.Reference}}</td>
-                            <td>{{job.Machine}}</td>
-                            <td>{{job.Created}}</td>
-                            <td>{{job.service_date}}</td>                            
+                            <td>{{job.date}}</td>
+                            <td>{{job.code}}</td>
+                            <td>{{job.description}}</td>
+                            <td>{{job.reference}}</td>  
+                            <td>{{job.quantity}}</td>
+                            <td>{{job.unit_cost}}</td>
+                            <td>{{job.amount}}</td>    
+                            <td>{{job.project}}</td>                         
                         </tr>
                         </tbody>
                     </table>
@@ -51,7 +59,7 @@
         },
        mounted(){
             this.initDatable();
-            this.itemsIssued;
+            this.itemsIssued();
             this.getParts();
             this.getProjects();
 
@@ -60,50 +68,26 @@
           jobs(){            
               return this.$store.state.jobs;
           },
-          itemsIssued(){
-          setTimeout(()=>{
-       let jobs =this.$store.state.jobs.filter(j => j.requistions !==null);
-            let requistions = [];
-            let internal_reqs = [];
-            let external_reqs = [];
-            for(let i=0;i<jobs.length;i++){
-                if(jobs[i]['requistions']['type'] =='Internal'){
-                    let reqs_internal = JSON.parse(jobs[i]['requistions']['inventory_items_internal']); 
-                       for(let k=0;k<reqs_internal.length;k++){
-                        this.requistions.push({
-                            'Item Code': this.parts.find(p => p.id ==reqs_internal[k]['part']).code,               
-                            'Item Description': this.parts.find(p => p.id ==reqs_internal[k]['part']).description,
-                            'Reference': jobs[i]['Reference'],
-                            'Quantity': reqs_internal[k]['quantity'],
-                            'Unit Cost': reqs_internal[k]['unit_cost'],
-                            'Amount': reqs_internal[k]['total_cost'],
-                            'Project': this.projects.find(p => jobs[i]['requistions']['project_id'] == p.id).name,
-                        })
-                       }         
-                      
-                } 
-                  else if(jobs[i]['requistions']['type'] =='External'){
-                    let reqs_external = JSON.parse(jobs[i]['requistions']['inventory_items_external']); 
-                       for(let k=0;k<reqs_external.length;k++){
-                        this.requistions.push({
-                            'Item Code': this.parts.find(p => p.id ==reqs_external[k]['part']).code,             
-                            'Item Description': this.parts.find(p => p.id ==reqs_external[k]['part']).description,
-                            'Reference': jobs[i]['Reference'],
-                            'Quantity': reqs_external[k]['quantity'],
-                            'Unit Cost': reqs_external[k]['unit_price'],
-                            'Amount': reqs_external[k]['total_price'],
-                            'Project': this.projects.find(p => jobs[i]['requistions']['project_id'] == p.id).name,
-                        })
-                       }         
-                      
-                }         
-
-               }
-                  
-          },1000) 
-          }
+        
         },
         methods:{
+         itemsIssued(){
+          setTimeout(()=>{  
+            for(let i=0;i<this.jobs.length;i++){
+             this.requistions.push({
+                'Date':this.jobs[i]['date'],
+                'Item Code': this.jobs[i]['code'],
+                'Item Description': this.jobs[i]['description'],
+                'Reference': this.jobs[i]['reference'],
+                'Quantity': this.jobs[i]['quantity'],
+                'Unit Cost': this.jobs[i]['unit_cost'],
+                'Amount': this.jobs[i]['amount'],
+                'Project': this.jobs[i]['project']
+             })
+            }          
+                  
+          },1000) 
+          },
             getParts(){
              axios.get('parts')
              .then(res => {

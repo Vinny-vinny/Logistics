@@ -58,6 +58,7 @@ Route::get('import-customers','CustomerController@importCustomers');
 Route::post('job-report','ReportsController@JobReport');
 Route::post('fuel-report','ReportsController@FuelReport');
 Route::post('km-per-hr','ReportsController@KmPerHr');
+Route::post('diesel-analysis','ReportsController@DieselAnalysis');
 
 Route::group([
     'middleware' => 'api',
