@@ -19,7 +19,7 @@
                         </div>
                         <div class="form-group">
                             <label>Req Type</label>
-                            <select class="form-control" v-model="form.type" required>
+                            <select class="form-control select2" v-model="form.type" required>
                                 <option value="Internal">Internal</option>
                                 <option value="External">External</option>
                             </select>
@@ -27,13 +27,15 @@
                         <div class="form-group">
                             <label>Requested By</label>
                             <input type="text" v-model="username" class="form-control" disabled>
-                        </div>
+                        </div>                       
 
                         <div class="form-group">
                             <label>Project</label>
-                            <select class="form-control" v-model="form.project_id" required>
-                                <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
-                            </select>
+                            <model-select :options="projects"
+                            v-model="form.project_id"                                       
+                            placeholder="select Project"
+                            required>
+                            </model-select>                        
                         </div>
                         <div class="form-group">
                             <label>Where to charge</label>
@@ -42,9 +44,13 @@
                        <!--  <v-select v-model="selected" :options="['Vue.js','React']"></v-select> -->
                         <div class="form-group">
                             <label>Stk Group</label>
-                            <select v-model="form.group_name" class="form-control" required @change="selectedGroup()">
-                                <option :value="group.name" v-for="group in stk_groups" :key="group.id">{{group.name}}-{{group.description}}</option>
-                            </select>
+                            <model-select :options="stk_groups"
+                            v-model="form.group_name" 
+                            @input="selectedGroup()"                                      
+                            placeholder="select category"
+                            required>
+                            </model-select>
+
                         </div>
                         <div class="form-group" v-if="form.type==='Internal'">
                             <label>Items</label>
@@ -58,12 +64,13 @@
                                     <th></th>
                                 </tr>
                                 <tr v-for="(item,k) in form.inventory_items_internal" :key="k">
-                                    <td><select class="form-control i_p" v-model="item.part" @change="part =item.part">
-                                        <option selected disabled>Select Item</option>
-                                        <option :value="part.id" v-for="part in items" :key="part.id">
-                                            {{part.code}} - {{part.description}}
-                                        </option>
-                                    </select>
+                                      <td>
+                                        <model-select :options="items"
+                                        v-model="item.part" 
+                                        @input="part =item.part"                                 
+                                        class="i_p"
+                                        required>
+                                        </model-select>
                                     </td>
                                     <td><input type="number" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty" @keyup="qty = item.quantity">
@@ -95,12 +102,13 @@
                                     <th></th>
                                 </tr>
                                 <tr v-for="(item,k) in form.inventory_items_external" :key="k">
-                                    <td><select class="form-control i_p" v-model="item.part" @change="part =item.part">
-                                        <option selected disabled>Select Item</option>
-                                        <option :value="part.id" v-for="part in items" :key="part.id">
-                                            {{part.code}} - {{part.description}}
-                                        </option>
-                                    </select>
+                                    <td>
+                                         <model-select :options="items"
+                                        v-model="item.part" 
+                                        @input="part =item.part"                                 
+                                        class="i_p"
+                                        required>
+                                        </model-select>                                      
                                     </td>
                                     <td><input type="number" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty"  @keyup="qty = item.quantity">
@@ -131,7 +139,7 @@
 
 <script>
     import datepicker from 'vuejs-datepicker';
-    import vSelect from 'vue-select';
+     import { ModelSelect } from 'vue-search-select'; 
     export default {
         props:['edit'],
         data(){
@@ -149,15 +157,15 @@
                     id:''
                 },
                 edit_requisition: this.edit,
-                projects:{},
+                projects:[],
                 parts:{},
                 qty:'',
                 part:'',
                 unit_price:'',
                 users:{},
                 username:User.name(),
-                stk_groups:{},
-                items:{},
+                stk_groups:[],
+                items:[],
                 initial_unit_cost:''
             }
         },
@@ -166,7 +174,12 @@
             this.getProjects();
             this.getParts();
             this.getUsers();
-            this.getGroups();
+            this.getGroups();        
+           
+         // console.log( this.itemId)
+        },
+        mounted(){
+         // this.callSelect2()
         },
         watch:{
             getExpenses(){
@@ -197,7 +210,8 @@
                 }
             }
         },
-        computed:{            
+        computed:{         
+                        
           getExpenses(){
             return [this.part,this.qty,this.form.inventory_items_internal].join();
           },
@@ -206,19 +220,30 @@
             }
         },
 
-        methods:{
-            costing(cost){
-            console.log(cost);
+        methods:{         
+                 
+            costing(cost){          
             return cost;
             },
             selectedGroup(){
-              this.items = this.parts.filter(item => item.item_group == this.form.group_name);
+             let items = this.parts.filter(item => item.item_group == this.form.group_name);
+            items.forEach(p => {
+                this.items.push({
+                    'value': p.id,
+                    'text': p.code +'-'+p.description
+                })
+            })             
 
             },
             getGroups(){
                 axios.get('stk-groups')
                 .then(res => {
-                    this.stk_groups = res.data
+                    res.data.forEach(stk => {
+                        this.stk_groups.push({
+                            'value': stk.name,
+                            'text': stk.name +'-'+stk.description
+                        })
+                    })                  
                 })
             },
             getUsers(){
@@ -230,7 +255,7 @@
             getParts(){
               axios.get('parts')
                   .then(parts => {
-                      this.parts = parts.data
+                      this.parts = parts.data;                
                   })
             },
             convertDate(str) {
@@ -244,9 +269,10 @@
             },
             addItem() {
                 this.form.inventory_items_internal.push({part: '', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:''});
+                 this.callSelect2()
             },
             removeItemExternal(i) {
-                this.form.inventory_items_internal.splice(i, 1);
+             this.form.inventory_items_internal.splice(i, 1);
             },
             addItemExternal() {
                 this.form.inventory_items_external.push({part: '', quantity: '',unit_price:'',total_price:'',total_price_inclusive:''});
@@ -254,7 +280,13 @@
             getProjects(){
               axios.get('asset-category')
                   .then(project => {
-                      this.projects = project.data;
+                    project.data.forEach(p => {
+                     this.projects.push({
+                        'value': p.id,
+                        'text': p.name
+                     })
+                    })
+                      
                   })
             },
             saveRequisition(){
@@ -297,36 +329,22 @@
             },
             listen(){
                 if (this.edit){
-                    this.form = this.$store.state.requisitions;
-                    axios.get(`users/${this.form.requested_by}`)
-                    .then(res =>{
-                       this.username = res.data.name;
-                    })
-                    if (this.form.type === 'Internal'){
-                        this.form.inventory_items_internal = JSON.parse(this.form.inventory_items_internal);
-                    }
-                    else if (this.form.type === 'External'){
-                        this.form.inventory_items_external = JSON.parse(this.form.inventory_items_external);
-                    }
-                else {
-                        this.form.inventory_items_internal= [{part: '', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:''}];
-                        this.form.inventory_items_external= [{part: '', quantity: '',unit_price:'',total_price:'',total_price_inclusive:''}];
-                    }
-                  setTimeout(()=>{                     
-                      this.items = this.parts.filter(item => item.item_group == this.form.group_name);
-                  },1000)
+                    this.form = this.$store.state.requisitions;                    
+                   setTimeout(()=>{
+                   this.selectedGroup(); 
+                   },1000)                
                 }
 
-            },
+            },       
         },
         components:{
             datepicker,
-            vSelect
+            ModelSelect
         }
     }
 </script>
 
-<style scoped>
+<style>
 .remove_2, .add_2{
     margin-left: 25px;
 }
@@ -336,4 +354,7 @@
     .p_in_2{
         margin-left: 15px;
     }
+   .i_p{
+    width: 250px !important;
+   }
 </style>

@@ -109,12 +109,11 @@
                                     <datepicker v-model="form.warranty"></datepicker>
                                 </div>
                                 <div class="form-group">
-                                    <label>Assign To</label>
-                                    <select name="assign_to" id="assign_to" v-model="form.assign_to"
-                                            class="form-control select2">
-                                        <option :value="user.id" v-for="user in users" :key="user.id">{{user.name}}
-                                        </option>
-                                    </select>
+                                    <label>Assign To</label>                                  
+                                     <model-select :options="users"
+                                        v-model="form.assign_to"                      
+                                        required>
+                                        </model-select>  
                                  </div>
                                 <div class="form-group">
                                     <label>Fuel Type</label>
@@ -136,8 +135,8 @@
 </template>
 <script>
     import datepicker from 'vuejs-datepicker';
-    import Multiselect from 'vue-multiselect';
-    import 'vue-multiselect/dist/vue-multiselect.min.css';
+    import Multiselect from 'vue-multiselect';    
+    import { ModelSelect } from 'vue-search-select'; 
     export default {
         props: ['edit'],
         data() {
@@ -170,7 +169,7 @@
                 track_type: '',
                 edit_machine: this.edit,
                 tracks: {},
-                users: {},
+                users: [],
                 show_file: false,
                 service_types:[],
                 services:[],
@@ -365,7 +364,12 @@
             getUsers() {
                 axios.get('users')
                     .then(users => {
-                        this.users = users.data
+                        users.data.forEach(u =>{
+                            this.users.push({
+                                'value': u.id,
+                                'text': u.name
+                            })
+                        })                        
                     });
             },
             listen() {
@@ -402,7 +406,8 @@
         },
         components:{
             datepicker,
-            Multiselect
+            Multiselect,
+            ModelSelect
         }
     }
 </script>

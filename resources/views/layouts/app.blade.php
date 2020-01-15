@@ -3,6 +3,7 @@
 <!-- Scripts -->
 @include('layouts.admin-lite.includes.head')
 <body class="sidebar-mini skin-blue">
+	
 {{--@include('layouts.admin-lite.includes.top-nav')--}}
 <!-- Left side column. contains the logo and sidebar-->
 {{--@include('layouts.admin-liloginte.includes.sidebar')--}}

@@ -25,7 +25,7 @@ import customers from "../components/customers/Index";
 import Mechanics from "../components/mechanics/Index";
 import JobType from "../components/maintenance/jobtypes/Index";
 import Types from "../components/fuels/types/Index";
-import Requisition from "../components/requisitions/Requisition";
+import Requisition from "../components/requisitions/Index";
 import JobCardForm from "../components/maintenance/jobcard/JobCardForm";
 import ShowRequisition from "../components/requisitions/ShowRequisition";
 import RequisitionForm from "../components/requisitions/RequisitionForm";

@@ -11,7 +11,7 @@
 
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/css/bootstrap-toggle.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/css/bootstrap-toggle.min.css')}}">  
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{asset('assets/fonts/font-awesome.min.css')}}">

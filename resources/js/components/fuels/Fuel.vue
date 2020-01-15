@@ -12,19 +12,20 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Project</label>
-                                    <select v-model="form.asset_category_id" required class="form-control" @change="subProject()">
-                                        <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
-                                    </select>
+                                    <label>Project</label>                                   
+                                      <model-select :options="projects"
+                                        v-model="form.asset_category_id"  
+                                        @input="subProject()"                    
+                                        required>
+                                        </model-select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Vehicle</label>
-                                    <select name="vehicle_id" class="form-control" v-model="form.vehicle_id"
-                                            @change="getFuelType()" required>
-                                        <option :value="vehicle.id" v-for="vehicle in subprojects" :key="vehicle.id">
-                                          {{vehicle.code}}
-                                        </option>
-                                    </select>
+                                    <label>Vehicle</label>                                   
+                                      <model-select :options="subprojects"
+                                        v-model="form.vehicle_id"  
+                                        @input="getFuelType()"                    
+                                        required>
+                                        </model-select>
                                 </div>
                                 <div class="form-group">
                                     <label>Fuel On</label>
@@ -95,10 +96,11 @@
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customer">
-                                    <label>Customer</label>
-                                    <select class="form-control" v-model="form.customer_id" required>
-                                        <option :value="customer.id" v-for="customer in filtered_customers" :key="customer.id">{{customer.name}}</option>
-                                    </select>
+                                    <label>Customer</label>                                   
+                                      <model-select :options="filtered_customers"
+                                        v-model="form.customer_id"                         
+                                        required>
+                                        </model-select>
                                 </div>
                                 <div class="form-group">
                                     <label>Authorized By</label>
@@ -124,6 +126,7 @@
 </template>
 <script>
     import datepicker from 'vuejs-datepicker';
+    import { ModelSelect } from 'vue-search-select'; 
     export default {
         props: ['edit', 'other_fuel', 'add_fuel'],
         data() {
@@ -170,8 +173,8 @@
                 fuels:{},
                 jobs:{},
                 username:User.name(),
-                projects:{},
-                subprojects:{},
+                projects:[],
+                subprojects:[],
                 stks:{}
             }
         },
@@ -234,16 +237,25 @@
             
             },
             subProject(){
-            this.subprojects = {};
-            this.subprojects = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
-            console.log('walla')          
-            
-
+                this.subprojects =[];
+             let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+             subp.forEach(p => {
+                this.subprojects.push({
+                    'value': p.id,
+                    'text': p.code
+                })
+             })
             },
             getProjects(){
               axios.get('asset-category')
               .then(res => {
-                  this.projects = res.data;
+                res.data.forEach(p => {
+                    this.projects.push({
+                        'value': p.id,
+                        'text': p.name
+                    })
+                })
+                 
               })
             },
             getFuels(){
@@ -268,20 +280,20 @@
             setTimeout(()=>{
                 let item =this.stks.find(s => s.id == this.form.fuel_type_id);
                 this.form.rate = item.cost;
-                this.fuel_type = item.description;
-                console.log(this.form.rate);
+                this.fuel_type = item.description;              
             },100)
 
             },
             customerTypes(){
                 this.filtered_customers = [];
-                    this.show_customer = true;
-                    console.log(this.form.customer_type_id)
-                    for (let i = 0; i < this.customers.length; i++) {
-                        if (this.customers[i]['customer_type_id'] === this.form.customer_type_id) {
-                            this.filtered_customers.push(this.customers[i]);
-                        }
-                    }
+                this.show_customer = true;
+                let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);              
+                 customers.forEach(c => {
+                    this.filtered_customers.push({
+                        'value': c.id,
+                        'text': c.name
+                    })
+                 })                 
 
             },
             genExpenses(){
@@ -396,30 +408,20 @@
                     .then(res => {
                         this.username = res.data.name;
                     })
-                    this.editedCustomers();
-                    this.form.asset_type ==='other' ? this.other =true : this.company = true;        
-                     this.subprojects = {};
+                    
+                    this.form.asset_type ==='other' ? this.other =true : this.company = true;
                      
-                   setTimeout(()=>{
-                    this.subprojects = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+                   setTimeout(()=>{                    
+                    this.subProject();
+                    this.customerTypes();
                    },1000)
                 }
             },
-            editedCustomers(){
-                axios.get('customers')
-                    .then(customers => {
-                        this.filtered_customers = [];
-                        this.show_customer = true
-                        for (let i =0; i < customers.data.length; i++){
-                            if (customers.data[i]['customer_type_id'] === this.form.customer_type_id){
-                                this.filtered_customers.push(customers.data[i]);
-                            }
-                        }
-                    })
-            }
+           
         },
         components: {
-            datepicker
+            datepicker,
+            ModelSelect
         }
     }
 </script>

@@ -46,26 +46,17 @@
                 tableData: [],
                 add_part: false,
                 editing: false,
-                importing:false,
-                warehouses:{},
+                importing:false,              
                 warehouse:'',
                 show_warehouse:false
             }
         },
         created(){
             this.listen();
-            this.getParts();
-            this.getWarehouses();
+            this.getParts();         
         },
       
-        methods:{
-            getWarehouses(){
-              axios.get('warehouse')
-                  .then(res => {
-                     this.warehouses = res.data
-
-                  })
-            },
+        methods:{           
             importParts(){
                 this.importing = true;
                 axios.get(`import-parts`)
