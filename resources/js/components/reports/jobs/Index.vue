@@ -65,102 +65,26 @@
 
         },
         computed:{
-            items(){
+            jobs(){
           return this.$store.state.jobs; 
-            },
-          jobs(){          
-             
-            setTimeout(()=>{
-             let jobs =this.items.filter(j => j.requistion_id !==null);
-              //console.log(jobs)
-            let internal_reqs = [];
-            let external_reqs = [];          
-            let requistions = []; 
-            jobs.forEach(j => {
-                if (j.requisitions !==null) {                 
-                  if (j.requisitions.type =='Internal') {                   
-                   internal_reqs.push(j.requisitions['inventory_items_internal']);
-                  }
-                }
-                
-            })
-
-            internal_reqs.forEach(h => console.log(h))
-            //console.log(internal_reqs)
-            // jobs.map(job => {
-            //     console.log(job.requisitions);
-            //     if (job.requisitions.type =='Internal') {
-            //       //job.requisitions.inventory_items_internal.forEach(l => console.log('wee'));
-            //     }
-            // })
-           // console.log(internal_reqs);
-            //  for(let p=0;p<jobs.length;p++){  
-            // console.log(jobs[p]['requisitions']['type']); 
-
-            //    if(jobs[p]['requisitions']['type'] =='Internal'){ 
-
-            //        let reqs_internal = jobs[p]['requisitions']['inventory_items_internal'];
-            //        console.log(reqs_internal) 
-            //           reqs_internal.forEach(s => console.log(s));
-                   //  reqs_internal.forEach(k => {
-                   //    console.log('oooo')
-                   //    console.log(k)
-                   //     requistions.push({
-                   //          'date': jobs[p]['start_date'], 
-                   //          'code': this.parts.find(pa => pa.id ==k.part).code,               
-                   //          'description': this.parts.find(pa => pa.id ==k.part).description,
-                   //          'reference': jobs[p]['card_no'],
-                   //          'quantity': k.quantity,
-                   //          'unit_cost': k.unit_cost,
-                   //          'amount': k.total_cost,
-                   //          'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
-                   //      })
-                           
-                   // })                      
-                   
-               // }
-                
-
-                //  else if(jobs[p]['requisitions']['type'] =='External'){                
-                //     let external_reqs = jobs[p]['requisitions']['inventory_items_external']; 
-                //        for(let k=0;k<external_reqs.length;k++){
-                //         requistions.push({
-                //             'date': jobs[p]['start_date'],
-                //             'code': this.parts.find(pa => pa.id ==external_reqs[k]['part']).code,               
-                //             'description': this.parts.find(pa => pa.id ==external_reqs[k]['part']).description,
-                //            'reference': jobs[p]['card_no'],
-                //             'quantity': external_reqs[k]['quantity'],
-                //             'unit_cost': external_reqs[k]['unit_price'],
-                //             'amount': external_reqs[k]['total_price'],
-                //             'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
-                //         })
-                //        }                        
-                      
-                // }         
-               
-               
-                 // }
-                  return requistions;
-            },2000)
-          }
+            },         
         
         },
         methods:{
-         itemsIssued(){
-            return [];
+         itemsIssued(){         
           setTimeout(()=>{  
-            // for(let i=0;i<this.jobs.length;i++){
-            //  this.requistions.push({
-            //     'Date':this.jobs[i]['date'],
-            //     'Item Code': this.jobs[i]['code'],
-            //     'Item Description': this.jobs[i]['description'],
-            //     'Reference': this.jobs[i]['reference'],
-            //     'Quantity': this.jobs[i]['quantity'],
-            //     'Unit Cost': this.jobs[i]['unit_cost'],
-            //     'Amount': this.jobs[i]['amount'],
-            //     'Project': this.jobs[i]['project']
-            //  })
-            // }          
+            for(let i=0;i<this.jobs.length;i++){
+             this.requistions.push({
+                'Date':this.jobs[i]['date'],
+                'Item Code': this.jobs[i]['code'],
+                'Item Description': this.jobs[i]['description'],
+                'Reference': this.jobs[i]['reference'],
+                'Quantity': this.jobs[i]['quantity'],
+                'Unit Cost': this.jobs[i]['unit_cost'],
+                'Amount': this.jobs[i]['amount'],
+                'Project': this.jobs[i]['project']
+             })
+            }          
                   
           },1000) 
           },

@@ -49,6 +49,7 @@ Route::apiResource('mechanics','MechanicsController');
 Route::apiResource('requisitions','RequisitionController');
 Route::apiResource('checklist-tool','ChecklistToolController');
 Route::post('generate-requisition','RequisitionController@autoGenerate');
+Route::get('item-requisition','RequisitionController@itemRequisitions');
 Route::apiResource('stk-groups','StkCategoryController');
 Route::apiResource('job-types','JobTypesController');
 Route::apiResource('transactions','TransactionController');

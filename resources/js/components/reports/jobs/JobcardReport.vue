@@ -76,83 +76,52 @@
             
             let internal_reqs = [];
             let external_reqs = [];          
-            let requistions = []; 
-            jobs.forEach(j => {
-                if (j.requisitions !==null) {                 
-                  if (j.requisitions.type =='Internal') {                   
-                   internal_reqs.push(j.requisitions['inventory_items_internal']);
+            let requistions = [];
+            for(let p=0;p<jobs.length;p++){
+              if (jobs[p]['requisitions'] !==null) {
+               // console.log(jobs[n]['requisitions'])
+                if (jobs[p]['requisitions']['type'] =='Internal') {
+                  let int_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_internal']);
+                   
+                  for(let k=0;k<int_reqs.length;k++){ 
+                                 
+                       requistions.push({
+                            'date': jobs[p]['start_date'], 
+                            'code': this.parts.find(pa => pa.id ==int_reqs[k]['part']).code,               
+                            'description': this.parts.find(pa => pa.id ==int_reqs[k]['part']).description,
+                            'reference': jobs[p]['card_no'],
+                            'quantity': int_reqs[k]['quantity'],
+                            'unit_cost': int_reqs[k]['unit_cost'],
+                            'amount': int_reqs[k]['total_cost'],
+                            'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
+                        })
+            
                   }
-                  if (j.requisitions.type =='External') {                   
-                   external_reqs.push(j.requisitions['inventory_items_external']);
-                  }
+               
                 }
-
-if (external_reqs.length > 0) {
-  console.log('yuuuu')
-              external_reqs.forEach(k => {
-
-                  // requistions.push({
-                  //           'date': jobs[j]['start_date'], 
-                  //           'code': this.parts.find(pa => pa.id ==k.part).code,               
-                  //           'description': this.parts.find(pa => pa.id ==k.part).description,
-                  //           'reference': jobs[j]['card_no'],
-                  //           'quantity': k.quantity,
-                  //           'unit_cost': k.unit_cost,
-                  //           'amount': k.total_cost,
-                  //           'project': this.projects.find(pro => jobs[j]['requisitions']['project_id'] == pro.id).name,
-                  //       })
-
-                  requistions.push({
-                    'part': k['part'] 
-                  });
-                  console.log('--test--')
-                 console.log(k);
-                   console.log('--end test')
-              });
-
-           }
-           // if (internal_reqs.length > 0) {
-           //    internal_reqs.forEach(k => {
-           //       requistions.push({
-           //                  'date': jobs[j]['start_date'], 
-           //                  'code': this.parts.find(pa => pa.id ==k.part).code,               
-           //                  'description': this.parts.find(pa => pa.id ==k.part).description,
-           //                  'reference': jobs[j]['card_no'],
-           //                  'quantity': k.quantity,
-           //                  'unit_cost': k.unit_cost,
-           //                  'amount': k.total_cost,
-           //                  'project': this.projects.find(pro => jobs[j]['requisitions']['project_id'] == pro.id).name,
-           //              })
-           //    });
-           //  }
+                 
+                if (jobs[p]['requisitions']['type'] =='External') {
+                  let ex_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_external']);
+                  for(let k=0;k<ex_reqs.length;k++){
+                       requistions.push({
+                            'date': jobs[p]['start_date'], 
+                            'code': this.parts.find(pa => pa.id ==ex_reqs[k]['part']).code,               
+                            'description': this.parts.find(pa => pa.id ==ex_reqs[k]['part']).description,
+                            'reference': jobs[p]['card_no'],
+                            'quantity': ex_reqs[k]['quantity'],
+                            'unit_cost': ex_reqs[k]['unit_price'],
+                            'amount': ex_reqs[k]['total_price'],
+                            'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
+                        })
             
-            //  console.log(requistions)  
-            })
+                  }
+              
+                }
+              }
 
-            // if (internal_reqs.length > 0) {
-            //   internal_reqs.forEach(k => {
-            //            requistions.push({
-            //                 'date': jobs[p]['start_date'], 
-            //                 'code': this.parts.find(pa => pa.id ==k.part).code,               
-            //                 'description': this.parts.find(pa => pa.id ==k.part).description,
-            //                 'reference': jobs[p]['card_no'],
-            //                 'quantity': k.quantity,
-            //                 'unit_cost': k.unit_cost,
-            //                 'amount': k.total_cost,
-            //                 'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
-            //             })
-            //   });
-            // }
-           console.log('--internal_reqs---')
-            
-            console.log('--end internal reqs--')
-
-            console.log('--external reqs--')
-              external_reqs.forEach(ex => console.log(ex));
-            console.log('--end reqs--')
-
-                 //  this.$store.dispatch('listJobReports',res.data) 
-                 // this.show_job = true;
+            }  
+                 this.$store.dispatch('listJobReports',requistions) 
+                 this.show_job = true;
                  
 
                   })

@@ -332,7 +332,7 @@
                     this.form = this.$store.state.requisitions;                    
                    setTimeout(()=>{
                    this.selectedGroup(); 
-                   },1000)                
+                   },2000)                
                 }
 
             },       
