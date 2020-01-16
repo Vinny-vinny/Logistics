@@ -41,17 +41,22 @@ class JobcardController extends Controller
     public function store(Request $request)
     {           
      
-        $request['time_in'] = Carbon::parse($request->time_in)->format('H:i');
-        $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
+       
+        $request['maintenance'] = json_encode($request->get('maintenance'));
+        $request->time_in !== '' && $request->time_in !== null ? $request['time_in'] = Carbon::parse($request->time_in)->format('H:i') : '';
+          $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
         $card_no = Jobcard::count()+1;
-        $request['card_no'] =  substr('LEWA-' . $card_no . '-' . Machine::find($request->machine_id)->code, 0, 20);
+        $request['card_no'] = 'Job00'.$card_no;
         $jobcard = Jobcard::create($request->except(['files']));
-        Machine::find($jobcard->machine_id)->update([
+        if ($jobcard->machine_id) {
+            Machine::find($jobcard->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),
             'next_service_date' => $request->get('next_service_date'),
             'fuel_balance_id' => $request->get('fuel_balance_id'),
         ]);
+        }
+     
         $request->requisition_id ? Requisition::find($request->requisition_id)->update(['used' => 1]) : '';
         return response()->json(new JobcardResource($jobcard));
     }
@@ -89,18 +94,23 @@ class JobcardController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request['time_in'] = Carbon::parse($request->time_in)->format('H:i');
-        $request['time_out'] = Carbon::parse($request->time_out)->format('H:i');
-        $request['card_no'] = substr('LEWA-' . $id . '-' . Machine::find($request->machine_id)->code, 0, 20);
-
+        $request->time_in !== '' && $request->time_in !== null ? $request['time_in'] = Carbon::parse($request->time_in)->format('H:i') : '';
+          $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
+               
+        $request['maintenance'] = json_encode($request->get('maintenance'));
+     
         $jobcard = Jobcard::find($id);
+        $request['card_no'] = 'Job00'.$id;
         $jobcard->update($request->except(['service_types','files','driver','machine','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist','cost_center','requisitions']));
-        Machine::find($request->machine_id)->update([
+        if ($request->machine_id) {
+             Machine::find($request->machine_id)->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),
             'next_service_date' => $request->get('next_service_date'),
             'fuel_balance_id' => $request->get('fuel_balance_id'),
         ]);
+        }
+      
       $request->requisition_id ? Requisition::find($request->requisition_id)->update(['used' => 1]) : '';
         return response()->json(new JobcardResource(Jobcard::find($id)));
     }

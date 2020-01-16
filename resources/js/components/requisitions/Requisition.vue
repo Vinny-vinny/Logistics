@@ -72,7 +72,7 @@
                                         required>
                                         </model-select>
                                     </td>
-                                    <td><input type="number" class="form-control qty" v-model="item.quantity"
+                                    <td><input type="text" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty" @keyup="qty = item.quantity">
                                     </td>
                                     <td><input type="number" class="form-control p_in" step="0.001" v-model="item.unit_cost"
@@ -181,11 +181,24 @@
         mounted(){
          // this.callSelect2()
         },
+
         watch:{
-            getExpenses(){
+            qty(){
+            
+            if (isNaN(parseFloat(this.qty)) && !isFinite(this.qty) && this.qty < 0) {
+              console.log('qqtyy....') 
+              this.qty = 1; 
+            }
+
+            },
+            getExpenses(){                
+               
                 for (let p=0; p < this.parts.length; p++){
                     for (let i=0; i < this.form.inventory_items_internal.length; i++){
                         if (this.form.inventory_items_internal[i]['quantity'] !=='' && this.form.inventory_items_internal[i]['part'] !==''){
+                            if(this.form.inventory_items_internal[i]['quantity'] < 0 || (isNaN(parseFloat(this.form.inventory_items_internal[i]['quantity'])) && !isFinite(this.form.inventory_items_internal[i]['quantity']))){
+                               this.form.inventory_items_internal[i]['quantity'] = 1; 
+                            }
                             if (this.form.inventory_items_internal[i]['part'] === this.parts[p]['id']){
                                 this.form.inventory_items_internal[i]['unit_cost'] = this.parts[p]['cost'];
                                 this.form.inventory_items_internal[i]['total_cost_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.inventory_items_internal[i]['quantity']).toFixed(2);
@@ -220,10 +233,12 @@
             }
         },
 
-        methods:{         
-                 
+        methods:{                   
             costing(cost){          
             return cost;
+            },
+            checkQty(n){
+            return !isNaN(parseFloat(n)) && isFinite(n);
             },
             selectedGroup(){
              let items = this.parts.filter(item => item.item_group == this.form.group_name);
@@ -269,7 +284,7 @@
             },
             addItem() {
                 this.form.inventory_items_internal.push({part: '', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:''});
-                 this.callSelect2()
+               
             },
             removeItemExternal(i) {
              this.form.inventory_items_internal.splice(i, 1);

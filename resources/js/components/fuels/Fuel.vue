@@ -197,6 +197,14 @@
 
         },
        watch:{
+        numConversion(){
+         if(this.form.odometer_readings < 0 || (isNaN(parseFloat(this.form.odometer_readings)) && !isFinite(this.form.odometer_readings))){
+             this.form.odometer_readings = 1; 
+            }
+             if(this.form.litres < 0 || (isNaN(parseFloat(this.form.litres)) && !isFinite(this.form.litres))){
+             this.form.litres = 1; 
+            }
+        },
          'form.vehicle_id'(){
              this.jobs = {};
              axios.get('job-card')
@@ -214,6 +222,9 @@
             });
         },
         computed: {
+            numConversion(){
+            return [this.form.odometer_readings,this.form.litres].join();
+            },
             totalAmount() {
                 let total = this.form.rate * this.form.litres;
                 return this.total = total;

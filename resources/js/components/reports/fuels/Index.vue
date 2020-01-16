@@ -70,7 +70,7 @@
              for(let i=0;i<this.fuels.length;i++){
               this.daily_issues.push({
                 'Date': this.fuels[i]['date'],
-                'Item Code': this.fuels[i]['code'],
+                'Item Code': this.fuels[i]['item_code'],
                 'Item Description': this.fuels[i]['description'],
                 'Reference': this.fuels[i]['reference'],
                 'Quantity': this.fuels[i]['quantity'],

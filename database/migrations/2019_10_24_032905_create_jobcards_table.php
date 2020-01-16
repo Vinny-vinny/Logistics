@@ -15,8 +15,8 @@ class CreateJobcardsTable extends Migration
     {
         Schema::create('jobcards', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('machine_id');
-            $table->integer('track_by_id');
+            $table->integer('machine_id')->nullable();
+            $table->integer('track_by_id')->nullable();
             $table->integer('service_type_id')->nullable();
             $table->string('service_type')->nullable();
             $table->float('next_readings')->nullable()->default(0);
