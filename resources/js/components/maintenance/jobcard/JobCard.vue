@@ -30,10 +30,10 @@
                                     <model-select :options="subprojects"
                                         v-model="form.machine_id"  
                                         @input="getAssetDetails()"                    
-                                        required>
+                                        >
                                         </model-select> 
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" v-if="this.form.machine_id">
                                     <label>Track By:</label> {{track_name}}
                                 </div>
                                 <div class="form-group">
@@ -44,9 +44,9 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" v-if="this.form.machine_id">
                                     <label>Job Type</label>
-                                    <select class="form-control" required v-model="form.job_type_id">
+                                    <select class="form-control"  v-model="form.job_type_id">
                                         <option :value="job_type.id" v-for="job_type in job_types" :key="job_type.id">
                                             {{job_type.name}} - {{job_type.currency}} {{job_type.hourly_rate}}
                                         </option>
@@ -54,7 +54,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Customer Type</label>
-                                    <select class="form-control" v-model="form.customer_type_id" required
+                                    <select class="form-control" v-model="form.customer_type_id" 
                                             @change="customerType()">
                                         <option :value="type.id" v-for="type in customer_types" :key="type.id">
                                             {{type.name}}
@@ -65,14 +65,14 @@
                                     <label>Customer</label>                                   
                                     <model-select :options="filtered_customers"
                                         v-model="form.customer_id"                           
-                                        required>
+                                        >
                                         </model-select>
                                 </div>
                                 <div class="form-group">
                                     <label>Mechanic</label>
                                         <model-select :options="mechanics"
                                         v-model="form.mechanic_id"                           
-                                        required>
+                                        >
                                         </model-select>
                                 </div>
                             </div>
@@ -88,16 +88,16 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Cost Code</label>
-                                    <input type="text" class="form-control" v-model="form.cost_code" required>
+                                    <input type="text" class="form-control" v-model="form.cost_code">
                                 </div>
                                 <div class="form-group">
                                     <label>Servicing Date</label>
-                                    <datepicker v-model="form.actual_date" required></datepicker>
+                                    <datepicker v-model="form.actual_date"></datepicker>
 
                                 </div>
                                 <div class="form-group">
                                     <label>Servicing Time In</label>
-                                    <input type="text" v-model="form.time_in" class="form-control time_in" required>
+                                    <input type="text" v-model="form.time_in" class="form-control time_in">
 
                                 </div>
                                 <div class="form-group">
@@ -114,10 +114,10 @@
                                 <div class="form-group">
                                     <label>Next Service Date</label>
                                     <datepicker v-model="form.next_service_date" ref="nextServiceDate"
-                                                required></datepicker>
+                                                ></datepicker>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" v-if="this.form.machine_id">
                                 <div class="form-group">
                                     <label>Make & Model: </label> {{make}}
                                 </div>
@@ -127,7 +127,7 @@
                                 <div class="form-group">
                                     <label>Fuel Balance(L)</label>
                                     <select name="fuel_balance_id" class="form-control" v-model="form.fuel_balance_id"
-                                            required>
+                                            >
                                         <option :value="bal.id" v-for="bal in balances" :key="bal.id">{{bal.litres}}
                                         </option>
                                     </select>
@@ -139,17 +139,17 @@
                                     <label>Current {{track_name}} Readings</label>
 
                                     <input type="number" step="0.001" class="form-control"
-                                           v-model="form.current_readings" required>
+                                           v-model="form.current_readings">
                                     <br>
                                     <label>Actual {{track_name}} Covered: {{actualMileage ? actualMileage : 0}}</label>
                                 </div>
                                 <div class="form-group" v-if="show_track_by">
                                     <label>Next {{track_name}} Maintenance</label>
                                     <input type="number" step="0.001" class="form-control" v-model="form.next_readings"
-                                           required :disabled="!show_next_readings">
+                                            :disabled="!show_next_readings">
                                 </div>                            
 
-                                <div class="form-group">
+                                <div class="form-group" v-if="this.form.machine_id">
                                     <label>Lobour Cost</label>
                                     <input type="text" class="form-control" v-model="form.labour_cost" disabled>
                                 </div>
@@ -434,8 +434,11 @@
                      axios.get('job-types')
                         .then(res => {
                             this.job_types = res.data;
-                            let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
-                            this.form.labour_cost = time_in_minutes / 60 * cost;
+                            if (this.form.job_type_id) {
+                              let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
+                            this.form.labour_cost = time_in_minutes / 60 * cost;  
+                            }
+                            
                         })
 
                     }
@@ -548,13 +551,16 @@
                 this.filtered_customers = [];
                 this.show_customers = true; 
                setTimeout(()=>{
-               let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
+                if (this.form.customer_type_id) {
+                      let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
                  customers.forEach(cus => {
                     this.filtered_customers.push({
                         'value': cus.id,
                         'text': cus.name
                     })
                  }); 
+                }
+             
                },500)              
             },
             getCustomers() {
@@ -714,9 +720,6 @@
                 }
                
 
-                if (this.form.next_service_date === '') {
-                    return this.$toastr.e('Next service date is required.');
-                }
                 this.edit_jobcard ? this.update() : this.save();
 
             },
@@ -726,12 +729,11 @@
             saveJob() {
                 delete this.form.id;
                 this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : ''
-                this.form.next_service_date = this.convertDate(this.form.next_service_date);
-                this.form.actual_date = this.convertDate(this.form.actual_date);
-                this.form.maintenance = JSON.stringify(this.form.maintenance);
-
+                this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : ''
+                this.form.actual_date !== '' ? this.form.actual_date = this.convertDate(this.form.actual_date) : ''
+               
                 axios.post('job-card', this.form).then(res => {
-                    
+                     console.log('cooll')
                     this.$toastr.s('Jobcard created Successfully.');
                     eventBus.$emit('listJobcards', res.data)
                 })
@@ -744,10 +746,10 @@
                 return [date.getFullYear(), mnth, day].join("-");
             },
             update() {
-                this.form.next_service_date = this.convertDate(this.form.next_service_date);
-                this.form.actual_date = this.convertDate(this.form.actual_date);
-                this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
-                this.form.maintenance = JSON.stringify(this.form.maintenance);
+                // this.form.next_service_date = this.convertDate(this.form.next_service_date);
+                // this.form.actual_date = this.convertDate(this.form.actual_date);
+                // this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
+                // this.form.maintenance = JSON.stringify(this.form.maintenance);
                 axios.patch(`job-card/${this.form.id}`, this.form).then(res => {
                     this.$toastr.s('Jobcard updated Successfully.');
                     eventBus.$emit('updateJobcard', res.data)

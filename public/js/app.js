@@ -3733,6 +3733,15 @@ __webpack_require__.r(__webpack_exports__);
     this.getStk();
   },
   watch: {
+    numConversion: function numConversion() {
+      if (this.form.odometer_readings < 0 || isNaN(parseFloat(this.form.odometer_readings)) && !isFinite(this.form.odometer_readings)) {
+        this.form.odometer_readings = 1;
+      }
+
+      if (this.form.litres < 0 || isNaN(parseFloat(this.form.litres)) && !isFinite(this.form.litres)) {
+        this.form.litres = 1;
+      }
+    },
     'form.vehicle_id': function formVehicle_id() {
       var _this = this;
 
@@ -3753,6 +3762,9 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   computed: {
+    numConversion: function numConversion() {
+      return [this.form.odometer_readings, this.form.litres].join();
+    },
     totalAmount: function totalAmount() {
       var total = this.form.rate * this.form.litres;
       return this.total = total;
@@ -6174,11 +6186,13 @@ __webpack_require__.r(__webpack_exports__);
           axios.get('job-types').then(function (res) {
             _this.job_types = res.data;
 
-            var cost = _this.job_types.find(function (type) {
-              return type.id == _this.form.job_type_id;
-            }).hourly_rate;
+            if (_this.form.job_type_id) {
+              var cost = _this.job_types.find(function (type) {
+                return type.id == _this.form.job_type_id;
+              }).hourly_rate;
 
-            _this.form.labour_cost = time_in_minutes / 60 * cost;
+              _this.form.labour_cost = time_in_minutes / 60 * cost;
+            }
           });
         }
       }
@@ -6305,16 +6319,18 @@ __webpack_require__.r(__webpack_exports__);
       this.filtered_customers = [];
       this.show_customers = true;
       setTimeout(function () {
-        var customers = _this6.customers.filter(function (c) {
-          return c.customer_type_id == _this6.form.customer_type_id;
-        });
-
-        customers.forEach(function (cus) {
-          _this6.filtered_customers.push({
-            'value': cus.id,
-            'text': cus.name
+        if (_this6.form.customer_type_id) {
+          var customers = _this6.customers.filter(function (c) {
+            return c.customer_type_id == _this6.form.customer_type_id;
           });
-        });
+
+          customers.forEach(function (cus) {
+            _this6.filtered_customers.push({
+              'value': cus.id,
+              'text': cus.name
+            });
+          });
+        }
       }, 500);
     },
     getCustomers: function getCustomers() {
@@ -6494,10 +6510,6 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
 
-      if (this.form.next_service_date === '') {
-        return this.$toastr.e('Next service date is required.');
-      }
-
       this.edit_jobcard ? this.update() : this.save();
     },
     save: function save() {
@@ -6508,10 +6520,11 @@ __webpack_require__.r(__webpack_exports__);
 
       delete this.form.id;
       this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
-      this.form.next_service_date = this.convertDate(this.form.next_service_date);
-      this.form.actual_date = this.convertDate(this.form.actual_date);
-      this.form.maintenance = JSON.stringify(this.form.maintenance);
+      this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : '';
+      this.form.actual_date !== '' ? this.form.actual_date = this.convertDate(this.form.actual_date) : '';
       axios.post('job-card', this.form).then(function (res) {
+        console.log('cooll');
+
         _this16.$toastr.s('Jobcard created Successfully.');
 
         eventBus.$emit('listJobcards', res.data);
@@ -6528,10 +6541,10 @@ __webpack_require__.r(__webpack_exports__);
     update: function update() {
       var _this17 = this;
 
-      this.form.next_service_date = this.convertDate(this.form.next_service_date);
-      this.form.actual_date = this.convertDate(this.form.actual_date);
-      this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
-      this.form.maintenance = JSON.stringify(this.form.maintenance);
+      // this.form.next_service_date = this.convertDate(this.form.next_service_date);
+      // this.form.actual_date = this.convertDate(this.form.actual_date);
+      // this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
+      // this.form.maintenance = JSON.stringify(this.form.maintenance);
       axios.patch("job-card/".concat(this.form.id), this.form).then(function (res) {
         _this17.$toastr.s('Jobcard updated Successfully.');
 
@@ -9852,7 +9865,7 @@ __webpack_require__.r(__webpack_exports__);
         for (var i = 0; i < _this.fuels.length; i++) {
           _this.daily_issues.push({
             'Date': _this.fuels[i]['date'],
-            'Item Code': _this.fuels[i]['code'],
+            'Item Code': _this.fuels[i]['item_code'],
             'Item Description': _this.fuels[i]['description'],
             'Reference': _this.fuels[i]['reference'],
             'Quantity': _this.fuels[i]['quantity'],
@@ -10730,95 +10743,27 @@ __webpack_require__.r(__webpack_exports__);
     this.getProjects();
   },
   computed: {
-    items: function items() {
-      return this.$store.state.jobs;
-    },
     jobs: function jobs() {
-      var _this = this;
-
-      setTimeout(function () {
-        var jobs = _this.items.filter(function (j) {
-          return j.requistion_id !== null;
-        }); //console.log(jobs)
-
-
-        var internal_reqs = [];
-        var external_reqs = [];
-        var requistions = [];
-        jobs.forEach(function (j) {
-          if (j.requisitions !== null) {
-            if (j.requisitions.type == 'Internal') {
-              internal_reqs.push(j.requisitions['inventory_items_internal']);
-            }
-          }
-        });
-        internal_reqs.forEach(function (h) {
-          return console.log(h);
-        }); //console.log(internal_reqs)
-        // jobs.map(job => {
-        //     console.log(job.requisitions);
-        //     if (job.requisitions.type =='Internal') {
-        //       //job.requisitions.inventory_items_internal.forEach(l => console.log('wee'));
-        //     }
-        // })
-        // console.log(internal_reqs);
-        //  for(let p=0;p<jobs.length;p++){  
-        // console.log(jobs[p]['requisitions']['type']); 
-        //    if(jobs[p]['requisitions']['type'] =='Internal'){ 
-        //        let reqs_internal = jobs[p]['requisitions']['inventory_items_internal'];
-        //        console.log(reqs_internal) 
-        //           reqs_internal.forEach(s => console.log(s));
-        //  reqs_internal.forEach(k => {
-        //    console.log('oooo')
-        //    console.log(k)
-        //     requistions.push({
-        //          'date': jobs[p]['start_date'], 
-        //          'code': this.parts.find(pa => pa.id ==k.part).code,               
-        //          'description': this.parts.find(pa => pa.id ==k.part).description,
-        //          'reference': jobs[p]['card_no'],
-        //          'quantity': k.quantity,
-        //          'unit_cost': k.unit_cost,
-        //          'amount': k.total_cost,
-        //          'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
-        //      })
-        // })                      
-        // }
-        //  else if(jobs[p]['requisitions']['type'] =='External'){                
-        //     let external_reqs = jobs[p]['requisitions']['inventory_items_external']; 
-        //        for(let k=0;k<external_reqs.length;k++){
-        //         requistions.push({
-        //             'date': jobs[p]['start_date'],
-        //             'code': this.parts.find(pa => pa.id ==external_reqs[k]['part']).code,               
-        //             'description': this.parts.find(pa => pa.id ==external_reqs[k]['part']).description,
-        //            'reference': jobs[p]['card_no'],
-        //             'quantity': external_reqs[k]['quantity'],
-        //             'unit_cost': external_reqs[k]['unit_price'],
-        //             'amount': external_reqs[k]['total_price'],
-        //             'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
-        //         })
-        //        }                        
-        // }         
-        // }
-
-        return requistions;
-      }, 2000);
+      return this.$store.state.jobs;
     }
   },
   methods: {
     itemsIssued: function itemsIssued() {
-      return [];
-      setTimeout(function () {// for(let i=0;i<this.jobs.length;i++){
-        //  this.requistions.push({
-        //     'Date':this.jobs[i]['date'],
-        //     'Item Code': this.jobs[i]['code'],
-        //     'Item Description': this.jobs[i]['description'],
-        //     'Reference': this.jobs[i]['reference'],
-        //     'Quantity': this.jobs[i]['quantity'],
-        //     'Unit Cost': this.jobs[i]['unit_cost'],
-        //     'Amount': this.jobs[i]['amount'],
-        //     'Project': this.jobs[i]['project']
-        //  })
-        // }          
+      var _this = this;
+
+      setTimeout(function () {
+        for (var i = 0; i < _this.jobs.length; i++) {
+          _this.requistions.push({
+            'Date': _this.jobs[i]['date'],
+            'Item Code': _this.jobs[i]['code'],
+            'Item Description': _this.jobs[i]['description'],
+            'Reference': _this.jobs[i]['reference'],
+            'Quantity': _this.jobs[i]['quantity'],
+            'Unit Cost': _this.jobs[i]['unit_cost'],
+            'Amount': _this.jobs[i]['amount'],
+            'Project': _this.jobs[i]['project']
+          });
+        }
       }, 1000);
     },
     getParts: function getParts() {
@@ -10936,6 +10881,8 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     jobCards: function jobCards() {
+      var _this3 = this;
+
       this.form.from = moment(this.form.from).format('YYYY-MM-DD');
       this.form.to = moment(this.form.to).format('YYYY-MM-DD');
 
@@ -10955,85 +10902,86 @@ __webpack_require__.r(__webpack_exports__);
         var internal_reqs = [];
         var external_reqs = [];
         var requistions = [];
-        jobs.forEach(function (j) {
-          if (j.requisitions !== null) {
-            if (j.requisitions.type == 'Internal') {
-              internal_reqs.push(j.requisitions['inventory_items_internal']);
+
+        var _loop = function _loop(p) {
+          if (jobs[p]['requisitions'] !== null) {
+            // console.log(jobs[n]['requisitions'])
+            if (jobs[p]['requisitions']['type'] == 'Internal') {
+              (function () {
+                var int_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_internal']);
+
+                var _loop2 = function _loop2(k) {
+                  requistions.push({
+                    'date': jobs[p]['start_date'],
+                    'code': _this3.parts.find(function (pa) {
+                      return pa.id == int_reqs[k]['part'];
+                    }).code,
+                    'description': _this3.parts.find(function (pa) {
+                      return pa.id == int_reqs[k]['part'];
+                    }).description,
+                    'reference': jobs[p]['card_no'],
+                    'quantity': int_reqs[k]['quantity'],
+                    'unit_cost': int_reqs[k]['unit_cost'],
+                    'amount': int_reqs[k]['total_cost'],
+                    'project': _this3.projects.find(function (pro) {
+                      return jobs[p]['requisitions']['project_id'] == pro.id;
+                    }).name
+                  });
+                };
+
+                for (var k = 0; k < int_reqs.length; k++) {
+                  _loop2(k);
+                }
+              })();
             }
 
-            if (j.requisitions.type == 'External') {
-              external_reqs.push(j.requisitions['inventory_items_external']);
+            if (jobs[p]['requisitions']['type'] == 'External') {
+              (function () {
+                var ex_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_external']);
+
+                var _loop3 = function _loop3(k) {
+                  requistions.push({
+                    'date': jobs[p]['start_date'],
+                    'code': _this3.parts.find(function (pa) {
+                      return pa.id == ex_reqs[k]['part'];
+                    }).code,
+                    'description': _this3.parts.find(function (pa) {
+                      return pa.id == ex_reqs[k]['part'];
+                    }).description,
+                    'reference': jobs[p]['card_no'],
+                    'quantity': ex_reqs[k]['quantity'],
+                    'unit_cost': ex_reqs[k]['unit_price'],
+                    'amount': ex_reqs[k]['total_price'],
+                    'project': _this3.projects.find(function (pro) {
+                      return jobs[p]['requisitions']['project_id'] == pro.id;
+                    }).name
+                  });
+                };
+
+                for (var k = 0; k < ex_reqs.length; k++) {
+                  _loop3(k);
+                }
+              })();
             }
           }
+        };
 
-          if (external_reqs.length > 0) {
-            console.log('yuuuu');
-            external_reqs.forEach(function (k) {
-              // requistions.push({
-              //           'date': jobs[j]['start_date'], 
-              //           'code': this.parts.find(pa => pa.id ==k.part).code,               
-              //           'description': this.parts.find(pa => pa.id ==k.part).description,
-              //           'reference': jobs[j]['card_no'],
-              //           'quantity': k.quantity,
-              //           'unit_cost': k.unit_cost,
-              //           'amount': k.total_cost,
-              //           'project': this.projects.find(pro => jobs[j]['requisitions']['project_id'] == pro.id).name,
-              //       })
-              requistions.push({
-                'part': k['part']
-              });
-              console.log('--test--');
-              console.log(k);
-              console.log('--end test');
-            });
-          } // if (internal_reqs.length > 0) {
-          //    internal_reqs.forEach(k => {
-          //       requistions.push({
-          //                  'date': jobs[j]['start_date'], 
-          //                  'code': this.parts.find(pa => pa.id ==k.part).code,               
-          //                  'description': this.parts.find(pa => pa.id ==k.part).description,
-          //                  'reference': jobs[j]['card_no'],
-          //                  'quantity': k.quantity,
-          //                  'unit_cost': k.unit_cost,
-          //                  'amount': k.total_cost,
-          //                  'project': this.projects.find(pro => jobs[j]['requisitions']['project_id'] == pro.id).name,
-          //              })
-          //    });
-          //  }
-          //  console.log(requistions)  
+        for (var p = 0; p < jobs.length; p++) {
+          _loop(p);
+        }
 
-        }); // if (internal_reqs.length > 0) {
-        //   internal_reqs.forEach(k => {
-        //            requistions.push({
-        //                 'date': jobs[p]['start_date'], 
-        //                 'code': this.parts.find(pa => pa.id ==k.part).code,               
-        //                 'description': this.parts.find(pa => pa.id ==k.part).description,
-        //                 'reference': jobs[p]['card_no'],
-        //                 'quantity': k.quantity,
-        //                 'unit_cost': k.unit_cost,
-        //                 'amount': k.total_cost,
-        //                 'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
-        //             })
-        //   });
-        // }
+        _this3.$store.dispatch('listJobReports', requistions);
 
-        console.log('--internal_reqs---');
-        console.log('--end internal reqs--');
-        console.log('--external reqs--');
-        external_reqs.forEach(function (ex) {
-          return console.log(ex);
-        });
-        console.log('--end reqs--'); //  this.$store.dispatch('listJobReports',res.data) 
-        // this.show_job = true;
+        _this3.show_job = true;
       })["catch"](function (error) {
         return error.response;
       });
     },
     listen: function listen() {
-      var _this3 = this;
+      var _this4 = this;
 
       eventBus.$on('back', function () {
-        _this3.show_job = false;
+        _this4.show_job = false;
       });
     }
   },
@@ -11680,10 +11628,20 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {// this.callSelect2()
   },
   watch: {
+    qty: function qty() {
+      if (isNaN(parseFloat(this.qty)) && !isFinite(this.qty) && this.qty < 0) {
+        console.log('qqtyy....');
+        this.qty = 1;
+      }
+    },
     getExpenses: function getExpenses() {
       for (var p = 0; p < this.parts.length; p++) {
         for (var i = 0; i < this.form.inventory_items_internal.length; i++) {
           if (this.form.inventory_items_internal[i]['quantity'] !== '' && this.form.inventory_items_internal[i]['part'] !== '') {
+            if (this.form.inventory_items_internal[i]['quantity'] < 0 || isNaN(parseFloat(this.form.inventory_items_internal[i]['quantity'])) && !isFinite(this.form.inventory_items_internal[i]['quantity'])) {
+              this.form.inventory_items_internal[i]['quantity'] = 1;
+            }
+
             if (this.form.inventory_items_internal[i]['part'] === this.parts[p]['id']) {
               this.form.inventory_items_internal[i]['unit_cost'] = this.parts[p]['cost'];
               this.form.inventory_items_internal[i]['total_cost_inclusive'] = (this.parts[p]['cost'] * 116 / 100 * this.form.inventory_items_internal[i]['quantity']).toFixed(2);
@@ -11719,6 +11677,9 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     costing: function costing(cost) {
       return cost;
+    },
+    checkQty: function checkQty(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
     },
     selectedGroup: function selectedGroup() {
       var _this = this;
@@ -11779,7 +11740,6 @@ __webpack_require__.r(__webpack_exports__);
         total_cost: '',
         total_cost_inclusive: ''
       });
-      this.callSelect2();
     },
     removeItemExternal: function removeItemExternal(i) {
       this.form.inventory_items_internal.splice(i, 1);
@@ -11854,7 +11814,7 @@ __webpack_require__.r(__webpack_exports__);
         this.form = this.$store.state.requisitions;
         setTimeout(function () {
           _this7.selectedGroup();
-        }, 1000);
+        }, 2000);
       }
     }
   },
@@ -37850,7 +37810,7 @@ var render = function() {
                       _c("label", [_vm._v("Vehicle")]),
                       _vm._v(" "),
                       _c("model-select", {
-                        attrs: { options: _vm.subprojects, required: "" },
+                        attrs: { options: _vm.subprojects },
                         on: {
                           input: function($event) {
                             return _vm.getAssetDetails()
@@ -37868,14 +37828,16 @@ var render = function() {
                     1
                   ),
                   _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Track By:")]),
-                    _vm._v(
-                      " " +
-                        _vm._s(_vm.track_name) +
-                        "\n                            "
-                    )
-                  ]),
+                  this.form.machine_id
+                    ? _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Track By:")]),
+                        _vm._v(
+                          " " +
+                            _vm._s(_vm.track_name) +
+                            "\n                            "
+                        )
+                      ])
+                    : _vm._e(),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group" }, [
                     _c("label", [_vm._v("Category")]),
@@ -37932,65 +37894,66 @@ var render = function() {
                     )
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Job Type")]),
-                    _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        directives: [
+                  this.form.machine_id
+                    ? _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Job Type")]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
                           {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.form.job_type_id,
-                            expression: "form.job_type_id"
-                          }
-                        ],
-                        staticClass: "form-control",
-                        attrs: { required: "" },
-                        on: {
-                          change: function($event) {
-                            var $$selectedVal = Array.prototype.filter
-                              .call($event.target.options, function(o) {
-                                return o.selected
-                              })
-                              .map(function(o) {
-                                var val = "_value" in o ? o._value : o.value
-                                return val
-                              })
-                            _vm.$set(
-                              _vm.form,
-                              "job_type_id",
-                              $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            )
-                          }
-                        }
-                      },
-                      _vm._l(_vm.job_types, function(job_type) {
-                        return _c(
-                          "option",
-                          {
-                            key: job_type.id,
-                            domProps: { value: job_type.id }
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.job_type_id,
+                                expression: "form.job_type_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "job_type_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
                           },
-                          [
-                            _vm._v(
-                              "\n                                        " +
-                                _vm._s(job_type.name) +
-                                " - " +
-                                _vm._s(job_type.currency) +
-                                " " +
-                                _vm._s(job_type.hourly_rate) +
-                                "\n                                    "
+                          _vm._l(_vm.job_types, function(job_type) {
+                            return _c(
+                              "option",
+                              {
+                                key: job_type.id,
+                                domProps: { value: job_type.id }
+                              },
+                              [
+                                _vm._v(
+                                  "\n                                        " +
+                                    _vm._s(job_type.name) +
+                                    " - " +
+                                    _vm._s(job_type.currency) +
+                                    " " +
+                                    _vm._s(job_type.hourly_rate) +
+                                    "\n                                    "
+                                )
+                              ]
                             )
-                          ]
+                          }),
+                          0
                         )
-                      }),
-                      0
-                    )
-                  ]),
+                      ])
+                    : _vm._e(),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group" }, [
                     _c("label", [_vm._v("Customer Type")]),
@@ -38007,7 +37970,6 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: { required: "" },
                         on: {
                           change: [
                             function($event) {
@@ -38058,10 +38020,7 @@ var render = function() {
                           _c("label", [_vm._v("Customer")]),
                           _vm._v(" "),
                           _c("model-select", {
-                            attrs: {
-                              options: _vm.filtered_customers,
-                              required: ""
-                            },
+                            attrs: { options: _vm.filtered_customers },
                             model: {
                               value: _vm.form.customer_id,
                               callback: function($$v) {
@@ -38082,7 +38041,7 @@ var render = function() {
                       _c("label", [_vm._v("Mechanic")]),
                       _vm._v(" "),
                       _c("model-select", {
-                        attrs: { options: _vm.mechanics, required: "" },
+                        attrs: { options: _vm.mechanics },
                         model: {
                           value: _vm.form.mechanic_id,
                           callback: function($$v) {
@@ -38168,7 +38127,7 @@ var render = function() {
                         }
                       ],
                       staticClass: "form-control",
-                      attrs: { type: "text", required: "" },
+                      attrs: { type: "text" },
                       domProps: { value: _vm.form.cost_code },
                       on: {
                         input: function($event) {
@@ -38188,7 +38147,6 @@ var render = function() {
                       _c("label", [_vm._v("Servicing Date")]),
                       _vm._v(" "),
                       _c("datepicker", {
-                        attrs: { required: "" },
                         model: {
                           value: _vm.form.actual_date,
                           callback: function($$v) {
@@ -38214,7 +38172,7 @@ var render = function() {
                         }
                       ],
                       staticClass: "form-control time_in",
-                      attrs: { type: "text", required: "" },
+                      attrs: { type: "text" },
                       domProps: { value: _vm.form.time_in },
                       on: {
                         input: function($event) {
@@ -38282,7 +38240,6 @@ var render = function() {
                       _vm._v(" "),
                       _c("datepicker", {
                         ref: "nextServiceDate",
-                        attrs: { required: "" },
                         model: {
                           value: _vm.form.next_service_date,
                           callback: function($$v) {
@@ -38296,205 +38253,216 @@ var render = function() {
                   )
                 ]),
                 _vm._v(" "),
-                _c("div", { staticClass: "col-md-4" }, [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Make & Model: ")]),
-                    _vm._v(
-                      " " + _vm._s(_vm.make) + "\n                            "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Assigned To: ")]),
-                    _vm._v(
-                      " " +
-                        _vm._s(_vm.driver) +
-                        "\n                            "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Fuel Balance(L)")]),
-                    _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.form.fuel_balance_id,
-                            expression: "form.fuel_balance_id"
-                          }
-                        ],
-                        staticClass: "form-control",
-                        attrs: { name: "fuel_balance_id", required: "" },
-                        on: {
-                          change: function($event) {
-                            var $$selectedVal = Array.prototype.filter
-                              .call($event.target.options, function(o) {
-                                return o.selected
-                              })
-                              .map(function(o) {
-                                var val = "_value" in o ? o._value : o.value
-                                return val
-                              })
-                            _vm.$set(
-                              _vm.form,
-                              "fuel_balance_id",
-                              $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            )
-                          }
-                        }
-                      },
-                      _vm._l(_vm.balances, function(bal) {
-                        return _c(
-                          "option",
-                          { key: bal.id, domProps: { value: bal.id } },
-                          [
-                            _vm._v(
-                              _vm._s(bal.litres) +
-                                "\n                                    "
-                            )
-                          ]
+                this.form.machine_id
+                  ? _c("div", { staticClass: "col-md-4" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Make & Model: ")]),
+                        _vm._v(
+                          " " +
+                            _vm._s(_vm.make) +
+                            "\n                            "
                         )
-                      }),
-                      0
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _vm.show_track_by
-                    ? _c("div", { staticClass: "form-group" }, [
-                        _c("label", { staticClass: "pull-left" }, [
-                          _vm._v(
-                            "Previous " +
-                              _vm._s(_vm.track_name) +
-                              " Reading:\n                                    " +
-                              _vm._s(_vm.previous_readings)
-                          )
-                        ]),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Assigned To: ")]),
+                        _vm._v(
+                          " " +
+                            _vm._s(_vm.driver) +
+                            "\n                            "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Fuel Balance(L)")]),
                         _vm._v(" "),
-                        _c("br"),
-                        _c("br"),
-                        _vm._v(" "),
-                        _c("label", [
-                          _vm._v(
-                            "Current " + _vm._s(_vm.track_name) + " Readings"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.form.current_readings,
-                              expression: "form.current_readings"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            step: "0.001",
-                            required: ""
-                          },
-                          domProps: { value: _vm.form.current_readings },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.form.fuel_balance_id,
+                                expression: "form.fuel_balance_id"
                               }
-                              _vm.$set(
-                                _vm.form,
-                                "current_readings",
-                                $event.target.value
-                              )
-                            }
-                          }
-                        }),
-                        _vm._v(" "),
-                        _c("br"),
-                        _vm._v(" "),
-                        _c("label", [
-                          _vm._v(
-                            "Actual " +
-                              _vm._s(_vm.track_name) +
-                              " Covered: " +
-                              _vm._s(_vm.actualMileage ? _vm.actualMileage : 0)
-                          )
-                        ])
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.show_track_by
-                    ? _c("div", { staticClass: "form-group" }, [
-                        _c("label", [
-                          _vm._v(
-                            "Next " + _vm._s(_vm.track_name) + " Maintenance"
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.form.next_readings,
-                              expression: "form.next_readings"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            step: "0.001",
-                            required: "",
-                            disabled: !_vm.show_next_readings
-                          },
-                          domProps: { value: _vm.form.next_readings },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
+                            ],
+                            staticClass: "form-control",
+                            attrs: { name: "fuel_balance_id" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.form,
+                                  "fuel_balance_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
                               }
-                              _vm.$set(
-                                _vm.form,
-                                "next_readings",
-                                $event.target.value
-                              )
                             }
-                          }
-                        })
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Lobour Cost")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.form.labour_cost,
-                          expression: "form.labour_cost"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "text", disabled: "" },
-                      domProps: { value: _vm.form.labour_cost },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.form, "labour_cost", $event.target.value)
-                        }
-                      }
-                    })
-                  ])
-                ])
+                          },
+                          _vm._l(_vm.balances, function(bal) {
+                            return _c(
+                              "option",
+                              { key: bal.id, domProps: { value: bal.id } },
+                              [
+                                _vm._v(
+                                  _vm._s(bal.litres) +
+                                    "\n                                    "
+                                )
+                              ]
+                            )
+                          }),
+                          0
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _vm.show_track_by
+                        ? _c("div", { staticClass: "form-group" }, [
+                            _c("label", { staticClass: "pull-left" }, [
+                              _vm._v(
+                                "Previous " +
+                                  _vm._s(_vm.track_name) +
+                                  " Reading:\n                                    " +
+                                  _vm._s(_vm.previous_readings)
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("br"),
+                            _c("br"),
+                            _vm._v(" "),
+                            _c("label", [
+                              _vm._v(
+                                "Current " +
+                                  _vm._s(_vm.track_name) +
+                                  " Readings"
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.form.current_readings,
+                                  expression: "form.current_readings"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: { type: "number", step: "0.001" },
+                              domProps: { value: _vm.form.current_readings },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.form,
+                                    "current_readings",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("br"),
+                            _vm._v(" "),
+                            _c("label", [
+                              _vm._v(
+                                "Actual " +
+                                  _vm._s(_vm.track_name) +
+                                  " Covered: " +
+                                  _vm._s(
+                                    _vm.actualMileage ? _vm.actualMileage : 0
+                                  )
+                              )
+                            ])
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.show_track_by
+                        ? _c("div", { staticClass: "form-group" }, [
+                            _c("label", [
+                              _vm._v(
+                                "Next " +
+                                  _vm._s(_vm.track_name) +
+                                  " Maintenance"
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.form.next_readings,
+                                  expression: "form.next_readings"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: {
+                                type: "number",
+                                step: "0.001",
+                                disabled: !_vm.show_next_readings
+                              },
+                              domProps: { value: _vm.form.next_readings },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.form,
+                                    "next_readings",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            })
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      this.form.machine_id
+                        ? _c("div", { staticClass: "form-group" }, [
+                            _c("label", [_vm._v("Lobour Cost")]),
+                            _vm._v(" "),
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.form.labour_cost,
+                                  expression: "form.labour_cost"
+                                }
+                              ],
+                              staticClass: "form-control",
+                              attrs: { type: "text", disabled: "" },
+                              domProps: { value: _vm.form.labour_cost },
+                              on: {
+                                input: function($event) {
+                                  if ($event.target.composing) {
+                                    return
+                                  }
+                                  _vm.$set(
+                                    _vm.form,
+                                    "labour_cost",
+                                    $event.target.value
+                                  )
+                                }
+                              }
+                            })
+                          ])
+                        : _vm._e()
+                    ])
+                  : _vm._e()
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "row" }, [
@@ -44857,7 +44825,7 @@ var render = function() {
                                   }
                                 ],
                                 staticClass: "form-control qty",
-                                attrs: { type: "number", placeholder: "Qty" },
+                                attrs: { type: "text", placeholder: "Qty" },
                                 domProps: { value: item.quantity },
                                 on: {
                                   keyup: function($event) {
