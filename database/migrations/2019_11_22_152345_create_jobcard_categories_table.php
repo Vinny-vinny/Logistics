@@ -16,6 +16,8 @@ class CreateJobcardCategoriesTable extends Migration
         Schema::create('jobcard_categories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
+            $table->integer('inv_tr_id')->nullable();
+            $table->integer('stk_tr_id')->nullable();
             $table->timestamps();
         });
     }

@@ -30,7 +30,11 @@ export default new Vuex.Store({
         jobcard_categories:{},
         fuel_types:{},
         requisitions:{},
-        checklist_tool:{}
+        checklist_tool:{},
+        km_hrs:{},
+        diesels:{},
+        department_consumptions:{},
+        partners:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -110,6 +114,18 @@ export default new Vuex.Store({
         },
         updateTool(state,tool){
          state.checklist_tool = tool;
+        },
+        listKMHRReports(state,km){
+         state.km_hrs = km;
+        },
+        listDieselReports(state,diesel){
+         state.diesels = diesel;
+        },
+        listconsumptionReports(state,dept){
+         state.department_consumptions = dept;
+        },
+        listPartnersReports(state,partner){
+         state.partners = partner;
         }
     },
     actions:{
@@ -190,6 +206,18 @@ export default new Vuex.Store({
         },
         updateTool({commit},tool){
         commit('updateTool',tool);
+        },
+        listKMHRReports({commit},km){
+        commit('listKMHRReports',km);
+        },
+        listDieselReports({commit},diesel){
+         commit('listDieselReports',diesel);
+        },
+        listconsumptionReports({commit},dept){
+          commit('listconsumptionReports',dept);
+        },
+        listPartnersReports({commit},partner){
+         commit('listPartnersReports',partner);
         }
     }
 })

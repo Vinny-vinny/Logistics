@@ -18,19 +18,20 @@
                                                                        value="External" v-model="form.service_type">External</label>
                                 </div>
                                     <div class="form-group">
-                                    <label>Project</label>
-                                    <select v-model="form.asset_category_id" required class="form-control" @change="subProject()">
-                                        <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
-                                    </select>
+                                    <label>Project</label>                                   
+                                    <model-select :options="projects"
+                                        v-model="form.asset_category_id"  
+                                        @input="subProject()"                    
+                                        required>
+                                        </model-select> 
                                 </div>
                                 <div class="form-group">
-                                    <label>Vehicle</label>
-                                    <select name="vehicle_id" class="form-control" v-model="form.machine_id"
-                                              @change="getAssetDetails()" required>
-                                        <option :value="vehicle.id" v-for="vehicle in subprojects" :key="vehicle.id">
-                                          {{vehicle.code}}
-                                        </option>
-                                    </select>
+                                    <label>Vehicle</label>                                  
+                                    <model-select :options="subprojects"
+                                        v-model="form.machine_id"  
+                                        @input="getAssetDetails()"                    
+                                        required>
+                                        </model-select> 
                                 </div>
                                 <div class="form-group">
                                     <label>Track By:</label> {{track_name}}
@@ -58,24 +59,21 @@
                                         <option :value="type.id" v-for="type in customer_types" :key="type.id">
                                             {{type.name}}
                                         </option>
-
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customers">
-                                    <label>Customer</label>
-                                    <select class="form-control" required v-model="form.customer_id">
-                                        <option :value="customer.id" v-for="customer in filtered_customers"
-                                                :key="customer.id">{{customer.name}}
-                                        </option>
-                                    </select>
+                                    <label>Customer</label>                                   
+                                    <model-select :options="filtered_customers"
+                                        v-model="form.customer_id"                           
+                                        required>
+                                        </model-select>
                                 </div>
                                 <div class="form-group">
                                     <label>Mechanic</label>
-                                    <select class="form-control" required v-model="form.mechanic_id">
-                                        <option :value="mechanic.id" v-for="mechanic in mechanics" :key="mechanic.id">
-                                            {{mechanic.name}}
-                                        </option>
-                                    </select>
+                                        <model-select :options="mechanics"
+                                        v-model="form.mechanic_id"                           
+                                        required>
+                                        </model-select>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -157,28 +155,28 @@
                                 </div>
 
                             </div>
-                        </div>
+                        </div>                      
 
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Maintenance</label>
+                                     <fieldset class="the-fieldset">
+                               <legend class="the-legend"><label class="fyr">Maintenance</label></legend>                                  
                                     <table style="width:100%">
                                         <tr>
-                                            <th></th>
-                                            <th></th>
-                                            <th></th>
+                                            <th>Category</th>
+                                            <th>Root Cause</th>
+                                            <th>Description</th>
                                             <th></th>
                                         </tr>
                                         <tr v-for="(m,i) in form.maintenance">
-                                            <td><select class="form-control i_p" v-model="m.category"
-                                                        placeholder="Category">
-                                                <option selected disabled>Select Category</option>
-                                                <option :value="cat.id" v-for="cat in categories" :key="cat.id">
-                                                    {{cat.name}}
-                                                </option>
-
-                                            </select></td>
+                                             <td>
+                                             <model-select :options="categories"
+                                            v-model="m.category"
+                                            class="i_p_2"                           
+                                            >
+                                            </model-select>
+                                            </td>
 
                                             <td><input type="text" class="form-control cost" v-model="m.description"
                                                        placeholder="Description"></td>
@@ -192,6 +190,7 @@
                                             </td>
                                         </tr>
                                     </table>
+                                </fieldset>
                                 </div>
                             </div>
                         </div>
@@ -220,13 +219,12 @@
 
                                         </tr>
                                         <tr v-for="(m,i) in filtered_items_internal">
-                                            <td>
-                                                <select class="form-control i_p" v-model="m.part" disabled> >
-                                                    <option :value="p.id" v-for="p in parts" :key="p.id">
-                                                        {{p.code}} - {{p.description}}
-                                                    </option>
-
-                                                </select>
+                                            <td>                                              
+                                            <model-select :options="stk_items"
+                                            v-model="m.part"
+                                            class="i_p"                           
+                                            >
+                                            </model-select>
                                             </td>
                                             <td><input type="number" class="form-control cost" v-model="m.quantity"
                                                        placeholder="Quantity" disabled></td>
@@ -260,13 +258,13 @@
 
                                         </tr>
                                         <tr v-for="(m,i) in filtered_items_external">
-                                            <td>
-                                                <select class="form-control i_p" v-model="m.part" disabled> >
-                                                    <option :value="p.id" v-for="p in parts" :key="p.id">
-                                                        {{p.code}} - {{p.description}}
-                                                    </option>
+                                            <td>                                    
+                                            <model-select :options="stk_items"
+                                            v-model="m.part"
+                                            class="i_p"                           
+                                            >
+                                            </model-select>
 
-                                                </select>
                                             </td>
                                             <td><input type="number" class="form-control cost" v-model="m.quantity"
                                                        placeholder="Quantity" disabled></td>
@@ -305,7 +303,7 @@
 </template>
 <script>
     import datepicker from 'vuejs-datepicker';
-
+     import { ModelSelect } from 'vue-search-select'; 
     export default {
         props: ['edit'],
         data() {
@@ -330,7 +328,7 @@
                     cost_code: '',
                     customer_id: '',
                     requisition_id: '',
-                    labour_cost: 0,
+                    labour_cost: 0,                  
                     id: '',
                     maintenance: [{category: '', description: '', root_cause: ''}],
 
@@ -355,11 +353,11 @@
                 next_computed_readings: 0,
                 show_next_readings: true,
                 parts: {},
-                categories: {},
+                categories: [],
                 status: 1,
-                projects: {},
+                projects: [],
                 job_categories: {},
-                mechanics: {},
+                mechanics: [],
                 job_types: {},
                 customer_type: '',
                 customers: {},
@@ -377,7 +375,10 @@
                 filtered_rq: '',
                 customer_types: {},
                 rqs:[],
-                subprojects:{}
+                subprojects:[],
+                transactions:{},
+                stk_items:[]           
+
             }
         },
         watch: {
@@ -461,8 +462,7 @@
             this.getCustomers();
             this.getRequisitions();
             this.filteredRqs();
-            this.getCustomerTypes();
-            this.subProject();
+            this.getCustomerTypes();            
 
         },
         filters: {
@@ -490,13 +490,15 @@
             },
 
         },
-        methods: {
-             subProject(){
-            this.subprojects = {};
-           setTimeout(()=>{
- this.subprojects = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
-           },500)  
-
+        methods: {      
+             subProject(){       
+            let subp = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+             subp.forEach(p => {
+                this.subprojects.push({
+                    'value': p.id,
+                    'text': p.code
+                })
+             })
             },
             getCustomerTypes() {
                 axios.get('customer-types')
@@ -508,7 +510,7 @@
                 axios.get('requisitions')
                     .then(rq => {
                         for (let i = 0; i < rq.data.length; i++) {
-                            if (rq.data[i]['used'] == 0 && rq.data[i]['type'] !==null) {
+                            if (rq.data[i]['used'] == 0 || rq.data[i]['used'] == null && rq.data[i]['type'] !==null) {
                                 this.rqs.push(rq.data[i]);
                             }
                         }
@@ -522,12 +524,13 @@
                     if (this.requisitions[i]['id'] === this.form.requisition_id) {
                         if(this.requisitions[i]['type'] ==='Internal'){
                             this.filtered_rq ='Internal';
-                                this.filtered_items_internal = JSON.parse(this.requisitions[i]['inventory_items_internal']);
+
+                                this.filtered_items_internal = this.requisitions[i]['inventory_items_internal'];
                             return;
                         }
                         if(this.requisitions[i]['type'] ==='External'){
-                            this.filtered_rq ='External';
-                            this.filtered_items_external = JSON.parse(this.requisitions[i]['inventory_items_external']);
+                            this.filtered_rq ='External';                       
+                            this.filtered_items_external = this.requisitions[i]['inventory_items_external'];
                             return;
                         }
 
@@ -543,12 +546,16 @@
             },
             customerType() {
                 this.filtered_customers = [];
-                this.show_customers = true;
-                for (let j = 0; j < this.customers.length; j++) {
-                    if (this.customers[j]['customer_type_id'] === this.form.customer_type_id) {
-                        this.filtered_customers.push(this.customers[j]);
-                    }
-                }
+                this.show_customers = true; 
+               setTimeout(()=>{
+               let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
+                 customers.forEach(cus => {
+                    this.filtered_customers.push({
+                        'value': cus.id,
+                        'text': cus.name
+                    })
+                 }); 
+               },500)              
             },
             getCustomers() {
                 axios.get('customers')
@@ -565,7 +572,12 @@
             getMechanics() {
                 axios.get('mechanics')
                     .then(res => {
-                        this.mechanics = res.data;
+                        res.data.forEach(m => {
+                            this.mechanics.push({
+                                'value': m.id,
+                                'text': m.name
+                            })
+                        })                     
                     })
             },
             getJobCategories() {
@@ -577,7 +589,12 @@
             getProjects() {
                axios.get('asset-category')
               .then(res => {
-                  this.projects = res.data;
+                res.data.forEach(p => {
+                    this.projects.push({
+                        'value': p.id,
+                        'text': p.name
+                    })
+                })        
               })
             },
             addService(i) {
@@ -597,8 +614,9 @@
                 if (confirm('Do you really want to close?')) {
                     axios.post(`close-jobcard/${this.form.id}`)
                         .then(res => {
-                            this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
-                            eventBus.$emit('cancel');
+                            console.log(res.data);
+                            // this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
+                            // eventBus.$emit('cancel');
                         })
                 }
             },
@@ -611,13 +629,24 @@
             getCategories() {
                 axios.get('categories')
                     .then(category => {
-                        this.categories = category.data
+                        category.data.forEach(c => {
+                            this.categories.push({
+                                'value': c.id,
+                                'text': c.name
+                            })
+                        })                  
                     })
             },
             getParts() {
                 axios.get('parts')
                     .then(res => {
                         this.parts = res.data
+                        res.data.forEach(p => {
+                            this.stk_items.push({
+                                'value': p.id,
+                                'text': p.code +'-'+p.description
+                            })
+                        })
                     })
             },
             nextReadings() {
@@ -683,11 +712,7 @@
                         }
                     }
                 }
-                if (moment(this.form.next_service_date).format('YYYY-MM-DD') < moment(Date.now()).format('YYYY-MM-DD')) {
-                    this.$refs.nextServiceDate.clearDate();
-                    this.form.next_service_date = '';
-                    return this.$toastr.e('Sorry, next service date cannot be later than today.');
-                }
+               
 
                 if (this.form.next_service_date === '') {
                     return this.$toastr.e('Next service date is required.');
@@ -706,6 +731,7 @@
                 this.form.maintenance = JSON.stringify(this.form.maintenance);
 
                 axios.post('job-card', this.form).then(res => {
+                    
                     this.$toastr.s('Jobcard created Successfully.');
                     eventBus.$emit('listJobcards', res.data)
                 })
@@ -772,25 +798,25 @@
                     this.make = this.$store.state.job_card.make;
                     this.driver = this.$store.state.job_card.driver;
                     this.service_types = this.form.service_types;
-                    this.form.maintenance = JSON.parse(this.$store.state.job_card.maintenance);
-
+                   
                     this.status = this.$store.state.job_card.status;
-                    this.show_customers = true;
-                    this.filtered_customers = [];
-                    this.Customers();
-                    this.ServiceTypes();
+                    this.show_customers = true;                                   
+                    
                      setTimeout(()=>{
-                         console.log(this.balances)
-                     },300)
-                    if (this.form.requisition_id) {
-                        this.disable_rq = true;
-                        this.show_inventory = true;
-                        this.editedRequisitions();
+                     this.subProject();   
+                     this.customerType(); 
+                     this.ServiceTypes();                 
+                       if (this.form.requisition_id) {
+                       this.disable_rq = true;
+                       this.show_inventory = true;   
+                       this.editedRequisitions();
                     }
-
+                     },1000)  
+                                          
                 }
             },
-            editedRequisitions() {
+           
+              editedRequisitions() {
                 this.rqs = [];
                 axios.get('requisitions')
                     .then(rq => {
@@ -806,18 +832,19 @@
                             if (rq.data[i]['id'] === this.form.requisition_id) {
                                 if(rq.data[i]['type'] ==='Internal'){
                                     this.filtered_rq ='Internal';
-                                    this.filtered_items_internal = JSON.parse(rq.data[i]['inventory_items_internal']);
+                                    this.filtered_items_internal =rq.data[i]['inventory_items_internal']
                                     //return;
                                 }
                                 if(rq.data[i]['type'] ==='External'){
                                     this.filtered_rq ='External';
-                                    this.filtered_items_external = JSON.parse(rq.data[i]['inventory_items_external']);
+                                    this.filtered_items_external = rq.data[i]['inventory_items_external'];
                                  //return;
                                 }
                             }
                         }
                     })
             },
+
             ServiceTypes() {
                 axios.get('service-types')
                     .then(res => {
@@ -829,21 +856,11 @@
                         }
                     });
             },
-            Customers() {
-                axios.get('customers')
-                    .then(res => {
-                        this.customers = res.data;
-                        this.show_customers = true;
-                        for (let j = 0; j < this.customers.length; j++) {
-                            if (this.customers[j]['customer_type_id'] === this.form.customer_type_id) {
-                                this.filtered_customers.push(this.customers[j]);
-                            }
-                        }
-                    })
-            }
+          
         },
         components: {
-            datepicker
+            datepicker,
+            ModelSelect
         }
     }
 </script>
@@ -852,7 +869,10 @@
     .i_p {
         margin-bottom: 8px;
     }
-
+    .i_p_2{
+       margin-bottom: 8px;
+       width: 300px !important;   
+    }
     .qty, .cost {
         margin-left: 5px;
         margin-bottom: 8px;
@@ -952,5 +972,28 @@
         border: #339FFF solid 2px;
         padding: 15px;
     }
+    .the-legend {
+    border-style: none;
+    border-width: 0;
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: 0;
+    width: auto;
+    padding: 0 10px;
+    border: 1px solid #e0e0e0;
+}
+.the-fieldset {
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+}
+.fyr{
+    font-weight:800
+}
+.fy{
+    display:flex;
+}
+.bf{
+    width:100%
+}
 
 </style>

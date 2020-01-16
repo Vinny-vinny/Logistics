@@ -40,7 +40,7 @@ class JobcardResource extends JsonResource
             'completion_date' => $this->completion_date,
             'time_in' => $this->time_in,
             'time_out' => $this->time_out,
-            'maintenance' => $this->maintenance,
+            'maintenance' => json_decode($this->maintenance),
             'card_no' => $this->card_no,
             'driver' => $this->machine->user->name,
             'machine' => $this->machine->code,
@@ -56,9 +56,10 @@ class JobcardResource extends JsonResource
             'checklist_assigned' => $this->checklist_assigned,
             'service_types' => $this->machine->service_types,
             'labour_cost' => $this->labour_cost,
-            'closed_at' => $this->closed_at,
+            'closed_at' => $this->closed_at,           
             'fuel' => $this->fuel ? $this->fuel->id : '',
-            'checklist' => $this->checklist ? $this->checklist->id :''
+            'checklist' => $this->checklist ? $this->checklist->id :'',
+            'requisitions' => $this->requisition
         ];
     }
 }

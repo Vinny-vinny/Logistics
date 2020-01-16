@@ -5,11 +5,11 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Fuel Reports</h3>
+                    <h3 class="box-title">Partner Reports</h3>
                     <download-excel
                         v-if="fuels.length"
                         class="btn btn-primary pull-right"
-                        :data="daily_issues">
+                        :data="results">
                         <i class="fa fa-file-excel-o" aria-hidden="true"></i> Download
                     </download-excel>
                     <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
@@ -18,27 +18,22 @@
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Item Code</th>
-                            <th>Item Description</th>
-                            <th>Reference</th>
-                            <th>Quantity</th>
-                            <th>Unit Cost</th>
-                            <th>Amount</th>
-                            <th>Project</th>
+                            <th>Reg. No</th>
+                            <th>Start Odometer</th>
+                            <th>End Odometer</th>
+                            <th>Distance</th>
+                            <th>Fuel Used(Ltr)</th>
+                            <th>LTRS/Hr & KM/LTR</th>
                             </tr>
                         </thead>
                         <tbody>
                         <tr v-for="fuel in fuels">
-                            <td>{{fuel.date}}</td>
-                            <td>{{fuel.item_code}}</td>
-                            <td>{{fuel.description}}</td>
-                            <td>{{fuel.reference}}</td>
-                            <td>{{fuel.quantity}}</td>
-                            <td>{{fuel.unit_cost}}</td>
-                            <td>{{fuel.amount}}</td>
-                            <td>{{fuel.project}}</td>
-
+                            <td>{{fuel.reg_no}}</td>
+                            <td>{{fuel.start_odo}}</td>
+                            <td>{{fuel.end_odo}}</td>
+                            <td>{{fuel.distance}}</td>
+                            <td>{{fuel.fuel_used}}</td>
+                            <td>{{fuel.km_per_ltrs}}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -51,35 +46,37 @@
 
     export default {
         data(){
-        return {
-            daily_issues:[]
-        }
+         return {
+            results:[]
+         }
         },
         mounted(){
             this.initDatable();
-            this.dailyIssue();
+            this.partners();
         },
         computed:{
             fuels(){
-                return this.$store.state.fuel_reports;
-            }
+                return this.$store.state.partners;
+            },
+
         },
         methods:{
-            dailyIssue(){
-            setTimeout(()=>{
-             for(let i=0;i<this.fuels.length;i++){
-              this.daily_issues.push({
-                'Date': this.fuels[i]['date'],
-                'Item Code': this.fuels[i]['code'],
-                'Item Description': this.fuels[i]['description'],
-                'Reference': this.fuels[i]['reference'],
-                'Quantity': this.fuels[i]['quantity'],
-                'Unit Cost': this.fuels[i]['unit_cost'],
-                'Amount': this.fuels[i]['amount'],
-                'Project': this.fuels[i]['project']
-              });
-             }
-            },1000)
+             partners(){
+                let results = [];
+               setTimeout(()=>{
+              for(let k=0;k<this.fuels.length;k++){
+                            this.results.push({
+                            'Reg': this.fuels[k]['reg_no'] ,                            
+                            'Start Odo':this.fuels[k]['start_odo'],
+                            'End Odo': this.fuels[k]['end_odo'],
+                            'Distance': this.fuels[k]['distance'],
+                            'Fuel Used(Ltr)': this.fuels[k]['fuel_used'],
+                            'LTRS/HR & KM/LTR':this.fuels[k]['km_per_ltrs']
+                              
+                          });
+                         }
+                         return results;
+               },1000)
             },
             back(){
                 eventBus.$emit('back');

@@ -28,19 +28,23 @@
               </span>
                     </router-link>
                     <ul class="treeview-menu">
-                        <li><router-link to="/assign-checklist">Assign Checklists</router-link></li>
+                        <li><router-link to="/assign-checklist" class="fa fa-circle-o"> Assign Checklists</router-link></li>
                         </ul>
                 </li>
                 <li><router-link to="/fuel"><i class="fa fa-database"></i> <span>Fuel</span></router-link></li>
-                <li class="treeview" style="display: none">
-                    <a href="#"><i class="fa fa-bar-chart"></i> <span>Reports</span>
+                <li class="treeview">
+                    <a href="#"><i class="fa fa-bar-chart"></i> <span>Workshop Reports</span>
                         <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
                     </a>
                     <ul class="treeview-menu">
-                         <li><router-link to="/jobcard-report">Job Cards</router-link></li>
-                        <li><router-link to="/fuel-report">Fuels</router-link></li>
+                         <li><router-link to="/jobcard-report" class="fa fa-circle-o"> Stock Issue</router-link></li>
+                        <li><router-link to="/fuel-report" class="fa fa-circle-o"> Daily Fuel Issue</router-link></li>
+                        <li><router-link to="/km-per-hr" class="fa fa-circle-o"> KM Per Hr</router-link></li>
+                        <li><router-link to="/diesel-analysis" class="fa fa-circle-o"> Diesel Analysis</router-link></li>
+                         <li><router-link to="/dpt-consumption" class="fa fa-circle-o"> Department Consumption%</router-link></li>
+                         <li><router-link to="/partners" class="fa fa-circle-o"> Partner Reports</router-link></li>
                         </ul>
                 </li>
                 <li class="treeview">
@@ -50,20 +54,20 @@
               </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><router-link to="/users">Users</router-link></li>
-                        <li><router-link to="/fuel-balance">Fuel Balance</router-link></li>
-                        <li><router-link to="/fuel-types">Fuel Types</router-link></li>
-                        <li><router-link to="/track-by">Track By</router-link></li>
-                        <li><router-link to="/service-types">Service Types</router-link></li>
-                        <li><router-link to="/expense">Other Charges</router-link></li>
-                        <li><router-link to="/parts">Parts</router-link></li>
-                        <li><router-link to="/projects" style="display:none">Projects</router-link></li>
-                        <li><router-link to="/customers">Customers</router-link></li>
-                        <li><router-link to="/mechanics">Mechanics</router-link></li>
-                        <li><router-link to="/categories">Categories</router-link></li>
-                        <li><router-link to="/job-type">Job types</router-link></li>
-                        <li><router-link to="/jobcard-category">Jobcard Categories</router-link></li>
-                        <li><router-link to="/checklist-tool">Checklist Tools</router-link></li>
+                        <li><router-link to="/users" class="fa fa-circle-o"> Users</router-link></li>
+                        <li><router-link to="/fuel-balance" class="fa fa-circle-o"> Fuel Balance</router-link></li>
+                        <li><router-link to="/fuel-types" class="fa fa-circle-o"> Fuel Types</router-link></li>
+                        <li><router-link to="/track-by" class="fa fa-circle-o"> Track By</router-link></li>
+                        <li><router-link to="/service-types" class="fa fa-circle-o"> Service Types</router-link></li>
+                        <li><router-link to="/expense" class="fa fa-circle-o"> Other Charges</router-link></li>
+                        <li><router-link to="/parts" class="fa fa-circle-o"> Parts</router-link></li>
+                        <li><router-link to="/projects" style="display:none"> Projects</router-link></li>
+                        <li><router-link to="/customers" class="fa fa-circle-o"> Customers</router-link></li>
+                        <li><router-link to="/mechanics" class="fa fa-circle-o"> Mechanics</router-link></li>
+                        <li><router-link to="/categories" class="fa fa-circle-o"> Categories</router-link></li>
+                        <li><router-link to="/job-type" class="fa fa-circle-o"> Job types</router-link></li>
+                        <li><router-link to="/jobcard-category" class="fa fa-circle-o"> Jobcard Categories</router-link></li>
+                        <li><router-link to="/checklist-tool" class="fa fa-circle-o"> Checklist Tools</router-link></li>
                     </ul>
                 </li>
             </ul>

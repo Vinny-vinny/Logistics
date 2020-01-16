@@ -25,12 +25,12 @@ class CreateFuelsTable extends Migration
             $table->integer('authorized_by')->nullable();
             $table->integer('expense_id')->nullable();
             $table->date('fuel_on');
-            $table->string('asset_type')->default('company');
-            $table->string('invoice_no')->nullable();
+            $table->string('asset_type')->default('company');      
             $table->integer('customer_type_id')->nullable();
             $table->integer('job_card_id')->nullable();
             $table->string('store_man')->nullable();
             $table->float('odometer_readings')->nullable()->default(0);
+            $table->float('previous_odometer')->nullable()->default(0);
             $table->float('rate')->nullable()->default(0);
             $table->timestamps();
         });

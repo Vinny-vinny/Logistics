@@ -52,6 +52,9 @@ Vue.filter('number', function(value) {
 import Exception from "./helpers/Exception";
 window.Exception = Exception;
 
+import 'vue-search-select/dist/VueSearchSelect.css';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
+
 
 import router from './routes/router';
 import store from "./store/store";
