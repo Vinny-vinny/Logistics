@@ -242,6 +242,8 @@
             },
             selectedGroup(){
              let items = this.parts.filter(item => item.item_group == this.form.group_name);
+             this.items = [];
+             console.log(items)
             items.forEach(p => {
                 this.items.push({
                     'value': p.id,

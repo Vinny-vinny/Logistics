@@ -11687,6 +11687,8 @@ __webpack_require__.r(__webpack_exports__);
       var items = this.parts.filter(function (item) {
         return item.item_group == _this.form.group_name;
       });
+      this.items = [];
+      console.log(items);
       items.forEach(function (p) {
         _this.items.push({
           'value': p.id,
