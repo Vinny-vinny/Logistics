@@ -5,26 +5,26 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Projects</h3>
-                    <button class="btn btn-success pull-right" @click="importProjects()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
+                    <h3 class="box-title">Ledgers</h3>
+                    <button class="btn btn-success pull-right" @click="importAccounts()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Code</th>
-                            <th>Name</th>
+                            <th>Account</th>                          
+                            <th>master Sub Account</th>
                             <th>Description</th>
 
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="project in tableData">
-                            <td>{{project.id}}</td>
-                            <td>{{project.code}}</td>
-                            <td>{{project.name}}</td>
-                            <td>{{project.description}}</td>
+                        <tr v-for="account in tableData">
+                            <td>{{account.id}}</td>                         
+                            <td>{{account.account}}</td>
+                             <td>{{account.sub_account}}</td>
+                            <td>{{account.description}}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -45,22 +45,23 @@
             }
         },
         created(){
-            this.getProjects();
-        },       
+            this.getAccounts();
+        },
+       
         methods:{
-            getProjects(){
-                axios.get('projects')
+            getAccounts(){
+                axios.get('accounts')
                     .then(res => {
-                      this.tableData = res.data;
+                      this.tableData = res.data
                       this.initDatable();
                     })
             },
-            importProjects(){
+            importAccounts(){
                 this.importing = true;
-                    axios.get(`import-projects`)
+                    axios.get(`import-accounts`)
                     .then(res =>{
                         this.importing = false;
-                        this.$toastr.s('Projects successfully imported.');
+                        this.$toastr.s('Ledgers successfully imported.');
                         this.$router.go();
                     })
             },

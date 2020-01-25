@@ -84,10 +84,10 @@
                 .then(res => {
                     this.requisition = res.data.find(req => req.id == this.$route.params['id']);
                    if (this.requisition.type ==='Internal'){
-                       items = JSON.parse( this.requisition.inventory_items_internal);
+                       items = this.requisition.inventory_items_internal;
                    }
                    else{
-                       items = JSON.parse( this.requisition.inventory_items_external);
+                       items = this.requisition.inventory_items_external;
                    }
                 axios.get('parts')
                     .then(res => {

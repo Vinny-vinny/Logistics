@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StkItem extends Model
+class Ledger extends Model
 {
     protected $connection ='sqlsrv2';
-    protected $table = 'StkItem';
+    protected $table = 'Accounts';
 }

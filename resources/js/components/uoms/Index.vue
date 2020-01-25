@@ -5,26 +5,26 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Projects</h3>
-                    <button class="btn btn-success pull-right" @click="importProjects()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
+                    <h3 class="box-title">Unit of Measures</h3>
+                    <button class="btn btn-success pull-right" @click="importUoms()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Code</th>
-                            <th>Name</th>
+                            <th>Code</th>                          
                             <th>Description</th>
+                            <th></th>
 
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="project in tableData">
-                            <td>{{project.id}}</td>
-                            <td>{{project.code}}</td>
-                            <td>{{project.name}}</td>
-                            <td>{{project.description}}</td>
+                        <tr v-for="uom in tableData">
+                            <td>{{uom.id}}</td>                         
+                            <td>{{uom.code}}</td>
+                             <td>{{uom.description}}</td>
+                            <td></td>
                         </tr>
                         </tbody>
                     </table>
@@ -38,29 +38,30 @@
     export default {
         data(){
             return {
-                tableData: [],
+               tableData: [],
                importing:false,
 
 
             }
         },
         created(){
-            this.getProjects();
-        },       
+            this.getUoms();
+        },
+       
         methods:{
-            getProjects(){
-                axios.get('projects')
+            getUoms(){
+                axios.get('uom')
                     .then(res => {
-                      this.tableData = res.data;
+                      this.tableData = res.data
                       this.initDatable();
                     })
             },
-            importProjects(){
+            importUoms(){
                 this.importing = true;
-                    axios.get(`import-projects`)
+                    axios.get(`import-uom`)
                     .then(res =>{
                         this.importing = false;
-                        this.$toastr.s('Projects successfully imported.');
+                        this.$toastr.s('Uoms successfully imported.');
                         this.$router.go();
                     })
             },

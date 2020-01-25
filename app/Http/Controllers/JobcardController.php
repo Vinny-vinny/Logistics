@@ -94,11 +94,11 @@ class JobcardController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $request->time_in !== '' && $request->time_in !== null ? $request['time_in'] = Carbon::parse($request->time_in)->format('H:i') : '';
           $request->time_out !== '' && $request->time_out !== null ? $request['time_out'] = Carbon::parse($request->time_out)->format('H:i') : '';
                
-        $request['maintenance'] = json_encode($request->get('maintenance'));
-     
+        $request['maintenance'] = json_encode($request->get('maintenance'));     
         $jobcard = Jobcard::find($id);
         $request['card_no'] = 'Job00'.$id;
         $jobcard->update($request->except(['service_types','files','driver','machine','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist','cost_center','requisitions']));
@@ -118,7 +118,7 @@ class JobcardController extends Controller
     public function closeJobcard($id)
     {
         $job = Jobcard::find($id);
-      //  $job->update(['closed_at' => Carbon::now(),'status' =>0]);
+        $job->update(['closed_at' => Carbon::now(),'status' =>0]);
         if ($job->requisition_id) {        
         $job_cat = JobcardCategory::find($job->jobcard_category_id);       
         $inv_date = date('Y-m-d');

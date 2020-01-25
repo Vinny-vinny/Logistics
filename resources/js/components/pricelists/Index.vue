@@ -5,26 +5,28 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Projects</h3>
-                    <button class="btn btn-success pull-right" @click="importProjects()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
+                    <h3 class="box-title">Price Lists</h3>
+                    <button class="btn btn-success pull-right" @click="importPrices()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Code</th>
-                            <th>Name</th>
-                            <th>Description</th>
+                            <th>Pricelist Name ID</th>                      
+                            <th>Exclusive Price</th>
+                            <th>Inclusive Price</th>
+                            <th></th>
 
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="project in tableData">
-                            <td>{{project.id}}</td>
-                            <td>{{project.code}}</td>
-                            <td>{{project.name}}</td>
-                            <td>{{project.description}}</td>
+                        <tr v-for="price in tableData">
+                            <td>{{price.id}}</td>                         
+                            <td>{{price.price_list_name_id}}</td>
+                             <td>{{price.exclusive_price}}</td>
+                             <td>{{price.inclusive_price}}</td>
+                            <td></td>
                         </tr>
                         </tbody>
                     </table>
@@ -38,29 +40,30 @@
     export default {
         data(){
             return {
-                tableData: [],
+               tableData: [],
                importing:false,
 
 
             }
         },
         created(){
-            this.getProjects();
-        },       
+            this.getPriceLists();
+        },
+       
         methods:{
-            getProjects(){
-                axios.get('projects')
+            getPriceLists(){
+                axios.get('price-list')
                     .then(res => {
-                      this.tableData = res.data;
+                      this.tableData = res.data
                       this.initDatable();
                     })
             },
-            importProjects(){
+            importPrices(){
                 this.importing = true;
-                    axios.get(`import-projects`)
+                    axios.get(`import-price-list`)
                     .then(res =>{
                         this.importing = false;
-                        this.$toastr.s('Projects successfully imported.');
+                        this.$toastr.s('Price Lists successfully imported.');
                         this.$router.go();
                     })
             },

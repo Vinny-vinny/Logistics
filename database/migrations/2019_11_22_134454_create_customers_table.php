@@ -26,6 +26,7 @@ class CreateCustomersTable extends Migration
             $table->string('tax_no')->nullable();
             $table->string('telephone')->nullable();
             $table->integer('customer_type_id')->nullable();
+            $table->integer('price_list_name_id')->nullable();
             $table->timestamps();
         });
     }

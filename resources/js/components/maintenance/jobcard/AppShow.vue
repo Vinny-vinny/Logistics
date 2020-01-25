@@ -232,8 +232,8 @@
                         </tr>
                         <tr>
                             <td>Miscellaneous</td>
-                            <td v-if="has_othercharges">{{other_charges.cost | number}}</td>
-                            <td v-if="!has_othercharges"></td>
+                            <td>1000</td>
+                            
                         </tr>
                         <tr>
                             <td>Stock</td>
@@ -241,11 +241,11 @@
                         </tr>
                         <tr>
                             <td>Cost</td>
-                            <td></td>
+                            <td>{{cost | number}}</td>
                         </tr>
                         <tr>
                             <td>Total Due (Excl)</td>
-                            <td></td>
+                            <td>{{(1000 + cost + job.labour_cost) | number}}</td>
                         </tr>
                         <tr>
                             <td>Foreman's sign</td>
@@ -261,7 +261,7 @@
                         <table class="customers" style="height: 100%;">
                             <tr>
                                 <td>Cost at</td>
-                                <td style="opacity:0">uuuuuuuuuuuuuuuuuuuuuu</td>
+                                <td>{{cost_at | number}} {{track_by}}</td>
                             </tr>
                             <tr>
                             <td>Time Taken</td>
@@ -359,7 +359,10 @@
                 items:[],
                 hours_spent:0,
                 customer:{},
-                requisitions:{}
+                requisitions:{},
+                cost:0,
+                cost_at:0,
+                track_by:''
             }
         },
         created() {
@@ -382,6 +385,8 @@
               axios.get('job-card')
               .then(res => {
                   this.job = res.data.find(j => j.id == this.$route.params['id']);
+                  this.cost_at = this.job.current_readings;
+                  this.track_by = this.job.track_name;
                   axios.get('customers')
                   .then(res => {
                      this.customer = res.data.find(c => c.id == this.job.customer_id);
@@ -422,13 +427,15 @@
                         this.requisition = req;
                         if (req.type =='Internal'){
                             this.requisition_type = 'Internal';
-                            this.requisitions_internal = JSON.parse(req.inventory_items_internal);
+                            this.requisitions_internal = req.inventory_items_internal;
 
                             axios.get('parts')
                             .then(res => {
+                                let total =0;
                                 this.requisitions_internal.forEach(item => {
                                     for (let i=0;i<res.data.length;i++){
                                         if (res.data[i]['id'] == item.part){
+                                            total+=(item.unit_cost*item.quantity);
                                             this.items.push({
                                                 'item':res.data[i]['description'],
                                                 'qty':item.quantity,
@@ -438,11 +445,12 @@
                                         }
                                     }
                                 })
+                                this.cost = total;
                             })
                         }
                            if (req.type =='External'){
                                this.requisition_type = 'External';
-                               this.requisitions_external = JSON.parse(req.inventory_items_external);
+                               this.requisitions_external = req.inventory_items_external;
                                axios.get('parts')
                                    .then(res => {
                                        this.requisitions_external.forEach(item => {
@@ -462,9 +470,9 @@
                        })
                    }
                   //Labour calculation = hrs* job type
-                  if (this.job.closed_at) {
+                  if (this.job.actual_date && this.job.completion_date) {
                       let initialdate = moment(this.job.actual_date).format('YYYY-MM-DD');
-                      let enddate = moment(this.job.closed_at).format('YYYY-MM-DD');
+                      let enddate = moment(this.job.completion_date).format('YYYY-MM-DD');
                       let start_time = moment(this.job.time_in, "HH:mm:ss").format("hh:mm")
                       let end_time = moment(this.job.time_out, "HH:mm:ss").format("hh:mm");
 

@@ -23,7 +23,7 @@ class FuelResource extends JsonResource
             'vehicle_id' => $this->vehicle_id,
             'customer_id' => $this->customer_id,
             'expense_id' => $this->expense_id,
-            'vehicle' => $this->vehicle->code ,
+            'vehicle' => $this->vehicle ? $this->vehicle->code :'',
             'fuel_type_id' => $this->fuel_type_id,
             'fuel_type' => $this->fueltype->description,
             'invoice_no' => $this->invoice_no,
@@ -37,12 +37,13 @@ class FuelResource extends JsonResource
             'job_card_id' => $this->job_card_id,
             'authorized_by' => $this->authorized_by,
             'odometer_readings' => $this->odometer_readings,
-            'track_by' => $this->vehicle->track->name,
-            'current_readings' => $this->vehicle->current_readings,
+            'track_by' => $this->vehicle ? $this->vehicle->track->name : '',
+            'current_readings' => $this->vehicle ? $this->vehicle->current_readings :'',
             'previous_odometer' => $this->previous_odometer,
             'store_man' => $this->store_man,
             'fuel_no' => $this->fuel_no,
-            'asset_category_id' => $this->asset_category_id
+            'asset_category_id' => $this->asset_category_id,
+            'external_reference' => $this->external_reference
              ];
     }
 }

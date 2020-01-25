@@ -26,6 +26,7 @@
                                         </model-select> 
                                 </div>
                                 <div class="form-group">
+                                    <span class="reset_btn pull-right" @click="resetVehicle">reset</span>
                                     <label>Vehicle</label>                                  
                                     <model-select :options="subprojects"
                                         v-model="form.machine_id"  
@@ -53,6 +54,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
+                                     <span class="reset_btn pull-right" @click="resetCustomerType">reset</span>
                                     <label>Customer Type</label>
                                     <select class="form-control" v-model="form.customer_type_id" 
                                             @change="customerType()">
@@ -62,6 +64,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customers">
+                                     <span class="reset_btn pull-right" @click="resetCustomer">reset</span>
                                     <label>Customer</label>                                   
                                     <model-select :options="filtered_customers"
                                         v-model="form.customer_id"                           
@@ -87,8 +90,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
+                                     <span class="reset_btn pull-right" @click="resetCostCode">reset</span>
                                     <label>Cost Code</label>
-                                    <input type="text" class="form-control" v-model="form.cost_code">
+                                    <model-select :options="accounts"
+                                            v-model="form.cost_code"                                      
+                                            >
+                                            </model-select>                                   
                                 </div>
                                 <div class="form-group">
                                     <label>Servicing Date</label>
@@ -124,14 +131,7 @@
                                 <div class="form-group">
                                     <label>Assigned To: </label> {{driver}}
                                 </div>
-                                <div class="form-group">
-                                    <label>Fuel Balance(L)</label>
-                                    <select name="fuel_balance_id" class="form-control" v-model="form.fuel_balance_id"
-                                            >
-                                        <option :value="bal.id" v-for="bal in balances" :key="bal.id">{{bal.litres}}
-                                        </option>
-                                    </select>
-                                </div>
+                                
                                 <div class="form-group" v-if="show_track_by">
                                     <label class="pull-left">Previous {{track_name}} Reading:
                                         {{previous_readings}}</label>
@@ -152,16 +152,20 @@
                                 <div class="form-group" v-if="this.form.machine_id">
                                     <label>Lobour Cost</label>
                                     <input type="text" class="form-control" v-model="form.labour_cost" disabled>
-                                </div>
-
+                                </div>                                
+                                 <div class="form-group">
+                                <label>Standing fee charged</label>
+                                <input type="number" step="0.001" v-model="form.standing_fee" class="form-control" required>
                             </div>
+                            </div>
+                         
                         </div>                      
 
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                      <fieldset class="the-fieldset">
-                               <legend class="the-legend"><label class="fyr">Maintenance</label></legend>                                  
+                               <legend class="the-legend"><label class="fyr">Maintenance</label></legend>                                
                                     <table style="width:100%">
                                         <tr>
                                             <th>Category</th>
@@ -199,6 +203,7 @@
                             <div class="col-md-11">
                                 <div class="form-group">
                                     <label>Requisitions</label>
+                                      <span class="reset_btn pull-right" @click="resetReqs">reset</span>
                                     <select class="form-control" v-model="form.requisition_id" @change="getDetails()"
                                             :disabled="disable_rq">
                                         <option :value="rq.id" v-for="rq in rqs" :key="rq.id">
@@ -317,11 +322,12 @@
                     actual_date: '',
                     completion_date: '',
                     time_in: '',
-                    time_out: '',
-                    fuel_balance_id: '',
+                    time_out: '',                    
                     next_readings: 0,
                     next_service_date: '',
                     current_readings: '',
+                    customer_type_id:'',
+                    standing_fee:1000,
                     service_type: 'Internal',
                     asset_category_id: '',
                     job_type_id: '',
@@ -377,7 +383,8 @@
                 rqs:[],
                 subprojects:[],
                 transactions:{},
-                stk_items:[]           
+                stk_items:[],
+                accounts:[]           
 
             }
         },
@@ -433,12 +440,13 @@
                     if (this.form.job_type_id !== '') {
                      axios.get('job-types')
                         .then(res => {
+                            let total =0;
                             this.job_types = res.data;
                             if (this.form.job_type_id) {
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
-                            this.form.labour_cost = time_in_minutes / 60 * cost;  
+                             total += time_in_minutes / 60 * cost;  
                             }
-                            
+                            this.form.labour_cost =  total;
                         })
 
                     }
@@ -454,8 +462,7 @@
             this.getMachines();
             this.getUsers();
             this.getTracks();
-            this.getServiceTypes();
-            this.getBalances();
+            this.getServiceTypes();          
             this.getParts();
             this.getCategories();
             this.getProjects();
@@ -465,7 +472,8 @@
             this.getCustomers();
             this.getRequisitions();
             this.filteredRqs();
-            this.getCustomerTypes();            
+            this.getCustomerTypes(); 
+            this.getAccounts();           
 
         },
         filters: {
@@ -493,9 +501,36 @@
             },
 
         },
-        methods: {      
+        methods: {
+            resetReqs(){
+            this.form.requisition_id = '';
+            },
+            resetCustomerType(){
+            this.form.customer_type_id = '';
+            },
+            resetCustomer(){
+            this.form.customer_id = '';
+            },
+            resetCostCode(){
+            this.form.cost_code = '';
+            },
+            resetVehicle(){
+            this.form.machine_id = '';
+            },
+        getAccounts(){
+        axios.get('accounts')
+        .then(res => {
+            res.data.forEach(a => {
+                this.accounts.push({
+                    'value': a.id,
+                    'text': a.account
+                })
+            })
+        })
+        }  ,    
              subProject(){       
             let subp = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+            this .subprojects = [];
              subp.forEach(p => {
                 this.subprojects.push({
                     'value': p.id,
@@ -620,9 +655,9 @@
                 if (confirm('Do you really want to close?')) {
                     axios.post(`close-jobcard/${this.form.id}`)
                         .then(res => {
-                            console.log(res.data);
-                            // this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
-                            // eventBus.$emit('cancel');
+                          //  console.log(res.data);
+                            this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
+                            eventBus.$emit('cancel');
                         })
                 }
             },
@@ -717,9 +752,16 @@
                             return this.$toastr.e('Please all Maintenance fields are required.');
                         }
                     }
-                }
+                }               
                
 
+                if (this.form.service_type =='External' && this.form.customer_id =='') {
+                    return this.$toastr.e('Please Customer field is mandatory.');
+                }
+               if (this.form.service_type =='Internal' && this.form.asset_category_id =='') {
+                return this.$toastr.e('Please select project first.');
+               }
+               
                 this.edit_jobcard ? this.update() : this.save();
 
             },
@@ -727,11 +769,10 @@
                 this.saveJob();
             },
             saveJob() {
-                delete this.form.id;
-                this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : ''
+                delete this.form.id;              
+               this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : ''
                 this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : ''
                 this.form.actual_date !== '' ? this.form.actual_date = this.convertDate(this.form.actual_date) : ''
-               
                 axios.post('job-card', this.form).then(res => {
                      console.log('cooll')
                     this.$toastr.s('Jobcard created Successfully.');
@@ -745,12 +786,12 @@
                     day = ("0" + date.getDate()).slice(-2);
                 return [date.getFullYear(), mnth, day].join("-");
             },
-            update() {
-                // this.form.next_service_date = this.convertDate(this.form.next_service_date);
-                // this.form.actual_date = this.convertDate(this.form.actual_date);
-                // this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
-                // this.form.maintenance = JSON.stringify(this.form.maintenance);
-                axios.patch(`job-card/${this.form.id}`, this.form).then(res => {
+            update() {                      
+                this.form.next_service_date !== null && this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : '';
+                  this.form.actual_date !== null && this.form.actual_date !== '' ? this.form.actual_date = this.convertDate(this.form.actual_date) : '';
+                    this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
+                
+                axios.patch(`job-card/${this.form.id}`, this.form).then(res => {                
                     this.$toastr.s('Jobcard updated Successfully.');
                     eventBus.$emit('updateJobcard', res.data)
                 })
@@ -774,13 +815,7 @@
                     .then(service_types => {
                         this.services = service_types.data;
                     })
-            },
-            getBalances() {
-                axios.get('fuel-balance')
-                    .then(balance => {
-                        this.balances = balance.data;
-                    })
-            },
+            },           
             getUsers() {
                 axios.get('users')
                     .then(users => {

@@ -21,8 +21,7 @@ class CreateJobcardsTable extends Migration
             $table->string('service_type')->nullable();
             $table->float('next_readings')->nullable()->default(0);
             $table->float('current_readings')->nullable()->default(0);
-            $table->date('next_service_date')->nullable();
-            $table->integer('fuel_balance_id')->nullable();
+            $table->date('next_service_date')->nullable();        
             $table->date('actual_date')->nullable();
             $table->date('completion_date')->nullable();
             $table->string('service_type_description')->nullable();
@@ -30,7 +29,7 @@ class CreateJobcardsTable extends Migration
             $table->time('time_out')->nullable();
             $table->text('maintenance')->nullable();
             $table->string('card_no');
-            $table->string('cost_code')->nullable();
+            $table->integer('cost_code')->nullable();
             $table->integer('asset_category_id')->nullable();
             $table->dateTime('closed_at')->nullable();
             $table->string('status')->nullable()->default(1);
@@ -42,6 +41,7 @@ class CreateJobcardsTable extends Migration
             $table->integer('checklist_assigned')->nullable()->default(0);
             $table->integer('requisition_id')->nullable();         
             $table->bigInteger('labour_cost')->nullable();
+            $table->bigInteger('standing_fee')->nullable();
           
             $table->timestamps();
         });

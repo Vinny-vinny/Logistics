@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\RequisitionResource;
 use App\Requisition;
+use App\WhseStk;
 use Illuminate\Http\Request;
 
 class RequisitionController extends Controller
@@ -59,7 +60,7 @@ class RequisitionController extends Controller
 
         $request['inventory_items_internal'] = json_encode($request->inventory_items_internal);
         $request['inventory_items_external'] = json_encode($request->inventory_items_external);
-        Requisition::find($id)->update($request->except(['date_requested','project','person_requested']));
+        Requisition::find($id)->update($request->except(['date_requested','project','person_requested','user']));
         return response()->json(new RequisitionResource(Requisition::find($id)));
     }
     //auto generate requisition
