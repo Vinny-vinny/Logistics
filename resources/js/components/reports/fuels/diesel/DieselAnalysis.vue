@@ -83,6 +83,7 @@
                        // console.log(result)                     
                         this.show_diesel = true;
                         this.$store.dispatch('listDieselReports',result)
+                         this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")}) 
                     })
                     .catch(error => error.response)
             },

@@ -84,6 +84,7 @@
                         }                     
                         this.show_fuel = true;
                         this.$store.dispatch('listconsumptionReports',result)
+                         this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})
                     })
                     .catch(error => error.response)
             },

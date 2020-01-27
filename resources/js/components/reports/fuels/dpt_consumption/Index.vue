@@ -6,12 +6,7 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Fuel Reports</h3>
-                    <download-excel
-                        v-if="fuels.length"
-                        class="btn btn-primary pull-right"
-                        :data="results">
-                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Download
-                    </download-excel>
+                   <button class="btn btn-primary pull-right" v-on:click="onexport" v-if="results.length"><i class="fa fa-file-excel-o" aria-hidden="true"></i>  Download</button>
                     <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
                 </div>
                 <div class="box-body">
@@ -39,6 +34,7 @@
     </div>
 </template>
 <script>
+import XLSX from 'xlsx'
 
     export default {
         data(){
@@ -54,9 +50,23 @@
             fuels(){
                 return this.$store.state.department_consumptions;
             },
-
+             dates(){
+              return this.$store.state.dates;
+            }
         },
         methods:{
+        onexport () {      
+      var animalWS = XLSX.utils.json_to_sheet(this.results)    
+
+      // A workbook is the name given to an Excel file
+      var wb = XLSX.utils.book_new() // make Workbook of Excel
+      // add Worksheet to Workbook
+      // Workbook contains one or more worksheets
+      XLSX.utils.book_append_sheet(wb, animalWS, `Dept% ${this.dates.from} to ${this.dates.to}`) // sheetAName is name of Worksheet     
+
+      // export Excel file
+      XLSX.writeFile(wb, `DEPARTMENT CONSUMPTION % AS FROM ${this.dates.from} to ${this.dates.to}.xls`) // name of the file is 'book.xlsx'
+    },
             consumptions(){
             setTimeout(()=>{
             for(let i=0;i<this.fuels.length;i++){

@@ -64,7 +64,8 @@
                  axios.post('km-per-hr',this.form)
                     .then(res =>{  
                        this.show_km = true;
-                       this.$store.dispatch('listKMHRReports',res.data)               
+                       this.$store.dispatch('listKMHRReports',res.data)
+                       this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})               
                    
                     })
                     .catch(error => error.response)
