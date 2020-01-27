@@ -11684,6 +11684,7 @@ __webpack_require__.r(__webpack_exports__);
     selectedGroup: function selectedGroup() {
       var _this = this;
 
+      this.items = [];
       setTimeout(function () {
         var items = _this.parts.filter(function (item) {
           return item.item_group == _this.form.group_name;

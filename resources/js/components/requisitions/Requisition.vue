@@ -241,7 +241,8 @@
             return !isNaN(parseFloat(n)) && isFinite(n);
             },
             selectedGroup(){
-           setTimeout(()=>{
+            this.items = [];
+          setTimeout(()=>{
           let items = this.parts.filter(item => item.item_group == this.form.group_name);
             items.forEach(p => {
                 this.items.push({
