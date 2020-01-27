@@ -55,15 +55,13 @@
         created(){
             this.listen();
             this.getJobs();
-        },
-        mounted(){
-            this.initDatable();
-        },
+        },    
         methods:{
             getJobs(){
                 axios.get('job-card')
                     .then(res =>{
                         this.tableData = res.data;
+                        this.initDatable()
                     })
                     .catch(error => Exception.handle(error))
                 this.initDatable();

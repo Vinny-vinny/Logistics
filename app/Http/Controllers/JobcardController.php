@@ -101,7 +101,7 @@ class JobcardController extends Controller
         $request['maintenance'] = json_encode($request->get('maintenance'));     
         $jobcard = Jobcard::find($id);
         $request['card_no'] = 'Job00'.$id;
-        $jobcard->update($request->except(['service_types','files','driver','machine','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist','cost_center','requisitions']));
+        $jobcard->update($request->except(['service_types','files','driver','machine','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist','cost_center','requisitions','costcode']));
         if ($request->machine_id) {
              Machine::find($request->machine_id)->update([
             'current_readings' => $request->get('current_readings'),

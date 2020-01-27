@@ -26,11 +26,11 @@
                     </tr>
                     <tr>
                         <td>GL Code</td>
-                        <td></td>
+                        <td>{{job.costcode}}</td>
                     </tr>
                     <tr>
                         <td>Cost Code</td>
-                        <td>{{job.cost_code}}</td>
+                        <td>{{job.costcode}}</td>
                     </tr>
                     <tr>
                         <td>Cost Center</td>
@@ -232,13 +232,9 @@
                         </tr>
                         <tr>
                             <td>Miscellaneous</td>
-                            <td>1000</td>
+                            <td>{{job.standing_fee}}</td>
                             
-                        </tr>
-                        <tr>
-                            <td>Stock</td>
-                            <td></td>
-                        </tr>
+                        </tr>                      
                         <tr>
                             <td>Cost</td>
                             <td>{{cost | number}}</td>
@@ -287,11 +283,15 @@
                 <table class="customers" style="width: 50%">
                     <tr>
                         <td>STORE ISSUES TOTAL VALUE</td>
-                        <td></td>
+                        <td>{{cost | number}}</td>
                     </tr>
                     <tr>
                         <td>LABOUR CHARGES</td>
                         <td>{{job.labour_cost | number}}</td>
+                    </tr>
+                     <tr>
+                        <td>STANDING CHARGE FEE</td>
+                        <td>{{job.standing_fee | number}}</td>
                     </tr>
                     <tr v-if="has_othercharges">
                         <td>{{other_charges.name}}</td>
@@ -299,7 +299,7 @@
                     </tr>
                     <tr>
                         <td>TOTAL COST OF PROJECT</td>
-                        <td>{{project_cost | number}}</td>
+                        <td>{{(job.labour_cost + cost + job.standing_fee) | number}}</td>
                     </tr>
                 </table>
                     <div style="margin-left: 40px; height:100%;margin-top: -20px;">
@@ -453,9 +453,11 @@
                                this.requisitions_external = req.inventory_items_external;
                                axios.get('parts')
                                    .then(res => {
+                                    let total =0;
                                        this.requisitions_external.forEach(item => {
                                            for (let i=0;i<res.data.length;i++){
                                                if (res.data[i]['id'] == item.part){
+                                                total+=(item.unit_price*item.quantity);
                                                    this.items.push({
                                                        'item':res.data[i]['description'],
                                                        'qty':item.quantity,
@@ -465,6 +467,7 @@
                                                }
                                            }
                                        })
+                                     this.cost = total;
                                    })
                                 }
                        })

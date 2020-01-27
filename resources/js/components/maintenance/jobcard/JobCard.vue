@@ -481,6 +481,7 @@
                 return moment(date);
             }
         },
+       
         computed: {
             partItems() {
                 return this.service_required;
@@ -562,14 +563,13 @@
                     if (this.requisitions[i]['id'] === this.form.requisition_id) {
                         if(this.requisitions[i]['type'] ==='Internal'){
                             this.filtered_rq ='Internal';
-
                                 this.filtered_items_internal = this.requisitions[i]['inventory_items_internal'];
-                            return;
+                          
                         }
                         if(this.requisitions[i]['type'] ==='External'){
                             this.filtered_rq ='External';                       
                             this.filtered_items_external = this.requisitions[i]['inventory_items_external'];
-                            return;
+                         
                         }
 
                     }

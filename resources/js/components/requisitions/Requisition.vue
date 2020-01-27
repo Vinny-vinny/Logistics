@@ -88,8 +88,7 @@
                                     <th>Unit Cost</th>
                                     <th>Total Cost</th>
                                     <th>Total Cost(with VAT)</th>
-                                    <th></th>
-                                    <th></th>
+                                    <th></th>                                 
                                 </tr>
                                 <tr v-for="(item,k) in form.inventory_items_internal" :key="k">
                                       <td>
@@ -117,8 +116,7 @@
                                                placeholder="Total Cost" disabled></td>
                                     <td><input type="number" class="form-control p_ex_2" step="0.001" v-model="item.total_cost_inclusive"
                                                placeholder="Total Cost Inclusive VAT" disabled></td>
-                                    <td style="display:none"><input type="text" class="form-control p_ex_2" v-model="item.group"
-                                               disabled></td>
+                                  
                                     <td>
                                         <i class="fa fa-minus-circle remove_2" @click="removeItem(k)"
                                            v-show="k || ( !k && form.inventory_items_internal.length > 1)"></i>
@@ -137,8 +135,7 @@
                                     <th>Qty</th>
                                     <th>Unit Price</th>
                                     <th>Total Price</th>
-                                    <th>Total Price(with VAT)</th>
-                                    <th style="display:none"></th>
+                                    <th>Total Price(with VAT)</th>                                 
                                     <th></th>
                                 </tr>
                                 <tr v-for="(item,k) in form.inventory_items_external" :key="k">
@@ -165,9 +162,7 @@
                                     <td><input type="number" class="form-control p_in_2" step="0.001" v-model="item.total_price"
                                                placeholder="Total Price" disabled></td>
                                     <td><input type="number" class="form-control p_ex_2" step="0.001" v-model="item.total_price_inclusive"
-                                               placeholder="Total Price Inclusive VAT" disabled></td>
-                                    <td style="display:none"><input type="text" class="form-control p_ex_2" v-model="item.group"
-                                               disabled></td>
+                                               placeholder="Total Price Inclusive VAT" disabled></td>                                  
                                     <td>
                                         <i class="fa fa-minus-circle remove_2" @click="removeItemExternal(k)"
                                            v-show="k || ( !k && form.inventory_items_external.length > 1)"></i>
@@ -204,8 +199,8 @@
                     type:'Internal',
                     customer_id:'',
                     group_name:'',
-                    inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',group:''}],
-                    inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',group:''}],
+                    inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:''}],
+                    inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:''}],
                     id:''
                 },
                 edit_requisition: this.edit,
@@ -267,15 +262,13 @@
                           
                             if (this.form.inventory_items_internal[i]['part'] === this.parts[p]['id']){
                                 if(!customer){
-                                    this.form.inventory_items_internal[i]['unit_cost'] = this.parts[p]['cost'];
-                                this.form.inventory_items_internal[i]['group'] = this.form.group_name;
+                                    this.form.inventory_items_internal[i]['unit_cost'] = this.parts[p]['cost'];                              
                                 this.form.inventory_items_internal[i]['total_cost_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.inventory_items_internal[i]['quantity']).toFixed(2);
                                 this.form.inventory_items_internal[i]['total_cost'] = (this.parts[p]['cost'] * this.form.inventory_items_internal[i]['quantity']).toFixed(2); 
                               }                               
                                 item_array.push({
                                     'id' : this.parts[p]['id'],
-                                    'cost' : this.parts[p]['cost'],
-                                    'group': this.form.group_name,
+                                    'cost' : this.parts[p]['cost'],                                    
                                     'qty': this.form.inventory_items_internal[i]['quantity']                               
                                 })
                             }
@@ -288,8 +281,7 @@
                      for(let q=0;q<this.form.inventory_items_internal.length;q++){
                       this.pricelists.forEach(m => {
                        if(m.id ==item.id && this.form.inventory_items_internal[q]['part']==item.id){                     
-                      this.form.inventory_items_internal[q]['unit_cost'] = m.exclusive_price;
-                      this.form.inventory_items_internal[q]['group'] = item.group;
+                      this.form.inventory_items_internal[q]['unit_cost'] = m.exclusive_price;       
                       this.form.inventory_items_internal[q]['total_cost_inclusive'] = (m.inclusive_price * item.qty).toFixed(2); 
                       this.form.inventory_items_internal[q]['total_cost'] = (m.exclusive_price * item.qty).toFixed(2);;
                        }
@@ -314,15 +306,13 @@
                         if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){
                             if (this.form.inventory_items_external[i]['part'] === this.parts[p]['id']){
                                if(!customer){
-                               this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']
-                                 this.form.inventory_items_external[i]['group'] = this.form.group_name;                  
+                               this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']                                              
                                 this.form.inventory_items_external[i]['total_price_inclusive'] = ((this.form.inventory_items_external[i]['unit_price']* 116/100) * this.form.inventory_items_external[i]['quantity']).toFixed(2);
                                 this.form.inventory_items_external[i]['total_price'] = (this.form.inventory_items_external[i]['unit_price'] * this.form.inventory_items_external[i]['quantity']).toFixed(2);
                             }
                             item_array.push({
                                     'id' : this.parts[p]['id'],
-                                    'cost' : this.parts[p]['cost'],
-                                    'group': this.form.group_name,
+                                    'cost' : this.parts[p]['cost'],                                
                                     'qty': this.form.inventory_items_external[i]['quantity']                               
                                 })
                         }
@@ -335,8 +325,7 @@
                      for(let q=0;q<this.form.inventory_items_external.length;q++){
                       this.pricelists.forEach(m => {
                        if(m.id ==item.id && this.form.inventory_items_external[q]['part']==item.id){                     
-                      this.form.inventory_items_external[q]['unit_price'] = m.exclusive_price;
-                      this.form.inventory_items_external[q]['group'] = item.group;
+                      this.form.inventory_items_external[q]['unit_price'] = m.exclusive_price;     
                       this.form.inventory_items_external[q]['total_price_inclusive'] = (m.inclusive_price * item.qty).toFixed(2); 
                       this.form.inventory_items_external[q]['total_price'] = (m.exclusive_price * item.qty).toFixed(2);;
                        }
@@ -423,26 +412,36 @@
                     this.form.group_name = '';
                 return this.$toastr.e('Please Select customer first');
                 }
-             let items = this.parts.filter(item => item.item_group == this.form.group_name);
-             // if (this.form.type =='Internal') {
-             //    if (Object.values(this.form.inventory_items_internal[0])[0] !== '') {
-             //         for (let i = 0; i < this.form.inventory_items_internal.length; i++) {
-             //            console.log(this.form.group_name)
-             //            console.log('-------')
-             //            console.log(this.form.inventory_items_internal[i]['group'])
-             //            console.log('==========')
-             //            if (this.form.group_name ==this.form.inventory_items_internal[i]['group']) {
-             //                console.log('ooppopop')
-             //                this.form.inventory_items_internal[i]['part'] = 2;
-             //                this.form.inventory_items_internal[i]['uom'] = 'unit'
-                           
-             //            }
+                this.items = []; 
+                let items=[];
+                 items = this.parts.filter(item => item.item_group == this.form.group_name);
+                 
+             if (this.form.type =='Internal') {
+                if (Object.values(this.form.inventory_items_internal[0])[0] !== '') {
+                     for (let i = 0; i < this.form.inventory_items_internal.length; i++) {
+                        this.parts.forEach(p => {
+                            if (p.id == this.form.inventory_items_internal[i]['part']) {
+                                items.push(p);
+                            }
+                        })                    
                        
-             //        }
-             //    }
-             // }
-             // console.log(Object.values(this.form.inventory_items_internal[0])[0]);
-             this.items = [];          
+                    }
+                }
+             } 
+
+                if (this.form.type =='External') {
+                if (Object.values(this.form.inventory_items_external[0])[0] !== '') {
+                     for (let i = 0; i < this.form.inventory_items_external.length; i++) {
+                        this.parts.forEach(p => {
+                            if (p.id == this.form.inventory_items_external[i]['part']) {
+                                items.push(p);
+                            }
+                        })                    
+                       
+                    }
+                }
+             }             
+                    
             items.forEach(p => {
                 this.items.push({
                     'value': p.id,

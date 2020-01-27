@@ -61,5 +61,8 @@ class Jobcard extends Model
     {
         return $this->belongsTo(AssignChecklist::class,'id','jobcard_id');
     }
+    public function account(){
+        return $this->belongsTo(Account::class,'cost_code');
+    }
 
 }

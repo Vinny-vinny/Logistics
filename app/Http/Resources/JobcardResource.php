@@ -51,6 +51,7 @@ class JobcardResource extends JsonResource
             'make' => $this->machine ? $this->machine->make : '',
             'status' => $this->status,
             'cost_code' => $this->cost_code,
+            'costcode' => $this->account ? $this->account->account : '',
             'requisition_id' => $this->requisition_id,
             'inventory_items' => $this->requisition_id ? $this->requisition->inventory_items : '',
             'checklist_assigned' => $this->checklist_assigned,
