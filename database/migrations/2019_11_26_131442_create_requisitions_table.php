@@ -19,13 +19,16 @@ class CreateRequisitionsTable extends Migration
             $table->string('description')->nullable();
             $table->string('type')->nullable();
             $table->string('req_no')->nullable();
-            $table->string('where_to_charge')->nullable();
+            $table->integer('where_to_charge')->nullable();
             $table->integer('project_id')->nullable();
             $table->integer('requested_by')->nullable();
             $table->string('group_name')->nullable();
             $table->integer('used')->default(0)->nullable();
             $table->text('inventory_items_internal')->nullable();
             $table->text('inventory_items_external')->nullable();
+            $table->string('external_reference')->nullable();
+            $table->string('person_collecting')->nullable();
+            $table->integer('customer_id')->nullable();
             $table->timestamps();
         });
     }

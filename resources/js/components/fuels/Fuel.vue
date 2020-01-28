@@ -12,19 +12,23 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
+                                    <label>Extenal Reference(FID No)</label>
+                                    <input type="text" class="form-control" v-model="form.external_reference" required>
+                                </div>
+                                <div class="form-group" v-if="company">
                                     <label>Project</label>                                   
                                       <model-select :options="projects"
                                         v-model="form.asset_category_id"  
                                         @input="subProject()"                    
-                                        required>
+                                        >
                                         </model-select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" v-if="company">
                                     <label>Vehicle</label>                                   
                                       <model-select :options="subprojects"
                                         v-model="form.vehicle_id"  
                                         @input="getFuelType()"                    
-                                        required>
+                                        >
                                         </model-select>
                                 </div>
                                 <div class="form-group">
@@ -49,7 +53,11 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" v-if="form.customer_id && form.fuel_type_id">
+                                    <label>Fuel Rate</label>
+                                    <input type="text" class="form-control" v-model="form.rate">
+                                </div>
+                                <div class="form-group" style="display:none">
                                     <label>Other Charges</label>
                                     <select name="expense_id" class="form-control" v-model="form.expense_id" @change="genExpenses()">
                                         <option :value="expense.id" v-for="expense in expenses" :key="expense.id">
@@ -65,6 +73,8 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
+                                <fieldset class="the-fieldset">
+                               <legend class="the-legend"><label class="fyr">Fueling</label></legend>
                                 <div class="form-group" style="margin-left:100px;">
                                     <table width="100%">
                                         <tr>
@@ -88,14 +98,17 @@
                                         </tr>
                                     </table>
                                 </div>
-
+                             </fieldset>
+                                   <br>
                                 <div class="form-group">
+                                    <span class="reset_btn pull-right" @click="resetCustomerType">reset</span>
                                     <label>Customer Type</label>
                                     <select class="form-control" v-model="form.customer_type_id" required @change="customerTypes()">
                                         <option :value="type.id" v-for="type in customer_types" :key="type.id">{{type.name}}</option>
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customer">
+                                    <span class="reset_btn pull-right" @click="resetCustomer">reset</span>
                                     <label>Customer</label>                                   
                                       <model-select :options="filtered_customers"
                                         v-model="form.customer_id"                         
@@ -147,6 +160,7 @@
                     store_man:'',
                     asset_category_id:'',
                     previous_odometer: 0,
+                    external_reference:'',
                     rate:0,
                     id: ''
                 },
@@ -192,7 +206,6 @@
             this.getJobcards();
             this.getFuels();
             this.getProjects();
-            this.getStk();
              
 
         },
@@ -239,13 +252,11 @@
             }
         },
         methods: {
-            getStk(){
-                setTimeout(()=>{
-             this.stks = this.parts.filter(p => p.code == 'LA0012' || p.code == 'LA0018');
-            console.log(this.stks);
-                },3000)
-               
-            
+            resetCustomerType(){
+            this.form.customer_type_id = '';
+            },
+            resetCustomer(){
+            this.form.customer_id = '';
             },
             subProject(){
                 this.subprojects =[];
@@ -322,7 +333,7 @@
                 axios.get('parts')
                     .then(res => {
                         this.parts = res.data
-
+                       this.stks = res.data.filter(p => p.code == 'LA0012' || p.code == 'LA0018');
                     })
 
             },
@@ -425,7 +436,9 @@
                    setTimeout(()=>{                    
                     this.subProject();
                     this.customerTypes();
-                   },1000)
+                    this.getCustomers();
+                    this.getVehicles();
+                   },4000)
                 }
             },
            

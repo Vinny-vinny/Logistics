@@ -120,7 +120,8 @@
               }
 
             }  
-                 this.$store.dispatch('listJobReports',requistions) 
+                 this.$store.dispatch('listJobReports',requistions)
+                 this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")}) 
                  this.show_job = true;
                  
 

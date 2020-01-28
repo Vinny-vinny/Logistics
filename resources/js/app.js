@@ -49,6 +49,8 @@ Vue.filter('number', function(value) {
      return new Intl.NumberFormat().format(value)
 });
 
+
+
 import Exception from "./helpers/Exception";
 window.Exception = Exception;
 

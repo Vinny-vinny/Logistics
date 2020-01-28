@@ -46,15 +46,13 @@
         },
         created(){
             this.getProjects();
-        },
-        mounted(){
-            this.initDatable();
-        },
+        },       
         methods:{
             getProjects(){
                 axios.get('projects')
                     .then(res => {
-                      this.tableData = res.data
+                      this.tableData = res.data;
+                      this.initDatable();
                     })
             },
             importProjects(){

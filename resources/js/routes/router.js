@@ -4,7 +4,7 @@ import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import ServiceTypes from "../components/maintenance/servicetypes/Index";
 import TrackBy from "../components/maintenance/trackby/Index";
-import FuelBalance from "../components/maintenance/fuelbalance/Index";
+import FuelBalance from "../components/maintenance/fuelbalance/FuelBalance";
 import Machines from "../components/maintenance/machines/Index";
 import JobCard from "../components/maintenance/jobcard/Index";
 import Fuel from "../components/fuels/Index";
@@ -34,6 +34,9 @@ import KmPerHr from "../components/reports/kmperhr/KmPerHr";
 import DieselAnalysis from "../components/reports/fuels/diesel/DieselAnalysis";
 import DepartmentConsumption from "../components/reports/fuels/dpt_consumption/DepartmentConsumption";
 import Partners from "../components/reports/fuels/partners/Partners";
+import Accounts from "../components/accounts/Index";
+import Uoms from "../components/uoms/Index";
+import PriceList from "../components/pricelists/Index";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -77,7 +80,10 @@ const routes = [
     {path:'/km-per-hr',component:KmPerHr, beforeEnter: guard},
     {path:'/diesel-analysis',component:DieselAnalysis, beforeEnter: guard},
     {path:'/dpt-consumption',component:DepartmentConsumption, beforeEnter: guard},
-    {path:'/partners',component:Partners, beforeEnter: guard}
+    {path:'/partners',component:Partners, beforeEnter: guard},
+    {path:'/accounts',component:Accounts, beforeEnter: guard},
+    {path:'/uoms',component:Uoms, beforeEnter: guard},
+    {path:'/price-list',component:PriceList, beforeEnter: guard},
 ];
 
 export default new VueRouter({

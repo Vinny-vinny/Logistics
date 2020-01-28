@@ -54,15 +54,17 @@
               </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><router-link to="/users" class="fa fa-circle-o"> Users</router-link></li>
-                        <li><router-link to="/fuel-balance" class="fa fa-circle-o"> Fuel Balance</router-link></li>
+                        <li><router-link to="/users" class="fa fa-circle-o"> Users</router-link></li> 
                         <li><router-link to="/fuel-types" class="fa fa-circle-o"> Fuel Types</router-link></li>
                         <li><router-link to="/track-by" class="fa fa-circle-o"> Track By</router-link></li>
                         <li><router-link to="/service-types" class="fa fa-circle-o"> Service Types</router-link></li>
                         <li><router-link to="/expense" class="fa fa-circle-o"> Other Charges</router-link></li>
                         <li><router-link to="/parts" class="fa fa-circle-o"> Parts</router-link></li>
+                        <li><router-link to="/accounts" class="fa fa-circle-o"> Ledgers</router-link></li>
+                        <li><router-link to="/uoms" class="fa fa-circle-o"> Uoms</router-link></li>
                         <li><router-link to="/projects" style="display:none"> Projects</router-link></li>
                         <li><router-link to="/customers" class="fa fa-circle-o"> Customers</router-link></li>
+                         <li><router-link to="/price-list" class="fa fa-circle-o"> Price Lists</router-link></li>
                         <li><router-link to="/mechanics" class="fa fa-circle-o"> Mechanics</router-link></li>
                         <li><router-link to="/categories" class="fa fa-circle-o"> Categories</router-link></li>
                         <li><router-link to="/job-type" class="fa fa-circle-o"> Job types</router-link></li>

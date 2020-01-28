@@ -85,7 +85,7 @@
                     .catch(error => Exception.handle(error))
             },
             listen(){
-                eventBus.$on('listReqs',(rq) =>{
+                eventBus.$on('listReqs',(rq) =>{                  
                     this.tableData.unshift(rq);
                     this.add_requisition =false;
                     this.initDatable();
@@ -129,7 +129,7 @@
                         colReorder: true,
 
                     });
-                },1000)
+                },2000)
             },
         },
         components:{

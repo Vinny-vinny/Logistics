@@ -34,7 +34,8 @@ export default new Vuex.Store({
         km_hrs:{},
         diesels:{},
         department_consumptions:{},
-        partners:{}
+        partners:{},
+        dates:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -126,6 +127,9 @@ export default new Vuex.Store({
         },
         listPartnersReports(state,partner){
          state.partners = partner;
+        },
+        getPeriod(state,dates){
+        state.dates = dates
         }
     },
     actions:{
@@ -218,6 +222,9 @@ export default new Vuex.Store({
         },
         listPartnersReports({commit},partner){
          commit('listPartnersReports',partner);
+        },
+        getPeriod({commit},dates){
+        commit('getPeriod',dates);
         }
     }
 })

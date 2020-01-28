@@ -5,13 +5,8 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Stock Issue</h3>
-                    <download-excel
-                        v-if="jobs.length"
-                        class="btn btn-primary pull-right"
-                        :data="requistions">
-                        <i class="fa fa-file-excel-o" aria-hidden="true"></i> Download
-                    </download-excel>
+                    <h3 class="box-title">Stock Issue</h3> 
+<button class="btn btn-primary pull-right" v-on:click="onexport" v-if="requistions.length"><i class="fa fa-file-excel-o" aria-hidden="true"></i>  Download</button>
                    <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
                 </div>
                 <div class="box-body">
@@ -49,12 +44,14 @@
 </template>
 <script>
     import JobcardReport from "./JobcardReport";
+    import XLSX from 'xlsx'
     export default {
         data(){
             return {
                 requistions:[],
                 parts:{},
-                projects:{}
+                projects:{}        
+
             }
         },
        mounted(){
@@ -67,11 +64,26 @@
         computed:{
             jobs(){
           return this.$store.state.jobs; 
-            },         
+            },   
+            dates(){
+              return this.$store.state.dates;
+            }      
         
         },
         methods:{
-         itemsIssued(){         
+       onexport () {      
+      var animalWS = XLSX.utils.json_to_sheet(this.requistions)    
+
+      // A workbook is the name given to an Excel file
+      var wb = XLSX.utils.book_new() // make Workbook of Excel
+      // add Worksheet to Workbook
+      // Workbook contains one or more worksheets
+      XLSX.utils.book_append_sheet(wb, animalWS, `Stocks ${this.dates.from} to ${this.dates.to}`) // sheetAName is name of Worksheet     
+
+      // export Excel file
+      XLSX.writeFile(wb, `STOCK ISSUE AS FROM ${this.dates.from} to ${this.dates.to}.xls`) // name of the file is 'book.xlsx'
+    },
+     itemsIssued(){         
           setTimeout(()=>{  
             for(let i=0;i<this.jobs.length;i++){
              this.requistions.push({

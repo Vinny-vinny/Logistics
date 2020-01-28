@@ -32,6 +32,7 @@ class CreateFuelsTable extends Migration
             $table->float('odometer_readings')->nullable()->default(0);
             $table->float('previous_odometer')->nullable()->default(0);
             $table->float('rate')->nullable()->default(0);
+            $table->string('external_reference')->nullable();
             $table->timestamps();
         });
     }

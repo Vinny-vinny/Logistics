@@ -8,8 +8,8 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Fueling</h3>
-                    <button class="btn btn-primary pull-right" @click="add_fuel_other=true">Add Other Fuel</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_fuel=true">Add Company Asset Fuel</button>
+                    <button class="btn btn-primary pull-right" @click="add_fuel_other=true" style="display:none">Add Other Fuel</button>
+                    <button class="btn btn-primary pull-right mr" @click="add_fuel=true">Add Fuel</button>
 
                 </div>
                 <div class="box-body">

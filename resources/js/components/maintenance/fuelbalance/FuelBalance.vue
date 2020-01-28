@@ -5,17 +5,25 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">{{edit_fuel ? 'Update Fuel Balance' : 'New Fuel Balance'}}</h3>
+                    <h3 class="box-title">Datatable test</h3>
                 </div>
                 <div class="box-body">
-                    <form @submit.prevent="saveFuel()">
-                        <div class="form-group">
-                            <label>Litres</label>
-                            <input type="number" step="0.001" class="form-control" v-model="form.litres" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
-                        <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-                    </form>
+      <vuetable ref="vuetable"
+      api-url="https://vuetable.ratiw.net/api/users"
+      :fields="fields"
+      pagination-path=""
+      @vuetable:pagination-data="onPaginationData"
+    >
+    <template slot="actions" slot-scope="props">
+    <div class="table-button-container">
+        <button class="ui button" @click="editRow(props.rowData)"><i class="fa fa-edit"></i> Edit</button>&nbsp;&nbsp;
+        <button class="ui basic red button" @click="deleteRow(props.rowData)"><i class="fa fa-remove"></i> Delete</button>&nbsp;&nbsp;
+    </div>
+</template>
+    </vuetable>
+    <vuetable-pagination ref="pagination"
+      @vuetable-pagination:change-page="onChangePage"
+    ></vuetable-pagination>
                 </div>
             </div>
         </section>
@@ -23,47 +31,35 @@
     </div>
 </template>
 <script>
+import Vuetable from 'vuetable-2';
+import VuetablePagination from 'vuetable-2'
     export default {
-        props:['edit'],
+       
         data(){
             return {
-                form:{
-                    litres:'',
-                    id:''
-                },
-                edit_fuel: this.edit
+                fields: ['name', 'email','birthdate','nickname','gender','__slot:actions']
                 }
         },
-        created(){
-            this.listen();
-        },
+       
         methods:{
-            saveFuel(){
-                this.edit_fuel ? this.update() : this.save();
-            },
-            save(){
-                delete this.form.id;
-                axios.post('fuel-balance',this.form)
-                    .then(res => eventBus.$emit('listFuelBalance',res.data))
-                    .catch(error => error.response)
-            },
-            update(){
-                axios.patch(`fuel-balance/${this.form.id}`,this.form)
-                    .then(res => {
-                        this.edit_fuel = false;
-                        eventBus.$emit('updateFuelBalance',res.data);
-                    })
-                    .catch(error => error.response)
-            },
-            cancel(){
-                eventBus.$emit('cancel')
-            },
-            listen(){
-                if (this.edit){
-                    this.form = this.$store.state.fuel_balance
-                    }
-            },
-        }
+      onPaginationData (paginationData) {
+      this.$refs.pagination.setPaginationData(paginationData)
+    },
+    onChangePage (page) {
+      this.$refs.vuetable.changePage(page)
+    },
+    editRow(rowData){
+      alert("You clicked edit on"+ JSON.stringify(rowData))
+    },
+    deleteRow(rowData){
+      alert("You clicked delete on"+ JSON.stringify(rowData))
+    }
+        },
+         components:{
+            Vuetable,
+            //VuetablePagination
+   'vuetable-pagination': Vuetable.VuetablePagination
+      },
     }
 </script>
 
