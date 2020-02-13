@@ -30,7 +30,7 @@
                             <td>{{checklist.reminder_before}} days</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editChecklist(checklist)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteChecklist(checklist.id)"><i class="fa fa-trash"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="deleteChecklist(checklist.id)" style="display:none"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
                         </tbody>

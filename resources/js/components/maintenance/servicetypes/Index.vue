@@ -28,7 +28,7 @@
                            <td>{{service.service_after}} {{service.track_name}}</td>
                            <td>
                                <button class="btn btn-success btn-sm" @click="editService(service)"><i class="fa fa-edit"></i></button>
-                               <button class="btn btn-danger btn-sm" @click="deleteService(service.id)"><i class="fa fa-trash"></i></button>
+                               <button class="btn btn-danger btn-sm" @click="deleteService(service.id)" style="display:none"><i class="fa fa-trash"></i></button>
                            </td>
                        </tr>
                        </tbody>

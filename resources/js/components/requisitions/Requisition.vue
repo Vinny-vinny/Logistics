@@ -17,7 +17,7 @@
                         </div>                        
                           <div class="form-group">
                             <label>Requisition Type</label>
-                            <select class="form-control select2" v-model="form.type" required>
+                            <select class="form-control select2" v-model="form.type" required :disabled="edit">
                                 <option value="Internal">Internal</option>
                                 <option value="External">External</option>
                             </select>
@@ -61,10 +61,11 @@
                         </div> 
                         </div>
                        <div class="form-group">
-                        <span class="reset_btn pull-right" @click="resetCustomer">reset</span>
+                        <span class="reset_btn pull-right" @click="resetCustomer" :disable="edit">reset</span>
                            <label>Customers</label>
                            <model-select :options="customers"
-                                        v-model="form.customer_id"                              
+                                        v-model="form.customer_id" 
+                                        :is-disabled="edit"                             
                                         >
                           </model-select>
                        </div>
@@ -85,6 +86,7 @@
                                     <th>Item</th>
                                     <th>Uom</th>
                                     <th>Qty</th>
+                                    <th>Avail. Qty</th>
                                     <th>Unit Cost</th>
                                     <th>Total Cost</th>
                                     <th>Total Cost(with VAT)</th>
@@ -100,15 +102,15 @@
                                         </model-select>
                                     </td>
                                        <td>
-                                        <model-select :options="uoms"
-                                        v-model="item.uom"                            
-                                        class="i_p qty"
-                                        >
-                                        </model-select>
+                                       <input type="text" class="form-control qty" v-model="item.uom"> 
                                     </td>
 
                                     <td><input type="text" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty" @keyup="qty = item.quantity">
+                                    </td>
+
+                                    <td><input type="text" class="form-control qty" v-model="item.qty_available"
+                                               disabled>
                                     </td>
                                     <td><input type="number" class="form-control p_in" step="0.001" v-model="item.unit_cost"
                                                placeholder="Unit Cost" disabled></td>
@@ -133,6 +135,7 @@
                                     <th>Item</th>
                                     <th>Uom</th>
                                     <th>Qty</th>
+                                    <th>Avail. Qty</th>
                                     <th>Unit Price</th>
                                     <th>Total Price</th>
                                     <th>Total Price(with VAT)</th>                                 
@@ -148,14 +151,13 @@
                                         </model-select>                                      
                                     </td>
                                         <td>
-                                        <model-select :options="uoms"
-                                        v-model="item.uom"                            
-                                        class="i_p qty"
-                                        >
-                                        </model-select>
+                                      <input type="text" class="form-control qty" v-model="item.uom"> 
                                     </td>
                                     <td><input type="number" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty"  @keyup="qty = item.quantity">
+                                    </td>
+                                    <td><input type="text" class="form-control qty" v-model="item.qty_available"
+                                               disabled>
                                     </td>
                                     <td><input type="number" class="form-control p_in" step="0.001" v-model="item.unit_price"
                                                placeholder="Unit Price" @keyup="unit_price = costing(item.part)"></td>
@@ -199,8 +201,8 @@
                     type:'Internal',
                     customer_id:'',
                     group_name:'',
-                    inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:''}],
-                    inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:''}],
+                    inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
+                    inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
                     id:''
                 },
                 edit_requisition: this.edit,
@@ -219,7 +221,9 @@
                 uoms:[],
                 customers:[],
                 pricelists:{},
-                all_customers:{}
+                all_customers:{},
+                units:{},
+                filtered_uoms:{}
             }
         },
         created(){
@@ -245,8 +249,11 @@
 
             },
             getExpenses(){  
+
             let customer; 
             let item_array = [];  
+            let uoms;
+            this.uoms = [];
         
                 if (this.form.customer_id) {                   
                    customer =this.all_customers.find(q =>q.id ==this.form.customer_id)                      
@@ -255,12 +262,22 @@
                         
                 for (let p=0; p < this.parts.length; p++){
                     for (let i=0; i < this.form.inventory_items_internal.length; i++){
+                           if (this.form.inventory_items_internal[i]['part'] === this.parts[p]['id']){
+                            //Uom alGo goes here                            
+                                uoms = this.units.filter(u =>u.id_units == this.parts[p]['uom_stock_id'] || u.id_units == this.parts[p]['uom_purchase_id'] || u.id_units == this.parts[p]['uom_sellunit_id'])
+                             
+                        if (uoms.length) {
+                          this.form.inventory_items_internal[i]['uom'] = uoms[0]['description']                      
+                       }
+                        this.form.inventory_items_internal[i]['qty_available'] = this.parts[p]['qty_on_hand'] 
                         if (this.form.inventory_items_internal[i]['quantity'] !=='' && this.form.inventory_items_internal[i]['part'] !==''){                             
                             if(this.form.inventory_items_internal[i]['quantity'] < 0 || (isNaN(parseFloat(this.form.inventory_items_internal[i]['quantity'])) && !isFinite(this.form.inventory_items_internal[i]['quantity']))){
                                this.form.inventory_items_internal[i]['quantity'] = 1; 
-                            }                          
-                          
-                            if (this.form.inventory_items_internal[i]['part'] === this.parts[p]['id']){
+                            }                    
+                          if (this.form.inventory_items_internal[i]['quantity'] > this.parts[p]['qty_on_hand']) {
+                            this.form.inventory_items_internal[i]['quantity'] ='';
+                            return this.$toastr.e('Sorry, requested Qty cannot be greater than available Qty.');
+                          }
                                 if(!customer){
                                     this.form.inventory_items_internal[i]['unit_cost'] = this.parts[p]['cost'];                              
                                 this.form.inventory_items_internal[i]['total_cost_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.inventory_items_internal[i]['quantity']).toFixed(2);
@@ -290,21 +307,31 @@
                          
                     })         
                 }
-                             
-               
+    
             },
             getExternal(){
+
             let customer; 
             let item_array = [];
+            let uoms;
           
                 if (this.form.customer_id) {                   
                    customer =this.all_customers.find(q =>q.id ==this.form.customer_id)                      
                    }
                     
                 for (let p=0; p < this.parts.length; p++){
-                    for (let i=0; i < this.form.inventory_items_external.length; i++){
-                        if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){
+                    for (let i=0; i < this.form.inventory_items_external.length; i++){                       
                             if (this.form.inventory_items_external[i]['part'] === this.parts[p]['id']){
+                              
+                                //uoms algo
+                                 // console.log(`stock_id== ${this.parts[p]['uom_stock_id']} purchase_id== ${this.parts[p]['uom_purchase_id']} selling_id== ${this.parts[p]['uom_sellunit_id']}`)
+                                uoms = this.units.filter(u =>u.id_units == this.parts[p]['uom_stock_id'] || u.id_units == this.parts[p]['uom_purchase_id'] || u.id_units == this.parts[p]['uom_sellunit_id'])
+
+                        if (uoms.length) {
+                          this.form.inventory_items_external[i]['uom'] = uoms[0]['description']                      
+                        }
+                             this.form.inventory_items_external[i]['qty_available'] = this.parts[p]['qty_on_hand'] 
+                                if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){                                
                                if(!customer){
                                this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']                                              
                                 this.form.inventory_items_external[i]['total_price_inclusive'] = ((this.form.inventory_items_external[i]['unit_price']* 116/100) * this.form.inventory_items_external[i]['quantity']).toFixed(2);
@@ -316,6 +343,8 @@
                                     'qty': this.form.inventory_items_external[i]['quantity']                               
                                 })
                         }
+
+
                         }
                     }
                 }
@@ -334,9 +363,7 @@
                          
                     })         
                 }
-       
-
-
+    
             }
         },
         computed:{                         
@@ -376,12 +403,9 @@
             getUoms(){
             axios.get('uom')
             .then(res => {
-                res.data.forEach(u => {
-                    this.uoms.push({
-                        'value': u.id,
-                        'text':`${u.code}-${u.description}`
-                    })
-                })
+                 this.units =  res.data;               
+               // console.log(this.units)  
+         
             })
             },
         getAccounts(){
@@ -412,11 +436,12 @@
                     this.form.group_name = '';
                 return this.$toastr.e('Please Select customer first');
                 }
-                this.items = []; 
+               
                 let items=[];
                  items = this.parts.filter(item => item.item_group == this.form.group_name);
                  
              if (this.form.type =='Internal') {
+                  this.items = [];
                 if (Object.values(this.form.inventory_items_internal[0])[0] !== '') {
                      for (let i = 0; i < this.form.inventory_items_internal.length; i++) {
                         this.parts.forEach(p => {
@@ -430,6 +455,7 @@
              } 
 
                 if (this.form.type =='External') {
+                      this.items = [];
                 if (Object.values(this.form.inventory_items_external[0])[0] !== '') {
                      for (let i = 0; i < this.form.inventory_items_external.length; i++) {
                         this.parts.forEach(p => {
@@ -483,14 +509,14 @@
                 this.form.inventory_items_internal.splice(i, 1);
             },
             addItem() {
-                this.form.inventory_items_internal.push({part: '',uom:'', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',group:''});
+                this.form.inventory_items_internal.push({part: '',uom:'', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''});
                
             },
             removeItemExternal(i) {
              this.form.inventory_items_internal.splice(i, 1);
             },
             addItemExternal() {
-                this.form.inventory_items_external.push({part: '',uom:'', quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',group:''});
+                this.form.inventory_items_external.push({part: '',uom:'', quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''});
             },
             getProjects(){
               axios.get('asset-category')
@@ -505,16 +531,16 @@
                   })
             },
             saveRequisition(){
-                if (Object.values(this.form.inventory_items_internal[0])[0] !== '' || Object.values(this.form.inventory_items_internal[0])[1] !== '' || Object.values(this.form.inventory_items_internal[0])[2] !== '') {
+                if (Object.values(this.form.inventory_items_internal[0])[0] !== '' || Object.values(this.form.inventory_items_internal[0])[2] !== '') {
                     for (let i = 0; i < this.form.inventory_items_internal.length; i++) {
-                        if (this.form.inventory_items_internal[i]['part'] === '' || this.form.inventory_items_internal[i]['uom'] === '' || this.form.inventory_items_internal[i]['quantity'] === '') {
+                        if (this.form.inventory_items_internal[i]['part'] === '' || this.form.inventory_items_internal[i]['quantity'] === '') {
                             return this.$toastr.e('Inventory Item and Quantity fields are required.');
                         }
                     }
                 }
-                if (Object.values(this.form.inventory_items_external[0])[0] !== '' || Object.values(this.form.inventory_items_external[0])[1] !== ''|| Object.values(this.form.inventory_items_external[0])[2] !== '' || Object.values(this.form.inventory_items_external[0])[3] !== '') {
+                if (Object.values(this.form.inventory_items_external[0])[0] !== '' || Object.values(this.form.inventory_items_external[0])[2] !== '' || Object.values(this.form.inventory_items_external[0])[3] !== '') {
                     for (let i = 0; i < this.form.inventory_items_external.length; i++) {
-                        if (this.form.inventory_items_external[i]['part'] === '' || this.form.inventory_items_external[i]['uom'] === '' || this.form.inventory_items_external[i]['quantity'] === '' || this.form.inventory_items_external[i]['unit_price'] === '') {
+                        if (this.form.inventory_items_external[i]['part'] === '' || this.form.inventory_items_external[i]['quantity'] === '' || this.form.inventory_items_external[i]['unit_price'] === '') {
                             return this.$toastr.e('Inventory Item , Quantity and Price fields are required.');
                         }
                     }

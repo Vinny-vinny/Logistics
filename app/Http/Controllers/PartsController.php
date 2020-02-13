@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Part;
-use App\WhseStk;
+use App\StkItem;
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
 
@@ -43,7 +43,7 @@ class PartsController extends Controller
     }
     public function importParts()
     {
-        $parts = WhseStk::select("StockLink","Code","Description_1","AveUCst","ItemGroup")->get();
+        $parts = StkItem::select("StockLink","Code","Description_1","AveUCst","ItemGroup","iUOMStockingUnitID","iUOMDefPurchaseUnitID","iUOMDefSellUnitID","Qty_On_Hand")->get();
         $existing = Part::get();
         $found_parts = [];
         if ($existing->count() < 1){
@@ -72,7 +72,11 @@ class PartsController extends Controller
                 'description' => $asset->Description_1,
                 'cost' => $asset->AveUCst==0 ? $faker->unique()->numberBetween(10,2000) : $asset->AveUCst,
                 'stock_link' => $asset->StockLink,
-                'item_group' => $asset->ItemGroup
+                'item_group' => $asset->ItemGroup,
+                'uom_stock_id' => $asset->iUOMStockingUnitID,
+                'uom_purchase_id' => $asset->iUOMDefPurchaseUnitID,
+                'uom_sellunit_id' => $asset->iUOMDefSellUnitID,
+                'qty_on_hand' => $asset->Qty_On_Hand
                 ]);
 
         }

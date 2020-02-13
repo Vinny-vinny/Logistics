@@ -11,9 +11,9 @@ class CustomerTypesSeeder extends Seeder
      */
     public function run()
     {
-        \App\CustomerType::create(['name' => 'Trade']);
+        
         \App\CustomerType::create(['name' => 'Internal']);
         \App\CustomerType::create(['name' => 'External']);
-        \App\CustomerType::create(['name' => 'Others']);
+     
     }
 }

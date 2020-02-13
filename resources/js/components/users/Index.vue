@@ -30,7 +30,7 @@
                             <td>{{user.join_date}}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editUser(user)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)"><i class="fa fa-trash"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)"  :class="{hide_user:user.id==1 || user.id==2}"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
                         </tbody>
@@ -130,5 +130,7 @@
 </script>
 
 <style scoped>
-
+.hide_user{
+    display:none;
+}
 </style>

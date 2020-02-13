@@ -28,7 +28,7 @@
                             <td>{{rate.currency}} {{rate.hourly_rate}}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editJobType(rate)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteJobType(rate.id)"><i class="fa fa-trash"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="deleteJobType(rate.id)" style="display:none"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
                         </tbody>

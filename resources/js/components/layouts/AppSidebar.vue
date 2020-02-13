@@ -55,7 +55,7 @@
                     </a>
                     <ul class="treeview-menu">
                         <li><router-link to="/users" class="fa fa-circle-o"> Users</router-link></li> 
-                        <li><router-link to="/fuel-types" class="fa fa-circle-o"> Fuel Types</router-link></li>
+                        <li style="display:none"><router-link to="/fuel-types" class="fa fa-circle-o"> Fuel Types</router-link></li>
                         <li><router-link to="/track-by" class="fa fa-circle-o"> Track By</router-link></li>
                         <li><router-link to="/service-types" class="fa fa-circle-o"> Service Types</router-link></li>
                         <li><router-link to="/expense" class="fa fa-circle-o"> Other Charges</router-link></li>

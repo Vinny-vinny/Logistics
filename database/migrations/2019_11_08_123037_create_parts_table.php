@@ -20,6 +20,10 @@ class CreatePartsTable extends Migration
             $table->float('cost');
             $table->integer('stock_link')->nullable();
             $table->string('item_group')->nullable();
+            $table->integer('uom_stock_id')->nullable();
+            $table->integer('uom_purchase_id')->nullable();
+            $table->integer('uom_sellunit_id')->nullable();
+            $table->integer('qty_on_hand')->nullable();
             $table->timestamps();
         });
     }

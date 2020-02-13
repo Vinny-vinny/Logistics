@@ -4,9 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SageAsset extends Model
+class IclassTbl extends Model
 {
     protected $connection = 'sqlsrv2';
-    //protected $table = '_btblFAAsset';
-     protected $table = 'Project';
+    protected $table = 'CliClass';
 }

@@ -24,7 +24,7 @@
                             <td>{{provider.name}}</td>
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editProviderType(provider)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteProviderType(provider.id)"><i class="fa fa-trash"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="deleteProviderType(provider.id)" style="display:none"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
                         </tbody>
