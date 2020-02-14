@@ -49,7 +49,7 @@
                             <input type="text" v-model="username" class="form-control" disabled>
                         </div> 
 
-                         <div class="form-group">
+                         <div class="form-group" :class="{hide_this:this.form.customer_id}">
                              <span class="reset_btn pull-right" @click="resetAccount">reset</span>
                             <label>Where to charge</label>
                              <model-select :options="accounts"
@@ -60,7 +60,7 @@
                         </div>  
                         </div> 
                         </div>
-                       <div class="form-group">
+                       <div class="form-group" :class="{hide_this:this.form.where_to_charge}">
                         <span class="reset_btn pull-right" @click="resetCustomer" :disable="edit">reset</span>
                            <label>Customers</label>
                            <model-select :options="customers"
@@ -648,5 +648,8 @@
     border-color: buttonface;
     border-image: initial;
     margin-top: 10px;
+   }
+   .hide_this{
+    display:none;
    }
 </style>
