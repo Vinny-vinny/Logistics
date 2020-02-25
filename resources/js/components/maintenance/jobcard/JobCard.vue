@@ -17,6 +17,25 @@
                                     <label class="radio-inline"><input type="radio" name="service_type"
                                                                        value="External" v-model="form.service_type">External</label>
                                 </div>
+                                 <div class="form-group">
+                                     <span class="reset_btn pull-right" @click="resetCustomerType">reset</span>
+                                    <label>Customer Type</label>
+                                    <select class="form-control" v-model="form.customer_type_id"
+                                            @change="customerType()">
+                                        <option :value="type.id" v-for="type in customer_types" :key="type.id">
+                                            {{type.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-group" v-if="show_customers">
+                                     <span class="reset_btn pull-right" @click="resetCustomer">reset</span>
+                                    <label>Customer</label>                                   
+                                    <model-select :options="filtered_customers"
+                                        v-model="form.customer_id"
+                                        @input="getJobDetails()"                           
+                                        >
+                                        </model-select>
+                                </div>
                                     <div class="form-group">
                                     <label>Project</label>                                   
                                     <model-select :options="projects"
@@ -52,25 +71,7 @@
                                             {{job_type.name}} - {{job_type.currency}} {{job_type.hourly_rate}}
                                         </option>
                                     </select>
-                                </div>
-                                <div class="form-group">
-                                     <span class="reset_btn pull-right" @click="resetCustomerType">reset</span>
-                                    <label>Customer Type</label>
-                                    <select class="form-control" v-model="form.customer_type_id" 
-                                            @change="customerType()">
-                                        <option :value="type.id" v-for="type in customer_types" :key="type.id">
-                                            {{type.name}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="form-group" v-if="show_customers">
-                                     <span class="reset_btn pull-right" @click="resetCustomer">reset</span>
-                                    <label>Customer</label>                                   
-                                    <model-select :options="filtered_customers"
-                                        v-model="form.customer_id"                           
-                                        >
-                                        </model-select>
-                                </div>
+                                </div>                               
                                 <div class="form-group">
                                     <label>Mechanic</label>
                                         <model-select :options="mechanics"
@@ -90,12 +91,8 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                     <span class="reset_btn pull-right" @click="resetCostCode">reset</span>
                                     <label>Cost Code</label>
-                                    <model-select :options="accounts"
-                                            v-model="form.cost_code"                                      
-                                            >
-                                            </model-select>                                   
+                                    <input type="text" class="form-control" v-model="form.cost_code">                                                                   
                                 </div>
                                 <div class="form-group">
                                     <label>Servicing Date</label>
@@ -121,7 +118,7 @@
                                 <div class="form-group">
                                     <label>Next Service Date</label>
                                     <datepicker v-model="form.next_service_date" ref="nextServiceDate"
-                                                ></datepicker>
+                                    ></datepicker>
                                 </div>
                             </div>
                             <div class="col-md-4" v-if="this.form.machine_id">
@@ -157,8 +154,7 @@
                                 <label>Standing fee charged</label>
                                 <input type="number" step="0.001" v-model="form.standing_fee" class="form-control" required>
                             </div>
-                            </div>
-                         
+                            </div>                         
                         </div>                      
 
                         <div class="row">
@@ -198,10 +194,9 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-11">
-                                <div class="form-group">
+                                <div class="form-group" v-if="show_rqs">
                                     <label>Requisitions</label>
                                       <span class="reset_btn pull-right" @click="resetReqs">reset</span>
                                     <select class="form-control" v-model="form.requisition_id" @change="getDetails()"
@@ -384,7 +379,7 @@
                 subprojects:[],
                 transactions:{},
                 stk_items:[],
-                accounts:[]           
+                show_rqs:false                      
 
             }
         },
@@ -473,7 +468,7 @@
             this.getRequisitions();
             this.filteredRqs();
             this.getCustomerTypes(); 
-            this.getAccounts();           
+                     
 
         },
         filters: {
@@ -503,6 +498,20 @@
 
         },
         methods: {
+            getJobDetails(){
+              this.show_rqs = false; 
+             if(this.form.customer_id){
+                this.form.asset_category_id='';
+               let req_details = this.requisitions.find(req => req.customer_id ==this.form.customer_id);
+               if(req_details) {                
+                this.form.asset_category_id = req_details.project_id; 
+                this.subProject(); 
+                this.rqs = this.requisitions.filter(req => req.customer_id ==this.form.customer_id)
+                this.show_rqs = true;               
+               }
+               
+             }
+            },
             resetReqs(){
             this.form.requisition_id = '';
             },
@@ -517,18 +526,7 @@
             },
             resetVehicle(){
             this.form.machine_id = '';
-            },
-        getAccounts(){
-        axios.get('accounts')
-        .then(res => {
-            res.data.forEach(a => {
-                this.accounts.push({
-                    'value': a.id,
-                    'text': a.account
-                })
-            })
-        })
-        }  ,    
+            },           
              subProject(){       
             let subp = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
             this .subprojects = [];
@@ -559,21 +557,35 @@
                 this.show_inventory = true;
                 this.filtered_items_internal = [];
                 this.filtered_items_external = [];
-                for (let i = 0; i < this.requisitions.length; i++) {
-                    if (this.requisitions[i]['id'] === this.form.requisition_id) {
-                        if(this.requisitions[i]['type'] ==='Internal'){
-                            this.filtered_rq ='Internal';
-                                this.filtered_items_internal = this.requisitions[i]['inventory_items_internal'];
-                          
-                        }
-                        if(this.requisitions[i]['type'] ==='External'){
-                            this.filtered_rq ='External';                       
-                            this.filtered_items_external = this.requisitions[i]['inventory_items_external'];
-                         
-                        }
-
-                    }
+                   if (this.rqs[0]['type'] =='Internal') {
+                    console.log('internal')
+                   this.filtered_rq ='Internal';
+                   this.filtered_items_internal = this.rqs[0]['inventory_items_internal'];
                 }
+                else if (this.rqs[0]['type'] =='External') {
+                    console.log('external')
+                   this.filtered_rq ='External';
+                   this.filtered_items_external = this.rqs[0]['inventory_items_external'];
+                   console.log(  this.filtered_items_external)
+                }
+
+                // for (let i = 0; i < this.requisitions.length; i++) {
+                //     if (this.requisitions[i]['id'] === this.form.requisition_id) {
+                //         if(this.requisitions[i]['type'] ==='Internal'){
+                //             this.filtered_rq ='Internal';
+                //                 this.filtered_items_internal = this.requisitions[i]['inventory_items_internal'];
+                          
+                //         }
+                //         if(this.requisitions[i]['type'] ==='External'){
+                //             this.filtered_rq ='External';                       
+                //             this.filtered_items_external = this.requisitions[i]['inventory_items_external'];
+                         
+                //         }
+
+                //     }
+                //     console.log('inside')
+                // }
+                console.log('end....')
 
             },
             getRequisitions() {

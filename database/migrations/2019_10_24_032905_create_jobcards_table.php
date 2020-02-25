@@ -29,7 +29,7 @@ class CreateJobcardsTable extends Migration
             $table->time('time_out')->nullable();
             $table->text('maintenance')->nullable();
             $table->string('card_no');
-            $table->integer('cost_code')->nullable();
+            $table->string('cost_code')->nullable();
             $table->integer('asset_category_id')->nullable();
             $table->dateTime('closed_at')->nullable();
             $table->string('status')->nullable()->default(1);

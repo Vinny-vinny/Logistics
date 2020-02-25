@@ -37,6 +37,8 @@ import Partners from "../components/reports/fuels/partners/Partners";
 import Accounts from "../components/accounts/Index";
 import Uoms from "../components/uoms/Index";
 import PriceList from "../components/pricelists/Index";
+import FuelCategory from "../components/fuels/categories/Index";
+import WhereToCharge from "../components/wheretocharge/Index";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -84,6 +86,9 @@ const routes = [
     {path:'/accounts',component:Accounts, beforeEnter: guard},
     {path:'/uoms',component:Uoms, beforeEnter: guard},
     {path:'/price-list',component:PriceList, beforeEnter: guard},
+    {path:'/fuel-category',component:FuelCategory, beforeEnter: guard},
+    {path:'/where-to-charge',component:WhereToCharge, beforeEnter: guard},
+
 ];
 
 export default new VueRouter({

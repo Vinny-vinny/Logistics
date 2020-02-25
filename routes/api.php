@@ -65,6 +65,8 @@ Route::post('job-report','ReportsController@JobReport');
 Route::post('fuel-report','ReportsController@FuelReport');
 Route::post('km-per-hr','ReportsController@KmPerHr');
 Route::post('diesel-analysis','ReportsController@DieselAnalysis');
+Route::apiResource('fuel-category','FuelCategoryController');
+Route::apiResource('where-to-charge','WheretochargeController');
 
 Route::group([
     'middleware' => 'api',

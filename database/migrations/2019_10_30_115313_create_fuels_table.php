@@ -33,6 +33,10 @@ class CreateFuelsTable extends Migration
             $table->float('previous_odometer')->nullable()->default(0);
             $table->float('rate')->nullable()->default(0);
             $table->string('external_reference')->nullable();
+            $table->string('fuel_category_id')->nullable();
+            $table->integer('status')->nullable()->default(1);
+            $table->integer('credit_account_id')->nullable();
+            $table->integer('where_to_charge')->nullable();
             $table->timestamps();
         });
     }

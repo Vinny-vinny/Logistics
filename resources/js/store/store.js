@@ -35,7 +35,9 @@ export default new Vuex.Store({
         diesels:{},
         department_consumptions:{},
         partners:{},
-        dates:{}
+        dates:{},
+        fuel_categories:{},
+        charges:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -130,6 +132,12 @@ export default new Vuex.Store({
         },
         getPeriod(state,dates){
         state.dates = dates
+        },
+        updateFuelCategory(state,category){
+        state.fuel_categories = category;
+        },
+        updateCharge(state,charge){
+            state.charges = charge;
         }
     },
     actions:{
@@ -225,6 +233,12 @@ export default new Vuex.Store({
         },
         getPeriod({commit},dates){
         commit('getPeriod',dates);
+        },
+        updateFuelCategory({commit},category){
+            commit('updateFuelCategory',category);
+        },
+        updateCharge({commit},charge){
+            commit('updateCharge',charge);
         }
     }
 })

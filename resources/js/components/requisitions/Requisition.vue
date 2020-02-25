@@ -18,8 +18,8 @@
                           <div class="form-group">
                             <label>Requisition Type</label>
                             <select class="form-control select2" v-model="form.type" required :disabled="edit">
-                                <option value="Internal">Internal</option>
-                                <option value="External">External</option>
+                                <option value="Internal">Stock Issue</option>
+                                <option value="External">Invoice Customer</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -48,20 +48,31 @@
                             <label>Requested By</label>
                             <input type="text" v-model="username" class="form-control" disabled>
                         </div> 
-
-                         <div class="form-group" :class="{hide_this:this.form.customer_id}">
-                             <span class="reset_btn pull-right" @click="resetAccount">reset</span>
-                            <label>Where to charge</label>
+                        
+                                 <fieldset class="the-fieldset" v-if="show_issue">
+                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>  
+                                  <div>
+                               <div class="form-group">
+                                   <label>Credit Account</label>
+                                   <input type="text" class="form-control" :value="account" disabled>
+                               </div>
+                            
+                         <div class="form-group">                           
+                            <label>Debit Account</label>
                              <model-select :options="accounts"
                             v-model="form.where_to_charge"                                      
                             placeholder="Where to charge"
                             required>
                             </model-select>                          
-                        </div>  
+                        </div>
+                       </div>
+                   </fieldset>
+                         
+
                         </div> 
                         </div>
-                       <div class="form-group" :class="{hide_this:this.form.where_to_charge}">
-                        <span class="reset_btn pull-right" @click="resetCustomer" :disable="edit">reset</span>
+                       <div class="form-group" v-show="show_customer">
+                        <span style="display:none" class="reset_btn pull-right" @click="resetCustomer" :disable="edit">reset</span>
                            <label>Customers</label>
                            <model-select :options="customers"
                                         v-model="form.customer_id" 
@@ -79,8 +90,9 @@
                             </model-select>
 
                         </div>
-                        <div class="form-group" v-if="form.type==='Internal'">
-                            <label>Items</label>
+                        <div class="form-group" v-if="form.type==='Internal'">                     
+                                 <fieldset class="the-fieldset">
+                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>
                             <table style="width: 100%">
                                 <tr>
                                     <th>Item</th>
@@ -127,9 +139,11 @@
                                     </td>
                                 </tr>
                             </table>
+                         </fieldset>
                         </div>
                         <div class="form-group" v-if="form.type==='External'">
-                            <label>Items</label>
+                             <fieldset class="the-fieldset">
+                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>
                             <table style="width: 100%">
                                 <tr>
                                     <th>Item</th>
@@ -173,9 +187,11 @@
                                     </td>
                                 </tr>
                             </table>
+                        </fieldset>
                         </div>
                         <button type="submit" class="btn btn-primary">{{edit_requisition ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                          <button type="button" class="btn btn-info" @click="cancel" v-if="edit_requisition && internalType">Issue Stock</button>
                     </form>
                 </div>
             </div>
@@ -201,6 +217,7 @@
                     type:'Internal',
                     customer_id:'',
                     group_name:'',
+                    credit_account_id:'',
                     inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
                     inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
                     id:''
@@ -223,7 +240,10 @@
                 pricelists:{},
                 all_customers:{},
                 units:{},
-                filtered_uoms:{}
+                filtered_uoms:{},
+                account:'',
+                show_issue:true,
+                show_customer:false
             }
         },
         created(){
@@ -233,13 +253,26 @@
             this.getUsers();
             this.getGroups();   
             this.getStks();
+            this.creditAccount();
             this.getAccounts();  
             this.getUoms();  
             this.getCustomers();
             this.getPriceLists();
+            
 
            },
         watch:{
+            'form.type'(){
+             if (this.form.type =='External') {
+             this.show_customer = true;
+             this.show_issue = false;
+             }
+             else if (this.form.type =='Internal') {
+             this.show_customer = false;
+             this.show_issue = true;
+             }
+
+            },
             qty(){
             
             if (isNaN(parseFloat(this.qty)) && !isFinite(this.qty) && this.qty < 0) {
@@ -257,8 +290,7 @@
         
                 if (this.form.customer_id) {                   
                    customer =this.all_customers.find(q =>q.id ==this.form.customer_id)                      
-                   }
-          
+                   }         
                         
                 for (let p=0; p < this.parts.length; p++){
                     for (let i=0; i < this.form.inventory_items_internal.length; i++){
@@ -330,9 +362,18 @@
                         if (uoms.length) {
                           this.form.inventory_items_external[i]['uom'] = uoms[0]['description']                      
                         }
-                             this.form.inventory_items_external[i]['qty_available'] = this.parts[p]['qty_on_hand'] 
-                                if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){                                
-                               if(!customer){
+
+                        this.form.inventory_items_external[i]['qty_available'] = this.parts[p]['qty_on_hand'] 
+                        if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){                             
+                            if(this.form.inventory_items_external[i]['quantity'] < 0 || (isNaN(parseFloat(this.form.inventory_items_external[i]['quantity'])) && !isFinite(this.form.inventory_items_external[i]['quantity']))){
+                               this.form.inventory_items_external[i]['quantity'] = 1; 
+                            }                    
+                          if (this.form.inventory_items_external[i]['quantity'] > this.parts[p]['qty_on_hand']) {
+                            this.form.inventory_items_external[i]['quantity'] ='';
+                            return this.$toastr.e('Sorry, requested Qty cannot be greater than available Qty.');
+                          }
+                           
+                              if(!customer){
                                this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']                                              
                                 this.form.inventory_items_external[i]['total_price_inclusive'] = ((this.form.inventory_items_external[i]['unit_price']* 116/100) * this.form.inventory_items_external[i]['quantity']).toFixed(2);
                                 this.form.inventory_items_external[i]['total_price'] = (this.form.inventory_items_external[i]['unit_price'] * this.form.inventory_items_external[i]['quantity']).toFixed(2);
@@ -342,12 +383,13 @@
                                     'cost' : this.parts[p]['cost'],                                
                                     'qty': this.form.inventory_items_external[i]['quantity']                               
                                 })
-                        }
+                        
 
 
                         }
                     }
                 }
+            }
 
                  if (item_array.length && customer) {                   
                      item_array.forEach(item => {
@@ -363,10 +405,14 @@
                          
                     })         
                 }
+
     
             }
         },
-        computed:{                         
+        computed:{ 
+        internalType(){
+        return this.form.type =='Internal';
+        }   ,                     
           getExpenses(){
             return [this.part,this.qty,this.form.inventory_items_internal,this.form.group_name,this.form.customer_id].join();
           },
@@ -376,6 +422,16 @@
         },
 
         methods:{ 
+            creditAccount(){
+            axios.get('where-to-charge')
+            .then(res => {                
+                if (res.data.length) {
+                  this.account = res.data[0]['account'];
+               this.form.credit_account_id  = res.data[0]['account_id']   
+                }            
+          
+            })
+            },
             resetAccount(){
             this.form.where_to_charge = '';
             },
@@ -411,7 +467,11 @@
         getAccounts(){
          axios.get('accounts')
          .then(res => {
-            res.data.forEach(a => {
+            console.log(this.form.credit_account_id)
+            let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
+            console.log(accounts.length);
+            console.log(res.data.length);
+            accounts.forEach(a => {
                 this.accounts.push({
                     'value': a.id,
                     'text': a.account
@@ -530,7 +590,7 @@
                       
                   })
             },
-            saveRequisition(){
+            saveRequisition(){               
                 if (Object.values(this.form.inventory_items_internal[0])[0] !== '' || Object.values(this.form.inventory_items_internal[0])[2] !== '') {
                     for (let i = 0; i < this.form.inventory_items_internal.length; i++) {
                         if (this.form.inventory_items_internal[i]['part'] === '' || this.form.inventory_items_internal[i]['quantity'] === '') {
@@ -545,6 +605,27 @@
                         }
                     }
                 }
+                if (this.form.project_id=='') {
+                    return this.$toastr.e('Please select project first.');
+                }
+                if (this.form.type=='External') {
+                if (this.form.customer_id =='') {
+                    return this.$toastr.e('Please Select customer first.')
+                }
+                this.form.credit_account_id ='';
+                this.form.where_to_charge ='';
+                }
+                else if(this.form.type =='Internal'){
+                if (this.form.where_to_charge =='') {
+                    return this.$toastr.e('Please select debit account.');
+                }
+                this.creditAccount();
+                this.form.customer_id ='';
+                }
+                if (this.form.requested_on =='') {
+                   return this.$toastr.e('Please enter date requested.');
+                }
+                //return console.log(this.form);
                 this.form.requested_on = this.convertDate(this.form.requested_on);
                 this.edit_requisition ? this.update() : this.save();
             },

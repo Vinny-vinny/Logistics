@@ -12,23 +12,24 @@
                         <div class="form-group">
                             <label>Name</label>
                             <input type="text" class="form-control" v-model="form.name" required>
-                        </div>                       
-                                  <div class="form-group">
+                        </div>    
+                            <div class="form-group">
                                     <label>INV TR Code</label>
-                                    <select class="form-control" v-model="form.inv_tr_id" @change="filterInvTR()">
-                                        <option :value="tr.transaction_id" v-for="tr in inv_transactions"
-                                                :key="tr.transaction_id">{{tr.code}}-{{tr.description}}
-                                        </option>
-                                    </select>
+                                   <model-select :options="inv_transactions"
+                                        v-model="form.inv_tr_id"
+                                        @input="filterInvTR()"                           
+                                        >
+                                   </model-select>
                                 </div>                 
                                   <div class="form-group">
                                     <label>Stock TR Code</label> 
-                                    <select class="form-control" v-model="form.stk_tr_id" @change="filterStkTR()">
-                                        <option :value="stk.transaction_id" v-for="stk in stk_transactions"
-                                                :key="stk.transaction_id">{{stk.code}}-{{stk.description}}
-                                        </option>
-                                    </select>
-                                </div>                 
+                                    <model-select :options="stk_transactions"
+                                        v-model="form.stk_tr_id"
+                                        @input="filterStkTR()"                           
+                                        >
+                                   </model-select>                                   
+                                </div>  
+
                         <button type="submit" class="btn btn-primary">{{edit_category ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
                     </form>
@@ -40,42 +41,71 @@
 </template>
 
 <script>
+import { ModelSelect } from 'vue-search-select';
 
     export default {
         props:['edit'],
         data(){
             return {
                 form:{
-                    name:'',                   
-                    transaction_id:[],
+                    name:'',             
+                    inv_tr_id:'',
+                    stk_tr_id:'',
                     id:''
                 },
                 edit_category: this.edit,
-                transactions:[],
-                transaction:[],
-                inv_transactions:{},
-                stk_transactions:{}
+                transactions:{},             
+                inv_transactions:[],
+                stk_transactions:[]
             }
         },
         created(){
             this.listen();
             this.getTransactions();            
         },
-        methods:{
-           
+        methods:{           
             getTransactions(){
                axios.get('transactions')
                .then(res => {
-                this.transactions = res.data;  
-                this.inv_transactions = res.data; 
-                this.stk_transactions = res.data;                       
-               })
-            },
-             filterInvTR(){               
-                this.stk_transactions = this.transactions.filter(t => t.transaction_id !==this.form.inv_tr_id);              
+                this.transactions = res.data; 
+
+                  res.data.forEach(t => {
+                  this.inv_transactions.push({
+                        'value':t.transaction_id,
+                        'text': `${t.code}-${t.description}`
+                    })
+                })
+                 res.data.forEach(t => {
+                    this.stk_transactions.push({
+                        'value':t.transaction_id,
+                        'text': `${t.code}-${t.description}`
+                    })
+                })                      
+              
+            })
+           },
+              filterInvTR(){
+                    let transactions = this.transactions.filter(t => t.transaction_id !==this.form.inv_tr_id);
+                    this.stk_transactions = [];                     
+                      transactions.forEach(t => {                 
+                      this.stk_transactions.push({
+                        'value': t.transaction_id,
+                        'text': `${t.code}-${t.description}`
+                      })  
+                   
+                })
+                      
                 },
-              filterStkTR(){
-                this.inv_transactions = this.transactions.filter(t => t.transaction_id !== this.form.stk_tr_id);
+              filterStkTR(){                     
+                 let transactions = this.transactions.filter(t => t.transaction_id !== this.form.stk_tr_id);
+                 this.inv_transactions = []; 
+                    transactions.forEach(t => {
+                    this.inv_transactions.push({
+                        'value': t.transaction_id,
+                        'text': `${t.code}-${t.description}`
+                    })
+                })
+                
               },
             saveCategory(){
                 this.edit_category ? this.update() : this.save();
@@ -101,11 +131,19 @@
             },
             listen(){
                 if (this.edit){
-                    this.form = this.$store.state.jobcard_categories                          
+                    this.form = this.$store.state.jobcard_categories;
+
+                    setTimeout(()=>{
+                    this.filterInvTR();
+                    this.filterStkTR();
+                    },3000)                          
                 }
             },
 
         },
+        components:{
+            ModelSelect
+        }
     
     }
 </script>
@@ -113,3 +151,4 @@
 <style scoped>
 
 </style>
+

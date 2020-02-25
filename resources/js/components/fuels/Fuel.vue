@@ -93,14 +93,42 @@
                                         <tr>
                                             <td style="font-size:16px"><b>Total Expense: </b>{{(genExpenses()) | number}}</td>
                                         </tr>
-                                        <tr>
-                                            <td style="font-size:16px"><b>Grand Total: </b>{{grandTotal}}</td>
-                                        </tr>
+                                      <tr>
+                                       <td style="font-size:16px"><b>Grand Total: </b>{{grandTotal}}</td>
+                                      </tr>
                                     </table>
                                 </div>
                              </fieldset>
                                    <br>
-                                <div class="form-group">
+                                   <div class="form-group">
+                                       <label>Category</label>
+                                       <select v-model="form.fuel_category_id" class="form-control" required>
+                                          <option value="stock_issue">Stock Issue</option>
+                                          <option value="invoice">Invoice to Customer</option>
+                                       </select>
+                                   </div>
+
+                                   <fieldset class="the-fieldset" v-if="show_issue">
+                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>  
+                                  <div>
+                               <div class="form-group">
+                                   <label>Credit Account</label>
+                                   <input type="text" class="form-control" :value="account" disabled>
+                               </div>
+                            
+                         <div class="form-group">                           
+                            <label>Debit Account</label>
+                             <model-select :options="accounts"
+                            v-model="form.where_to_charge"                                      
+                            placeholder="Where to charge"
+                            required>
+                            </model-select>                          
+                        </div>
+                       </div>
+                   </fieldset>
+
+                               <div v-if="show_inv">
+                                    <div class="form-group">
                                     <span class="reset_btn pull-right" @click="resetCustomerType">reset</span>
                                     <label>Customer Type</label>
                                     <select class="form-control" v-model="form.customer_type_id" required @change="customerTypes()">
@@ -115,6 +143,7 @@
                                         required>
                                         </model-select>
                                 </div>
+                               </div>
                                 <div class="form-group">
                                     <label>Authorized By</label>
                                     <input type="text" class="form-control" v-model="username" disabled>
@@ -126,11 +155,12 @@
                                 <div class="form-group">
                                     <label>Store Man</label>
                                     <input type="text" class="form-control" v-model="form.store_man" required>
-                                </div>
+                              </div>
                             </div>
                             </div>
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                        <button type="button" class="btn btn-success" @click="cancel" v-if="edit_fuel && checkCatgory"><i class="fa fa-check" aria-hidden="true"></i> Issue Stock</button>
                     </form>
                 </div>
             </div>
@@ -161,7 +191,11 @@
                     asset_category_id:'',
                     previous_odometer: 0,
                     external_reference:'',
+                    fuel_category_id:'',
+                    status:1,
                     rate:0,
+                    credit_account_id:'',
+                    where_to_charge:'',                    
                     id: ''
                 },
                 edit_fuel: this.edit,
@@ -189,11 +223,16 @@
                 username:User.name(),
                 projects:[],
                 subprojects:[],
-                stks:{}
+                stks:{},
+                fuel_categories:{},
+                accounts:[],
+                show_issue:false,
+                show_inv:false,
+                account:''
+
             }
         },
         created() {
-
             this.listen();
             this.getCustomers();
             this.getVehicles();
@@ -206,10 +245,23 @@
             this.getJobcards();
             this.getFuels();
             this.getProjects();
-             
+            this.creditAccount();
+            this.getFuelCategories();
+            this.getAccounts();
+          
 
         },
-       watch:{
+       watch:{            
+        'form.fuel_category_id'(){
+            if (this.form.fuel_category_id=='stock_issue') {
+            this.show_issue = true;
+            this.show_inv = false;
+         }
+         if (this.form.fuel_category_id=='invoice') {
+            this.show_issue = false;
+            this.show_inv = true;
+         }
+        },
         numConversion(){
          if(this.form.odometer_readings < 0 || (isNaN(parseFloat(this.form.odometer_readings)) && !isFinite(this.form.odometer_readings))){
              this.form.odometer_readings = 1; 
@@ -235,6 +287,12 @@
             });
         },
         computed: {
+             checkCatgory(){
+           return this.form.fuel_category_id =='stock_issue';
+            },
+          fuel_category(){
+          return this.form.fuel_category_id;
+        },
             numConversion(){
             return [this.form.odometer_readings,this.form.litres].join();
             },
@@ -251,7 +309,38 @@
                 return total;
             }
         },
-        methods: {
+        methods: {           
+            creditAccount(){
+            axios.get('where-to-charge')
+            .then(res => {                
+                if (res.data.length) {
+                  this.account = res.data[0]['account'];
+               this.form.credit_account_id  = res.data[0]['account_id']   
+                }            
+          
+            })
+            },
+          getAccounts(){
+         axios.get('accounts')
+         .then(res => {
+            console.log(this.form.credit_account_id)
+            let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
+            console.log(accounts.length);
+            console.log(res.data.length);
+            accounts.forEach(a => {
+                this.accounts.push({
+                    'value': a.id,
+                    'text': a.account
+                })
+            })
+         })
+        }  ,
+           getFuelCategories(){
+          axios.get('fuel-category')
+          .then(res => {           
+            this.fuel_categories = res.data;
+          })
+            },
             resetCustomerType(){
             this.form.customer_type_id = '';
             },
@@ -393,13 +482,33 @@
                 if (this.form.odometer_readings < this.form.previous_odometer){
                     return this.$toastr.e('Current Odometer Readings cannot be less than Previous Readings.');
                 }
+                if (this.form.fuel_category_id =='stock_issue') {
+                    if (this.form.where_to_charge =='') {
+                        return this.$toastr.e('Please select debit account first.')
+                    }
+                    this.form.customer_type_id = '';
+                    this.form.customer_id = '';
+                    this.creditAccount();
+                }
+                  else if (this.form.fuel_category_id =='invoice') {
+                    if (this.form.customer_id =='') {
+                        return this.$toastr.e('Please select customer first.')
+                    }
+                    this.form.where_to_charge = '';
+                    this.form.credit_account_id = '';
+                }
+                if (this.form.fuel_on =='') {
+                    return this.$toastr.e('Please enter fueled on date.');
+                }
+                this.form.fuel_on = this.convertDate(this.form.fuel_on);  
+
                 this.other_fuel_asset ? this.form.asset_type = 'other' : this.form.asset_type = 'company';
 
               this.edit_fuel ? this.update() : this.save();
             },
             save() {
                 delete this.form.id;
-                this.form.fuel_on = this.convertDate(this.form.fuel_on);
+
                 this.form.authorized_by = User.id();
                 axios.post('fuel', this.form)
                     .then(res => eventBus.$emit('listFuels', res.data))

@@ -29,6 +29,7 @@ class CreateRequisitionsTable extends Migration
             $table->string('external_reference')->nullable();
             $table->string('person_collecting')->nullable();
             $table->integer('customer_id')->nullable();
+            $table->integer('credit_account_id')->nullable();
             $table->timestamps();
         });
     }

@@ -42,7 +42,10 @@ class FuelResource extends JsonResource
             'store_man' => $this->store_man,
             'fuel_no' => $this->fuel_no,
             'asset_category_id' => $this->asset_category_id,
-            'external_reference' => $this->external_reference
+            'external_reference' => $this->external_reference,
+            'fuel_category_id' => $this->fuel_category_id,
+            'credit_account_id' => $this->credit_account_id,
+            'where_to_charge' => $this->where_to_charge
              ];
     }
 }
