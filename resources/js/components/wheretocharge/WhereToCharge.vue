@@ -12,9 +12,16 @@
                         <div class="form-group">
                             <label>Select Credit Account</label>
                            <model-select :options="accounts"
-                                        v-model="form.account_id"                                                            
+                                        v-model="form.account_id"                                                           
                                         >
                                         </model-select> 
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select class="form-control" v-model="form.type" required>
+                            <option value="Fueling">Fueling</option>
+                            <option value="Requisition">Requisition</option>
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-primary">{{edit_charge ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
@@ -34,6 +41,7 @@ import { ModelSelect } from 'vue-search-select';
             return {
                 form:{
                     account_id:'',
+                    type:'',
                     id:''
                 },
                 edit_charge: this.edit,

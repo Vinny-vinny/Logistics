@@ -37,6 +37,9 @@ class CreateFuelsTable extends Migration
             $table->integer('status')->nullable()->default(1);
             $table->integer('credit_account_id')->nullable();
             $table->integer('where_to_charge')->nullable();
+            $table->string('reversal_ref')->nullable();
+            $table->float('reversal_litres')->nullable();
+            $table->float('reversal_rate')->nullable();
             $table->timestamps();
         });
     }

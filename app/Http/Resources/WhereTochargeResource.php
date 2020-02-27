@@ -17,7 +17,8 @@ class WhereTochargeResource extends JsonResource
         return [
             'id' => $this->id,
             'account_id' => $this->account_id,
-            'account' => $this->account->account
+            'account' => $this->account->account,
+            'type' => $this->type
         ];
     }
 }

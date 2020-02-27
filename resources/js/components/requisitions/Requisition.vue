@@ -29,11 +29,39 @@
                          <div class="form-group">
                             <label>Project</label>
                             <model-select :options="projects"
-                            v-model="form.project_id"                                       
-                            placeholder="select Project"
+                            v-model="form.project_id"   
+                             @input="subProject()"                                    
+                            placeholder="select Project"                           
                             required>
                             </model-select>                        
                         </div> 
+                         <div class="form-group">
+                          <label>Sub Project</label>                                   
+                          <model-select :options="subprojects"
+                          v-model="form.subproject_id"
+
+                                        >
+                          </model-select>
+                                </div>
+                                 <div class="form-group" v-show="show_customer">
+                        <span style="display:none" class="reset_btn pull-right" @click="resetCustomer" :disable="edit">reset</span>
+                           <label>Customers</label>
+                           <model-select :options="customers"
+                                        v-model="form.customer_id" 
+                                        :is-disabled="edit"                             
+                                        >
+                          </model-select>
+                       </div>
+                           <div class="form-group">
+                            <label>Stk Group</label>
+                            <model-select :options="stk_groups"
+                            v-model="form.group_name" 
+                            @input="selectedGroup()"                                      
+                            placeholder="select category"
+                            required>
+                            </model-select>
+
+                        </div>
                         </div> 
                         <div class="col-md-6">
                            <div class="form-group">
@@ -71,25 +99,8 @@
 
                         </div> 
                         </div>
-                       <div class="form-group" v-show="show_customer">
-                        <span style="display:none" class="reset_btn pull-right" @click="resetCustomer" :disable="edit">reset</span>
-                           <label>Customers</label>
-                           <model-select :options="customers"
-                                        v-model="form.customer_id" 
-                                        :is-disabled="edit"                             
-                                        >
-                          </model-select>
-                       </div>
-                        <div class="form-group">
-                            <label>Stk Group</label>
-                            <model-select :options="stk_groups"
-                            v-model="form.group_name" 
-                            @input="selectedGroup()"                                      
-                            placeholder="select category"
-                            required>
-                            </model-select>
-
-                        </div>
+                      
+                 
                         <div class="form-group" v-if="form.type==='Internal'">                     
                                  <fieldset class="the-fieldset">
                                <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>
@@ -218,6 +229,7 @@
                     customer_id:'',
                     group_name:'',
                     credit_account_id:'',
+                    subproject_id:'',
                     inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
                     inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
                     id:''
@@ -243,7 +255,8 @@
                 filtered_uoms:{},
                 account:'',
                 show_issue:true,
-                show_customer:false
+                show_customer:false,
+                subprojects:[]
             }
         },
         created(){
@@ -258,7 +271,7 @@
             this.getUoms();  
             this.getCustomers();
             this.getPriceLists();
-            
+            this.getVehicles();
 
            },
         watch:{
@@ -422,12 +435,29 @@
         },
 
         methods:{ 
+           getVehicles() {
+                axios.get('machines')
+                    .then(vehicle => {
+                        this.vehicles = vehicle.data;
+                    })
+            },
+           subProject(){
+             this.subprojects =[];
+             let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.project_id);
+             subp.forEach(p => {
+                this.subprojects.push({
+                    'value': p.id,
+                    'text': p.code
+                })
+             })
+            },
             creditAccount(){
             axios.get('where-to-charge')
             .then(res => {                
                 if (res.data.length) {
-                  this.account = res.data[0]['account'];
-               this.form.credit_account_id  = res.data[0]['account_id']   
+                 let account = res.data.find(req => req.type =='Requisition');
+                 this.account = account.account;
+                 this.form.credit_account_id  = account.account_id;  
                 }            
           
             })
@@ -656,6 +686,7 @@
                    this.selectedGroup(); 
                    this.getCustomers();
                    this.getParts();
+                   this.subProject();
                    },5000)                
                 }
 
@@ -732,5 +763,8 @@
    }
    .hide_this{
     display:none;
+   }
+   .ui.selection.dropdown {
+    font-weight:800 !important;
    }
 </style>

@@ -314,8 +314,9 @@
             axios.get('where-to-charge')
             .then(res => {                
                 if (res.data.length) {
-                  this.account = res.data[0]['account'];
-               this.form.credit_account_id  = res.data[0]['account_id']   
+                 let account = res.data.find(req => req.type =='Fueling');               
+                 this.account = account.account;
+                 this.form.credit_account_id  = account.account_id;   
                 }            
           
             })
@@ -547,6 +548,7 @@
                     this.customerTypes();
                     this.getCustomers();
                     this.getVehicles();
+                    this.subProject();
                    },4000)
                 }
             },

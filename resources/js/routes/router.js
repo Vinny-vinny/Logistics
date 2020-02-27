@@ -39,6 +39,9 @@ import Uoms from "../components/uoms/Index";
 import PriceList from "../components/pricelists/Index";
 import FuelCategory from "../components/fuels/categories/Index";
 import WhereToCharge from "../components/wheretocharge/Index";
+import ReversalList from "../components/requisitions/ReversalList";
+import JobReversalList from "../components/maintenance/jobcard/RevesalList";
+import FuelReversalList from "../components/fuels/ReversalList";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -88,6 +91,9 @@ const routes = [
     {path:'/price-list',component:PriceList, beforeEnter: guard},
     {path:'/fuel-category',component:FuelCategory, beforeEnter: guard},
     {path:'/where-to-charge',component:WhereToCharge, beforeEnter: guard},
+    {path:'/reversed-requisitions',component:ReversalList, beforeEnter: guard},
+    {path:'/reversed-jobcards',component:JobReversalList, beforeEnter: guard},
+    {path:'/reversed-fuel',component:FuelReversalList, beforeEnter: guard},
 
 ];
 

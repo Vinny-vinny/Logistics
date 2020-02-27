@@ -34,7 +34,10 @@ class RequisitionResource extends JsonResource
             'user' => $this->user->name,
             'external_reference' => $this->external_reference,
             'person_collecting' => $this->person_collecting,
-            'customer_id' => $this->customer_id
+            'customer_id' => $this->customer_id,
+            'subproject_id' => $this->subproject_id,
+            'reversal_ref' => $this->reversal_ref,
+            'inventory_items_reversal' => json_decode($this->inventory_items_reversal)
         ];
     }
 }

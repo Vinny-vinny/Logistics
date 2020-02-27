@@ -79,6 +79,10 @@
                                         >
                                         </model-select>
                                 </div>
+                                <div class="form-group">
+                                    <label>Hours Spent</label>
+                                    <input type="number" class="form-control" step="0.001" v-model="form.hours_spent">
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -208,7 +212,8 @@
                                 </div>
 
                                 <div class="form-group" v-if="show_inventory && filtered_rq=='Internal'">
-                                    <label>Inventory Items</label>
+                                 <fieldset class="the-fieldset">
+                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>    
                                     <table style="width:100%">
                                         <tr>
                                             <th align="right">Part</th>
@@ -245,9 +250,11 @@
 
                                         </tr>
                                     </table>
+                                </fieldset>
                                 </div>
                                 <div class="form-group" v-if="show_inventory && filtered_rq=='External'">
-                                    <label>Inventory Items</label>
+                                     <fieldset class="the-fieldset">
+                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend> 
                                     <table style="width:100%">
                                         <tr>
                                             <th align="right">Part</th>
@@ -285,6 +292,7 @@
 
                                         </tr>
                                     </table>
+                                </fieldset>
                                 </div>
                             </div>
                         </div>
@@ -329,7 +337,8 @@
                     cost_code: '',
                     customer_id: '',
                     requisition_id: '',
-                    labour_cost: 0,                  
+                    labour_cost: 0,  
+                    hours_spent:'',                
                     id: '',
                     maintenance: [{category: '', description: '', root_cause: ''}],
 
@@ -384,6 +393,20 @@
             }
         },
         watch: {
+            labours(){                
+            if (this.form.hours_spent > 0 && this.form.job_type_id) {
+                       axios.get('job-types')
+                        .then(res => {
+                            let total =0;
+                            this.job_types = res.data;
+                            if (this.form.job_type_id) {
+                              let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
+                             total += this.form.hours_spent * cost;  
+                            }
+                           this.form.labour_cost =  total.toFixed(2);
+                        })
+            }
+            },
             getCost() {
                 for (let p = 0; p < this.parts.length; p++) {
                     for (let i = 0; i < this.form.service_required.length; i++) {
@@ -441,7 +464,7 @@
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
                              total += time_in_minutes / 60 * cost;  
                             }
-                            this.form.labour_cost =  total;
+                           // this.form.labour_cost =  total;
                         })
 
                     }
@@ -478,6 +501,9 @@
         },
        
         computed: {
+            labours(){
+            return [this.form.hours_spent,this.form.job_type_id].join();
+            },
             partItems() {
                 return this.service_required;
             },
@@ -498,6 +524,7 @@
 
         },
         methods: {
+
             getJobDetails(){
               this.show_rqs = false; 
              if(this.form.customer_id){
@@ -505,7 +532,10 @@
                let req_details = this.requisitions.find(req => req.customer_id ==this.form.customer_id);
                if(req_details) {                
                 this.form.asset_category_id = req_details.project_id; 
+                this.form.machine_id = req_details.subproject_id;
+
                 this.subProject(); 
+                this.getAssetDetails();
                 this.rqs = this.requisitions.filter(req => req.customer_id ==this.form.customer_id)
                 this.show_rqs = true;               
                }
@@ -862,38 +892,23 @@
                        this.show_inventory = true;   
                        this.editedRequisitions();
                     }
-                     },4000)
+                     },3000)
                                           
                 }
             },
            
               editedRequisitions() {
-                this.rqs = [];
-                axios.get('requisitions')
-                    .then(rq => {
-                        this.filtered_items_internal = [];
-                        this.filtered_items_external = [];
-                        for (let i = 0; i < rq.data.length; i++) {
-                            if (rq.data[i]['type'] !=null){
-                                if (rq.data[i]['id'] == this.form.requisition_id){
-                                    this.rqs.splice(rq.data[i],1);
-                                }
-                               this.rqs.push(rq.data[i]);
-                            }
-                            if (rq.data[i]['id'] === this.form.requisition_id) {
-                                if(rq.data[i]['type'] ==='Internal'){
-                                    this.filtered_rq ='Internal';
-                                    this.filtered_items_internal =rq.data[i]['inventory_items_internal']
-                                    //return;
-                                }
-                                if(rq.data[i]['type'] ==='External'){
-                                    this.filtered_rq ='External';
-                                    this.filtered_items_external = rq.data[i]['inventory_items_external'];
-                                 //return;
-                                }
-                            }
-                        }
-                    })
+               this.rqs = [];
+               let req = this.requisitions.find(rq => rq.id ==this.form.requisition_id);         
+                if(req.type=='External'){
+                this.filtered_rq ='External';            
+                 this.filtered_items_external =req.inventory_items_external; 
+               
+                }
+                if(req.type=='Internal'){
+                this.filtered_rq ='Internal';                 
+                this.filtered_items_internal =req.inventory_items_internal;  
+                }
             },
 
             ServiceTypes() {

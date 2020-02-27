@@ -60,7 +60,10 @@ class JobcardResource extends JsonResource
             'closed_at' => $this->closed_at,           
             'fuel' => $this->fuel ? $this->fuel->id : '',
             'checklist' => $this->checklist ? $this->checklist->id :'',
-            'requisitions' => $this->requisition
+            'requisitions' => $this->requisition,
+            'hours_spent' => $this->hours_spent,
+            'inventory_items_reversal' =>  json_decode($this->inventory_items_reversal),
+             'reversal_ref' => $this->reversal_ref
         ];
     }
 }

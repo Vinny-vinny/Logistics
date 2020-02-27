@@ -45,7 +45,10 @@ class FuelResource extends JsonResource
             'external_reference' => $this->external_reference,
             'fuel_category_id' => $this->fuel_category_id,
             'credit_account_id' => $this->credit_account_id,
-            'where_to_charge' => $this->where_to_charge
+            'where_to_charge' => $this->where_to_charge,
+            'reversal_ref' => $this->reversal_ref,
+            'reversal_litres' => $this->reversal_litres,
+            'reversal_rate' => $this->reversal_rate
              ];
     }
 }

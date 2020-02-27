@@ -18,9 +18,33 @@
             <ul class="sidebar-menu" data-widget="tree">
                 <li class="header"></li>
                 <!-- Optionally, you can add icons to the links -->
-                <li><router-link to="/machines"><i class="fa fa-shopping-basket angle-left"></i> <span>Assets</span></router-link></li>
-                <li><router-link to="/requisitions"><i class="fa fa-shopping-basket angle-left"></i> <span>Requisitions</span></router-link></li>
-                <li><router-link to="/job-card"><i class="fa fa-tag"></i> <span>Job Card</span></router-link></li>
+                <li><router-link to="/machines"><i class="fa fa-shopping-basket angle-left"></i> <span>Assets</span></router-link></li>               
+               
+                   <li class="treeview">
+                  <a href="#"><i class="fa fa-shopping-basket angle-left"></i> <span>Requisitions</span>
+                        <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><router-link to="/requisitions" class="fa fa-circle-o"> All</router-link></li>
+                        <li><router-link to="/reversed-requisitions" class="fa fa-circle-o"> Reversed</router-link></li>
+
+                        </ul>
+                </li>                 
+                  <li class="treeview">
+                  <a href="#"><i class="fa fa-tag"></i> <span>Job Card</span>
+                        <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><router-link to="/job-card" class="fa fa-circle-o"> All</router-link></li>
+                        <li><router-link to="/reversed-jobcards" class="fa fa-circle-o"> Reversed</router-link></li>
+
+                        </ul>
+                </li>
+
                      <li class="treeview">
                     <router-link to="/checklists"><i class="fa fa-check-square-o"></i> <span>Checklists</span>
                         <span class="pull-right-container">
@@ -30,8 +54,20 @@
                     <ul class="treeview-menu">
                         <li><router-link to="/assign-checklist" class="fa fa-circle-o"> Assign Checklists</router-link></li>
                         </ul>
+                </li>             
+
+                <li class="treeview">
+                  <a href="#"><i class="fa fa-database"></i> <span>Fuel</span>
+                        <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><router-link to="/fuel" class="fa fa-circle-o"> All</router-link></li>
+                        <li><router-link to="/reversed-fuel" class="fa fa-circle-o"> Reversed</router-link></li>
+
+                        </ul>
                 </li>
-                <li><router-link to="/fuel"><i class="fa fa-database"></i> <span>Fuel</span></router-link></li>
                 <li class="treeview">
                     <a href="#"><i class="fa fa-bar-chart"></i> <span>Workshop Reports</span>
                         <span class="pull-right-container">

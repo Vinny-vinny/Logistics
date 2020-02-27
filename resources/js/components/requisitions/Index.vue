@@ -1,9 +1,10 @@
 <template>
     <div>
-        <requisition v-if="add_requisition && !show_form" :edit="editing"></requisition>
-        <requisition-form v-if="show_form && !add_requisition"></requisition-form>
+        <requisition v-if="add_requisition && !show_form && !show_reversal" :edit="editing"></requisition>
+        <reversal v-if="!add_requisition && !show_form && show_reversal" :reverse="reversing"></reversal>
+        <requisition-form v-if="show_form && !add_requisition && !show_reversal"></requisition-form>
         <!-- Main content -->
-        <section class="content" v-if="!add_requisition && !show_form">
+        <section class="content" v-if="!add_requisition && !show_form && !show_reversal">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
@@ -33,6 +34,7 @@
                             <td>
                                <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
                                <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
+                                <button class="btn btn-danger btn-sm" @click="reverseRequisition(rq)"><i class="fa fa-undo" aria-hidden="true"></i></button>
 <!--                               <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->                            </td>
                         </tr>
                         </tbody>
@@ -45,13 +47,15 @@
 <script>
     import Requisition from "./Requisition";
     import RequisitionForm from "./RequisitionForm";
+    import Reversal from "./Reversal";
     export default {
         data(){
             return {
                 tableData: [],
                 add_requisition: false,
                 editing: false,
-                show_form:false
+                show_form:false,
+                show_reversal:false
             }
         },
         created(){
@@ -60,6 +64,14 @@
         },
 
         methods:{
+            reverseRequisition(rq){
+            this.$store.dispatch('updateRequisition',rq)
+                    .then(() =>{
+                        this.reversing=true;
+                        this.show_reversal = true;
+                        this.add_requisition=false;
+                    })
+            },
             getRequisitions(){
                 axios.get('requisitions')
                     .then(res => this.tableData = res.data)
@@ -93,6 +105,8 @@
                 eventBus.$on('cancel',()=>{
                     this.add_requisition = false;
                     this.editing = false;
+                    this.reversing = false;
+                    this.show_reversal = false;
                     this.getRequisitions();
                     this.initDatable();
                 });
@@ -134,7 +148,8 @@
         },
         components:{
             Requisition,
-            RequisitionForm
+            RequisitionForm,
+            Reversal
         }
     }
 </script>

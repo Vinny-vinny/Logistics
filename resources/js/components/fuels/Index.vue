@@ -1,9 +1,10 @@
 <template>
     <div>
-        <fuel v-if="add_fuel || add_fuel_other" :edit="editing" :other_fuel="add_fuel_other"
+        <fuel v-if="add_fuel" :edit="editing" :other_fuel="add_fuel_other"
               :add_fuel="add_fuel"></fuel>
+             <reversal v-if="show_reversal" :reverse="show_reversal"></reversal> 
         <!-- Main content -->
-        <section class="content" v-if="!add_fuel && !add_fuel_other">
+        <section class="content" v-if="!add_fuel && !add_fuel_other && !show_reversal">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
@@ -35,6 +36,7 @@
                                 <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
                                     class="fa fa-edit"></i></button>
                                 <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
+                                <button class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
 <!--                                <button class="btn btn-danger btn-sm" @click="deleteFuel(fuel.id)"><i-->
 <!--                                    class="fa fa-trash"></i></button>-->
                             </td>
@@ -48,6 +50,7 @@
 </template>
 <script>
     import Fuel from "./Fuel";
+    import Reversal from "./Reversal";
 
     export default {
         data() {
@@ -55,7 +58,8 @@
                 tableData: [],
                 add_fuel: false,
                 add_fuel_other: false,
-                editing: false
+                editing: false,
+                show_reversal:false
             }
         },
         created() {
@@ -66,6 +70,13 @@
             this.initDatable();
         },
         methods: {
+            reverseFuel(fuel){
+             this.$store.dispatch('updateFuel',fuel)
+                    .then(() =>{                       
+                        this.show_reversal = true;
+                        this.add_fuel=false;
+                        })
+            },
             getFuels() {
                 axios.get('fuel')
                     .then(res => this.tableData = res.data)
@@ -100,6 +111,7 @@
                     this.add_fuel = false;
                     this.add_fuel_other = false;
                     this.editing = false;
+                    this.show_reversal = false;
                     this.getFuels();
                     this.initDatable();
                 });
@@ -136,7 +148,8 @@
             },
         },
         components: {
-            Fuel
+            Fuel,
+            Reversal
         }
     }
 </script>

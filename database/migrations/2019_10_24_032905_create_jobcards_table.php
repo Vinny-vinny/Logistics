@@ -42,7 +42,9 @@ class CreateJobcardsTable extends Migration
             $table->integer('requisition_id')->nullable();         
             $table->bigInteger('labour_cost')->nullable();
             $table->bigInteger('standing_fee')->nullable();
-          
+            $table->float('hours_spent')->nullable(); 
+            $table->text('inventory_items_reversal')->nullable();
+            $table->string('reversal_ref')->nullable();         
             $table->timestamps();
         });
     }

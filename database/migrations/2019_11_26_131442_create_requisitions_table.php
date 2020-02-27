@@ -21,6 +21,7 @@ class CreateRequisitionsTable extends Migration
             $table->string('req_no')->nullable();
             $table->integer('where_to_charge')->nullable();
             $table->integer('project_id')->nullable();
+            $table->integer('subproject_id')->nullable();
             $table->integer('requested_by')->nullable();
             $table->string('group_name')->nullable();
             $table->integer('used')->default(0)->nullable();
@@ -30,6 +31,8 @@ class CreateRequisitionsTable extends Migration
             $table->string('person_collecting')->nullable();
             $table->integer('customer_id')->nullable();
             $table->integer('credit_account_id')->nullable();
+            $table->text('inventory_items_reversal')->nullable();
+            $table->string('reversal_ref')->nullable();
             $table->timestamps();
         });
     }

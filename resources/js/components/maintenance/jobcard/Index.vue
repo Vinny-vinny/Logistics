@@ -1,9 +1,10 @@
 <template>
     <div>
         <job-card v-if="add_jobcard" :edit="editing"></job-card>
-        <job-form v-if="show_form" :printJob="show_form"></job-form>        
+        <job-form v-if="show_form" :printJob="show_form"></job-form>
+        <reversal v-if="show_reversal" :reverse="show_reversal"></reversal>         
         <!-- Main content -->
-        <section class="content" v-if="!add_jobcard && !show_form">
+        <section class="content" v-if="!add_jobcard && !show_form && !show_reversal">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
@@ -31,6 +32,7 @@
                               <td>
                                 <button class="btn btn-success btn-sm" @click="editJobcard(job)"><i class="fa fa-edit"></i></button>
                                 <router-link :to="{path:'/job-card/'+job.id}" class="btn btn-info btn-sm"><i class=" fa fa-eye"></i></router-link>
+                                 <button class="btn btn-danger btn-sm" @click="reverseJob(job)"><i class="fa fa-undo" aria-hidden="true"></i></button>
                                  </td>
                         </tr>
                         </tbody>
@@ -42,7 +44,8 @@
 </template>
 <script>
     import JobCard from "./JobCard";
-    import JobForm from "./JobForm";   
+    import JobForm from "./JobForm"; 
+    import Reversal from "./Reversal";   
     export default {
         data(){
             return {
@@ -50,6 +53,7 @@
                 add_jobcard: false,
                 editing: false,
                 show_form:false,               
+                show_reversal:false         
             }
         },
         created(){
@@ -57,6 +61,13 @@
             this.getJobs();
         },    
         methods:{
+                 reverseJob(rq){
+            this.$store.dispatch('updateJobcard',rq)
+                    .then(() =>{                       
+                        this.show_reversal = true;
+                        this.add_jobcard=false;
+                    })
+            },
             getJobs(){
                 axios.get('job-card')
                     .then(res =>{
@@ -95,6 +106,7 @@
                 eventBus.$on('cancel',()=>{
                     this.add_jobcard = false;
                     this.editing = false;
+                    this.show_reversal = false;
                     this.initDatable();
                     this.getJobs();
                 });
@@ -141,7 +153,8 @@
         },
         components:{
             JobCard,
-            JobForm            
+            JobForm,
+            Reversal            
         }
     }
 </script>

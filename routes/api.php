@@ -20,6 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::apiResource('job-card','JobcardController');
 Route::post('close-jobcard/{id}','JobcardController@closeJobcard');
 Route::post('generate-job','JobcardController@generateJobcard');
+Route::post('reverse-job-card','JobcardController@reverseJob');
 Route::apiResource('machines','MachineController');
 Route::get('import-machines','MachineController@importMachines');
 Route::apiResource('users','UserController');
@@ -28,6 +29,7 @@ Route::apiResource('service-types','ServiceTypeController');
 Route::apiResource('fuel-balance','FuelBalanceController');
 Route::apiResource('expense','ExpensesController');
 Route::apiResource('fuel','FuelController');
+Route::post('reverse-fuel','FuelController@reverseFuel');
 Route::apiResource('fuel-types','FuelTypeController');
 Route::apiResource('fuel-supplier','FuelSupplierController');
 Route::apiResource('checklists','ChecklistsController');
@@ -49,6 +51,7 @@ Route::apiResource('mechanics','MechanicsController');
 Route::apiResource('requisitions','RequisitionController');
 Route::apiResource('checklist-tool','ChecklistToolController');
 Route::post('generate-requisition','RequisitionController@autoGenerate');
+Route::post('rev-reqs','RequisitionController@reverseReq');
 Route::apiResource('stk-groups','StkCategoryController');
 Route::apiResource('job-types','JobTypesController');
 Route::apiResource('uom','UomController');
@@ -67,6 +70,7 @@ Route::post('km-per-hr','ReportsController@KmPerHr');
 Route::post('diesel-analysis','ReportsController@DieselAnalysis');
 Route::apiResource('fuel-category','FuelCategoryController');
 Route::apiResource('where-to-charge','WheretochargeController');
+
 
 Route::group([
     'middleware' => 'api',

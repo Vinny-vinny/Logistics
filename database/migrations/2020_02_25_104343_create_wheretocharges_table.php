@@ -16,6 +16,7 @@ class CreateWheretochargesTable extends Migration
         Schema::create('wheretocharges', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('account_id');
+            $table->string('type');
             $table->timestamps();
         });
     }
