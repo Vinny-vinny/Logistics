@@ -34,7 +34,7 @@
                             <td>
                                <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
                                <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
-                                <button class="btn btn-danger btn-sm" @click="reverseRequisition(rq)"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="reverseRequisition(rq)" v-if="!rq.reversal_ref && rq.type=='Internal'"><i class="fa fa-undo" aria-hidden="true"></i></button>
 <!--                               <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->                            </td>
                         </tr>
                         </tbody>
@@ -113,6 +113,7 @@
                 eventBus.$on('updateRequisition',(rq)=>{
                     this.add_requisition = false;
                     this.editing = false;
+                    this.show_reversal = false;
                     for (let i=0;i<this.tableData.length;i++){
                         if (this.tableData[i].id == rq.id){
                             this.tableData.splice(i,1);

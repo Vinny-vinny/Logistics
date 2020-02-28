@@ -483,7 +483,7 @@
                     .then(res => {
                         console.log(res.data);
                         // this.edit_fuel = false;
-                        // eventBus.$emit('updateFuel', res.data);
+                         eventBus.$emit('updateFuel', res.data);
                     })
                     .catch(error => error.response)
             },

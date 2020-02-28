@@ -50,7 +50,7 @@ class RequisitionController extends Controller
         $request['inventory_items_reversal'] = json_encode($request->get('inventory_items_reversal'));
         $request['reversal_ref'] = 'REV00'.$request->get('id');
         Requisition::find($request->get('id'))->update($request->all());
-        return response()->json($request->all());
+        return response()->json(new RequisitionResource(Requisition::find($request->get('id'))));
     }
  
     /**

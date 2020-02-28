@@ -36,7 +36,7 @@
                                 <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
                                     class="fa fa-edit"></i></button>
                                 <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
-                                <button class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                                <button v-if="!fuel.reversal_ref" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
 <!--                                <button class="btn btn-danger btn-sm" @click="deleteFuel(fuel.id)"><i-->
 <!--                                    class="fa fa-trash"></i></button>-->
                             </td>
@@ -119,6 +119,7 @@
                     this.add_fuel = false;
                     this.add_fuel_other = false;
                     this.editing = false;
+                    this.show_reversal = false;
                     for (let i = 0; i < this.tableData.length; i++) {
                         if (this.tableData[i].id == fuel.id) {
                             this.tableData.splice(i, 1);

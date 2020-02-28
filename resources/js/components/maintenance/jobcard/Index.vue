@@ -32,7 +32,7 @@
                               <td>
                                 <button class="btn btn-success btn-sm" @click="editJobcard(job)"><i class="fa fa-edit"></i></button>
                                 <router-link :to="{path:'/job-card/'+job.id}" class="btn btn-info btn-sm"><i class=" fa fa-eye"></i></router-link>
-                                 <button class="btn btn-danger btn-sm" @click="reverseJob(job)"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                                 <button v-if="!job.reversal_ref" class="btn btn-danger btn-sm" @click="reverseJob(job)"><i class="fa fa-undo" aria-hidden="true"></i></button>
                                  </td>
                         </tr>
                         </tbody>
@@ -113,6 +113,7 @@
                 eventBus.$on('updateJobcard',(job)=>{
                     this.add_jobcard = false;
                     this.editing = false;
+                    this.show_reversal = false;
                     for (let i=0;i<this.tableData.length;i++){
                         if (this.tableData[i].id == job.id){
                             this.tableData.splice(i,1);

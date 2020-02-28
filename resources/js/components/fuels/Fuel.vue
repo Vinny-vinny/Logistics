@@ -306,7 +306,7 @@
                 if (this.totalAmount > 0 || this.genExpenses() > 0){
                     total += parseFloat(this.totalAmount) + parseFloat(this.genExpenses());
                 }
-                return total;
+                return total.toFixed(2);
             }
         },
         methods: {           

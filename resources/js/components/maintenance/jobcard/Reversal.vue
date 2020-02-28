@@ -5,7 +5,7 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Reversal Ref#</h3>
+                    <h3 class="box-title">Jobcard Reversal</h3>
                 </div>
                 <div class="box-body">
                     <form @submit.prevent="saveJobcard()" enctype="multipart/form-data" id="jobcard">
@@ -761,7 +761,7 @@
                 axios.post(`reverse-job-card`, {'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id}).then(res => {   
                  console.log(res.data);             
                     // this.$toastr.s('Jobcard updated Successfully.');
-                    // eventBus.$emit('updateJobcard', res.data)
+                     eventBus.$emit('updateJobcard', res.data)
                 })
                     .catch(error => error.response)
             },

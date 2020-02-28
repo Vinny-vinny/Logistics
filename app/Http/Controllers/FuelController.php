@@ -51,7 +51,7 @@ class FuelController extends Controller
     public function reverseFuel(Request $request){
         $request['reversal_ref'] = 'REV00'.$request->get('id');
         Fuel::find($request->get('id'))->update($request->all());
-        return response()->json($request->all());
+        return response()->json(new FuelResource(Fuel::find($request->get('id'))));
     }
 
     /**

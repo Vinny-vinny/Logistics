@@ -457,6 +457,7 @@
             axios.get('customers')
             .then(res => {
                 this.all_customers = res.data;
+               // console.log(this.all_customers.length)
                 res.data.forEach(c => {
                     this.customers.push({
                         'value': c.id,
@@ -655,8 +656,9 @@
                 axios.post(`rev-reqs`,{'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id})
                     .then(res => {
                       console.log(res.data)
+                         this.reverse = false;
                         //this.edit_requisition = false;
-                         //eventBus.$emit('updateRequisition',res.data);
+                         eventBus.$emit('updateRequisition',res.data);
                     })
                     .catch(error => error.response)
             },
