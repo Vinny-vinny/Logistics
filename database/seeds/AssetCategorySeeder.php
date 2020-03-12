@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\AssetCategory;
+use App\SageProject;
 
 class AssetCategorySeeder extends Seeder
 {
@@ -12,11 +13,13 @@ class AssetCategorySeeder extends Seeder
      */
     public function run()
     {
-        AssetCategory::create(['name' => 'Security']);
-        AssetCategory::create(['name' => 'Logistic']);
-        AssetCategory::create(['name' => 'Community']);
-        AssetCategory::create(['name' => 'Wildlife']);
-        AssetCategory::create(['name' => 'Education']);
-        AssetCategory::create(['name' => 'Conservation Overhead']);
+        AssetCategory::truncate();
+        $projects = SageProject::select('ProjectLink','ProjectName')->where('SubProjectOfLink',0)->where('ProjectLevel',1)->get();
+        collect($projects)->map(function($project){
+       AssetCategory::create([
+            'name' => $project->ProjectName,
+            'project_link' => $project->ProjectLink
+         ]);
+        });        
     }
 }

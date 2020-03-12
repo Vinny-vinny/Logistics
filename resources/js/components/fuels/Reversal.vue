@@ -16,20 +16,20 @@
                                     <input type="text" class="form-control" v-model="form.external_reference" disabled>
                                 </div>
                                 <div class="form-group" v-if="company">
-                                    <label>Project</label>                                   
+                                    <label>Project</label>
                                       <model-select :options="projects"
-                                        v-model="form.asset_category_id"  
+                                        v-model="form.asset_category_id"
                                         @input="subProject()"
-                                        :is-disabled="true"                    
+                                        :is-disabled="true"
                                         >
                                         </model-select>
                                 </div>
                                 <div class="form-group" v-if="company">
-                                    <label>Vehicle</label>                                   
+                                    <label>Vehicle</label>
                                       <model-select :options="subprojects"
-                                        v-model="form.vehicle_id"  
-                                        @input="getFuelType()"  
-                                        :is-disabled="true"                  
+                                        v-model="form.vehicle_id"
+                                        @input="getFuelType()"
+                                        :is-disabled="true"
                                         >
                                         </model-select>
                                 </div>
@@ -111,37 +111,37 @@
                                    </div>
 
                                    <fieldset class="the-fieldset" v-if="show_issue">
-                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>  
+                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>
                                   <div>
                                <div class="form-group">
                                    <label>Credit Account</label>
-                                   <input type="text" class="form-control" :value="account" disabled>
+                                      <model-select :options="accounts"
+                            v-model="form.where_to_charge"
+                            placeholder="Where to charge">
+                            </model-select>
                                </div>
-                            
-                         <div class="form-group">                           
+
+                         <div class="form-group">
                             <label>Debit Account</label>
-                             <model-select :options="accounts"
-                            v-model="form.where_to_charge"                                      
-                            placeholder="Where to charge"
-                            :is-disabled="true">
-                            </model-select>                          
+
+                             <input type="text" class="form-control" v-model="form.account" disabled>
                         </div>
                        </div>
                    </fieldset>
 
                                <div v-if="show_inv">
                                     <div class="form-group">
-                                   
+
                                     <label>Customer Type</label>
                                     <select class="form-control" v-model="form.customer_type_id" required @change="customerTypes()" disabled>
                                         <option :value="type.id" v-for="type in customer_types" :key="type.id">{{type.name}}</option>
                                     </select>
                                 </div>
                                 <div class="form-group" v-if="show_customer">
-                                    
-                                    <label>Customer</label>                                   
+
+                                    <label>Customer</label>
                                       <model-select :options="filtered_customers"
-                                        v-model="form.customer_id"                         
+                                        v-model="form.customer_id"
                                         :is-disabled="true">
                                         </model-select>
                                 </div>
@@ -149,7 +149,7 @@
                                 <div class="form-group">
                                     <label>Authorized By</label>
                                     <input type="text" class="form-control" v-model="username" disabled>
-                                </div>                              
+                                </div>
                                 <div class="form-group">
                                     <label>Requested By</label>
                                     <input type="text" class="form-control" v-model="form.requested_by" disabled>
@@ -160,8 +160,8 @@
                               </div>
                             </div>
                             </div>
-                        <button type="submit" class="btn btn-info"> <i class="fa fa-undo" aria-hidden="true"></i> Reverse</button>
-                        <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>                     
+                        <button type="submit" class="btn btn-info" :disabled="reverse_text"> <i class="fa fa-undo" aria-hidden="true"></i>{{reverse_text ? 'Please Wait' :'Reverse'}} </button>
+                        <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
                     </form>
                 </div>
             </div>
@@ -170,7 +170,7 @@
 </template>
 <script>
     import datepicker from 'vuejs-datepicker';
-    import { ModelSelect } from 'vue-search-select'; 
+    import { ModelSelect } from 'vue-search-select';
     export default {
         props: ['edit', 'other_fuel', 'add_fuel','reverse'],
         data() {
@@ -179,7 +179,7 @@
                     litres: '',
                     vehicle_id: '',
                     fuel_on: '',
-                    customer_id: '',                  
+                    customer_id: '',
                     expense_id: '',
                     fuel_type_id: '',
                     authorized_by: '',
@@ -196,10 +196,12 @@
                     status:1,
                     rate:0,
                     credit_account_id:'',
-                    where_to_charge:'',                    
+                    where_to_charge:'',
+                     account:'',
                     id: ''
                 },
                 edit_fuel: this.edit,
+                reverse_text:false,
                 other_fuel_asset: this.other_fuel,
                 customers: {},
                 vehicles: {},
@@ -211,7 +213,7 @@
                 fuel_type: '',
                 total: 0,
                 show_fuel_type: false,
-                show_rate: false,             
+                show_rate: false,
                 parts: {},
                 total_expenses:0,
                 pa:{},
@@ -229,7 +231,7 @@
                 accounts:[],
                 show_issue:false,
                 show_inv:false,
-                account:''
+
 
             }
         },
@@ -249,10 +251,10 @@
             this.creditAccount();
             this.getFuelCategories();
             this.getAccounts();
-          
+
 
         },
-       watch:{            
+       watch:{
         'form.fuel_category_id'(){
             if (this.form.fuel_category_id=='stock_issue') {
             this.show_issue = true;
@@ -265,10 +267,10 @@
         },
         numConversion(){
          if(this.form.odometer_readings < 0 || (isNaN(parseFloat(this.form.odometer_readings)) && !isFinite(this.form.odometer_readings))){
-             this.form.odometer_readings = 1; 
+             this.form.odometer_readings = 1;
             }
              if(this.form.litres < 0 || (isNaN(parseFloat(this.form.litres)) && !isFinite(this.form.litres))){
-             this.form.litres = 1; 
+             this.form.litres = 1;
             }
         },
          'form.vehicle_id'(){
@@ -310,16 +312,16 @@
                 return total;
             }
         },
-        methods: {           
+        methods: {
             creditAccount(){
             axios.get('where-to-charge')
-            .then(res => {                
+            .then(res => {
                 if (res.data.length) {
-                 let account = res.data.find(req => req.type =='Fueling');               
-                 this.account = account.account;
-                 this.form.credit_account_id  = account.account_id;   
-                }            
-          
+                 let account = res.data.find(req => req.type =='Fueling');
+                 this.form.account = account.account;
+                 this.form.credit_account_id  = account.account_id;
+                }
+
             })
             },
           getAccounts(){
@@ -331,7 +333,7 @@
             console.log(res.data.length);
             accounts.forEach(a => {
                 this.accounts.push({
-                    'value': a.id,
+                    'value': a.account_link,
                     'text': a.account
                 })
             })
@@ -339,7 +341,7 @@
         }  ,
            getFuelCategories(){
           axios.get('fuel-category')
-          .then(res => {           
+          .then(res => {
             this.fuel_categories = res.data;
           })
             },
@@ -368,7 +370,7 @@
                         'text': p.name
                     })
                 })
-                 
+
               })
             },
             getFuels(){
@@ -388,25 +390,25 @@
                 .then(res => {
                     this.customer_types = res.data;
                 })
-            },            
+            },
             fuelRate(){
             setTimeout(()=>{
                 let item =this.stks.find(s => s.id == this.form.fuel_type_id);
                 this.form.rate = item.cost;
-                this.fuel_type = item.description;              
+                this.fuel_type = item.description;
             },100)
 
             },
             customerTypes(){
                 this.filtered_customers = [];
                 this.show_customer = true;
-                let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);              
+                let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
                  customers.forEach(c => {
                     this.filtered_customers.push({
                         'value': c.id,
                         'text': c.name
                     })
-                 })                 
+                 })
 
             },
             genExpenses(){
@@ -431,7 +433,7 @@
             getFuelType() {
                 this.vehicles.forEach(vehicle => {
                     if (vehicle.id === this.form.vehicle_id) {
-                         this.form.previous_odometer = vehicle.odometer_readings;                                  
+                         this.form.previous_odometer = vehicle.odometer_readings;
                     }
                 })
             },
@@ -475,15 +477,15 @@
                     day = ("0" + date.getDate()).slice(-2);
                 return [date.getFullYear(), mnth, day].join("-");
             },
-            saveFuel() {              
+            saveFuel() {
+            //return console.log(this.form);
             this.update();
-            },          
+            },
             update() {
-                axios.post(`reverse-fuel`, {'reversal_litres':this.form.litres,'id':this.form.id,'reversal_rate':this.form.rate})
+                this.reverse_text = true;
+                axios.post(`reverse-fuel`, {'reversal_litres':this.form.litres,'id':this.form.id,'reversal_rate':this.form.rate,'where_to_charge':this.form.where_to_charge,'credit_account_id':this.form.credit_account_id})
                     .then(res => {
-                        console.log(res.data);
-                        // this.edit_fuel = false;
-                         eventBus.$emit('updateFuel', res.data);
+                      eventBus.$emit('cancel');
                     })
                     .catch(error => error.response)
             },
@@ -502,19 +504,19 @@
                     .then(res => {
                         this.username = res.data.name;
                     })
-                    
+
                     this.form.asset_type ==='other' ? this.other =true : this.company = true;
-                     
-                   setTimeout(()=>{                    
+
+                   setTimeout(()=>{
                     this.subProject();
                     this.customerTypes();
                     this.getCustomers();
                     this.getVehicles();
                     this.subProject();
                    },4000)
-                
+
             },
-           
+
         },
         components: {
             datepicker,

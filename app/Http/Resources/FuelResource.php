@@ -29,6 +29,7 @@ class FuelResource extends JsonResource
             'fuel_on' => $this->fuel_on,
             'date_fueled' => Carbon::parse($this->fuel_on)->format('d/m/Y'),
             'rate' => $this->rate,
+            'status' => $this->status,
             'customer_type_id' => $this->customer_type_id,
             'asset_type' => $this->asset_type,
             'requested_by' => $this->requested_by,
@@ -48,7 +49,8 @@ class FuelResource extends JsonResource
             'where_to_charge' => $this->where_to_charge,
             'reversal_ref' => $this->reversal_ref,
             'reversal_litres' => $this->reversal_litres,
-            'reversal_rate' => $this->reversal_rate
+            'reversal_rate' => $this->reversal_rate,
+            'invoiced' => $this->invoiced
              ];
     }
 }

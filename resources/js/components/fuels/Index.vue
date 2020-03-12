@@ -2,7 +2,7 @@
     <div>
         <fuel v-if="add_fuel" :edit="editing" :other_fuel="add_fuel_other"
               :add_fuel="add_fuel"></fuel>
-             <reversal v-if="show_reversal" :reverse="show_reversal"></reversal> 
+             <reversal v-if="show_reversal" :reverse="show_reversal"></reversal>
         <!-- Main content -->
         <section class="content" v-if="!add_fuel && !add_fuel_other && !show_reversal">
             <!-- Default box -->
@@ -36,9 +36,7 @@
                                 <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
                                     class="fa fa-edit"></i></button>
                                 <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
-                                <button v-if="!fuel.reversal_ref" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
-<!--                                <button class="btn btn-danger btn-sm" @click="deleteFuel(fuel.id)"><i-->
-<!--                                    class="fa fa-trash"></i></button>-->
+                                <button v-if="!fuel.reversal_ref && fuel.fuel_category_id=='stock_issue' && fuel.status !=0" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
                             </td>
                         </tr>
                         </tbody>
@@ -51,7 +49,6 @@
 <script>
     import Fuel from "./Fuel";
     import Reversal from "./Reversal";
-
     export default {
         data() {
             return {
@@ -72,7 +69,7 @@
         methods: {
             reverseFuel(fuel){
              this.$store.dispatch('updateFuel',fuel)
-                    .then(() =>{                       
+                    .then(() =>{
                         this.show_reversal = true;
                         this.add_fuel=false;
                         })

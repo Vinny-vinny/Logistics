@@ -88,24 +88,24 @@
                      let result = [];
                      for(let i=0;i<partners_fuels.length;i++){
                         if (!km_object[partners_fuels[i]['vehicle_id']]) {
-                          km_object[partners_fuels[i]['vehicle_id']]= partners_fuels[i]; 
+                          km_object[partners_fuels[i]['vehicle_id']]= partners_fuels[i];
                         }
                         else if(km_object[partners_fuels[i]['vehicle_id']]){
                            other_km_obj.push(partners_fuels[i]);
                            km_object[partners_fuels[i]['vehicle_id']]['litres'] += partners_fuels[i]['litres']
                         }
                      }
-                    
+
                     let myitems = other_km_obj.map(obj =>{
                    return obj.vehicle_id;
-                    });                               
+                    });
 
                        for(var k in km_object){
-                        if(km_object.hasOwnProperty(k)){                       
+                        if(km_object.hasOwnProperty(k)){
                          if (myitems.includes(km_object[k]['vehicle_id'])) {
-                         let itm = other_km_obj.filter(j => j.vehicle_id ==km_object[k]['vehicle_id']);                         
+                         let itm = other_km_obj.filter(j => j.vehicle_id ==km_object[k]['vehicle_id']);
                           result.push({
-                            'reg_no': this.machines.find(m => m.id ==km_object[k]['vehicle_id']).code,                            
+                            'reg_no': this.machines.find(m => m.project_link ==km_object[k]['vehicle_id']).code,
                             'start_odo': km_object[k]['odometer_readings'],
                             'end_odo': itm[itm.length-1]['odometer_readings'],
                             'distance': itm[itm.length-1]['odometer_readings'] - km_object[k]['odometer_readings'],
@@ -113,23 +113,23 @@
                             'km_per_ltrs':((itm[itm.length-1]['odometer_readings'] - km_object[k]['odometer_readings'])/km_object[k]['litres']).toFixed(2)
                           })
                          }
-                         else if(!myitems.includes(km_object[k]['vehicle_id'])){                
+                         else if(!myitems.includes(km_object[k]['vehicle_id'])){
                            result.push({
-                            'reg_no': this.machines.find(m => m.id ==km_object[k]['vehicle_id']).code,                            
+                            'reg_no': this.machines.find(m => m.project_link ==km_object[k]['vehicle_id']).code,
                             'start_odo': km_object[k]['previous_odometer'],
                             'end_odo': km_object[k]['odometer_readings'],
                             'distance': km_object[k]['odometer_readings']- km_object[k]['previous_odometer'],
                             'fuel_used': km_object[k]['litres'],
-                            'km_per_ltrs':((km_object[k]['odometer_readings'] - km_object[k]['previous_odometer'])/km_object[k]['litres']).toFixed(2)                              
+                            'km_per_ltrs':((km_object[k]['odometer_readings'] - km_object[k]['previous_odometer'])/km_object[k]['litres']).toFixed(2)
                           });
-                         }                    
-                    
+                         }
+
                       }
 
-                    }            
+                    }
                      this.show_fuel = true;
                      this.$store.dispatch('listPartnersReports',result);
-                     this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})                   
+                     this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})
 
                     })
                     .catch(error => error.response)

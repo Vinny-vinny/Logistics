@@ -44,7 +44,8 @@ class CreateJobcardsTable extends Migration
             $table->bigInteger('standing_fee')->nullable();
             $table->float('hours_spent')->nullable(); 
             $table->text('inventory_items_reversal')->nullable();
-            $table->string('reversal_ref')->nullable();         
+            $table->string('reversal_ref')->nullable();  
+            $table->integer('invoiced')->default(0)->nullable();       
             $table->timestamps();
         });
     }

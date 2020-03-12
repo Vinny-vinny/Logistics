@@ -16,6 +16,7 @@ class CreateAssetCategoriesTable extends Migration
         Schema::create('asset_categories', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
+            $table->integer('project_link');
             $table->timestamps();
         });
     }

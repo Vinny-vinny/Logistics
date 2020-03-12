@@ -14,7 +14,7 @@
                             <div class="form-group">
                             <label>External Reference</label>
                             <input type="text" class="form-control" v-model="form.external_reference" disabled>
-                        </div>                        
+                        </div>
                           <div class="form-group">
                             <label>Requisition Type</label>
                             <select class="form-control select2" v-model="form.type" disabled>
@@ -29,22 +29,22 @@
                          <div class="form-group">
                             <label>Project</label>
                             <model-select :options="projects"
-                            v-model="form.project_id"                                       
+                            v-model="form.project_id"
                             placeholder="select Project"
                             :is-disabled="true">
-                            </model-select>                        
-                        </div> 
+                            </model-select>
+                        </div>
                            <div class="form-group">
                             <label>Stk Group</label>
                             <model-select :options="stk_groups"
-                            v-model="form.group_name" 
-                            @input="selectedGroup()"                                      
+                            v-model="form.group_name"
+                            @input="selectedGroup()"
                             placeholder="select category"
                             :is-disabled="true">
                             </model-select>
 
                         </div>
-                        </div> 
+                        </div>
                         <div class="col-md-6">
                            <div class="form-group">
                             <label>Requested On</label>
@@ -57,40 +57,40 @@
                         <div class="form-group">
                             <label>Requested By</label>
                             <input type="text" v-model="username" class="form-control" disabled>
-                        </div> 
-                        
+                        </div>
+
                                  <fieldset class="the-fieldset" v-if="show_issue">
-                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>  
+                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>
                                   <div>
                                <div class="form-group">
-                                   <label>Credit Account</label>
-                                   <input type="text" class="form-control" :value="account" disabled>
-                               </div>
-                            
-                         <div class="form-group">                           
-                            <label>Debit Account</label>
-                             <model-select :options="accounts"
-                            v-model="form.where_to_charge"                                      
+                           <label>Credit Account</label>
+                           <model-select :options="accounts"
+                            v-model="form.where_to_charge"
                             placeholder="Where to charge"
-                            :is-disabled="true">
-                            </model-select>                          
+                            >
+                            </model-select>
+                               </div>
+
+                         <div class="form-group">
+                            <label>Debit Account</label>
+                           <input type="text" class="form-control" v-model="form.account" disabled>
                         </div>
                        </div>
                    </fieldset>
-                         
 
-                        </div> 
+
+                        </div>
                         </div>
                        <div class="form-group" v-show="show_customer">
                            <label>Customers</label>
                            <model-select :options="customers"
-                                        v-model="form.customer_id" 
-                                        :is-disabled="true"                             
+                                        v-model="form.customer_id"
+                                        :is-disabled="true"
                                         >
                           </model-select>
                        </div>
-                 
-                        <div class="form-group" v-if="form.type==='Internal'">                     
+
+                        <div class="form-group" v-if="form.type==='Internal'">
                                  <fieldset class="the-fieldset">
                                <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>
                             <table style="width: 100%">
@@ -102,20 +102,20 @@
                                     <th>Unit Cost</th>
                                     <th>Total Cost</th>
                                     <th>Total Cost(with VAT)</th>
-                                    <th></th>                                 
+                                    <th></th>
                                 </tr>
                                 <tr v-for="(item,k) in form.inventory_items_internal" :key="k">
                                       <td>
                                         <model-select :options="items"
-                                        v-model="item.part" 
-                                        @input="part =item.part"                                 
+                                        v-model="item.part"
+                                        @input="part =item.part"
                                         class="i_p"
                                         :is-disabled="true"
                                         >
                                         </model-select>
                                     </td>
                                        <td>
-                                       <input type="text" class="form-control qty" v-model="item.uom" disabled> 
+                                       <input type="text" class="form-control qty" v-model="item.uom" disabled>
                                     </td>
 
                                     <td><input type="text" class="form-control qty" v-model="item.quantity"
@@ -131,7 +131,7 @@
                                                placeholder="Total Cost" disabled></td>
                                     <td><input type="number" class="form-control p_ex_2" step="0.001" v-model="item.total_cost_inclusive"
                                                placeholder="Total Cost Inclusive VAT" disabled></td>
-                                  
+
                                     <td>
                                         <i class="fa fa-minus-circle remove_2" @click="removeItem(k)"
                                            v-show="k || ( !k && form.inventory_items_internal.length > 1)"></i>
@@ -153,20 +153,20 @@
                                     <th>Avail. Qty</th>
                                     <th>Unit Price</th>
                                     <th>Total Price</th>
-                                    <th>Total Price(with VAT)</th>                                 
+                                    <th>Total Price(with VAT)</th>
                                     <th></th>
                                 </tr>
                                 <tr v-for="(item,k) in form.inventory_items_external" :key="k">
                                     <td>
                                          <model-select :options="items"
-                                        v-model="item.part" 
-                                        @input="part =item.part"                                 
+                                        v-model="item.part"
+                                        @input="part =item.part"
                                         class="i_p"
                                         required>
-                                        </model-select>                                      
+                                        </model-select>
                                     </td>
                                         <td>
-                                      <input type="text" class="form-control qty" v-model="item.uom" disabled> 
+                                      <input type="text" class="form-control qty" v-model="item.uom" disabled>
                                     </td>
                                     <td><input type="number" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty"  @keyup="qty = item.quantity">
@@ -179,18 +179,18 @@
                                     <td><input type="number" class="form-control p_in_2" step="0.001" v-model="item.total_price"
                                                placeholder="Total Price" disabled></td>
                                     <td><input type="number" class="form-control p_ex_2" step="0.001" v-model="item.total_price_inclusive"
-                                               placeholder="Total Price Inclusive VAT" disabled></td>                                  
+                                               placeholder="Total Price Inclusive VAT" disabled></td>
                                        <td>
                                         <i class="fa fa-minus-circle remove_2" @click="removeItemExternal(k)"
-                                           v-show="k"></i>                                        
+                                           v-show="k"></i>
                                     </td>
                                 </tr>
                             </table>
                         </fieldset>
                         </div>
-                        <button type="submit" class="btn btn-primary">Reverse</button>
+                        <button type="submit" class="btn btn-danger" :disabled="show_text">{{show_text ? 'Please wait' : 'Reverse'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-                          
+
                     </form>
                 </div>
             </div>
@@ -200,12 +200,12 @@
 
 <script>
     import datepicker from 'vuejs-datepicker';
-     import { ModelSelect } from 'vue-search-select'; 
+     import { ModelSelect } from 'vue-search-select';
     export default {
         props:['reverse'],
         data(){
             return {
-                form:{
+                 form:{
                     project_id:'',
                     where_to_charge:'',
                     description:'',
@@ -215,14 +215,16 @@
                     person_collecting:'',
                     type:'Internal',
                     customer_id:'',
+                    account:'',
                     group_name:'',
                     credit_account_id:'',
                     inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
-                    inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],                    
+                    inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
                     id:''
                 },
                 reverse_req: this.reverse,
                 inventory_items_reversal:[],
+                show_text:false,
                 projects:[],
                 parts:{},
                 qty:'',
@@ -241,7 +243,6 @@
                 all_customers:{},
                 units:{},
                 filtered_uoms:{},
-                account:'',
                 show_issue:true,
                 show_customer:false,
                 external_reqs:[],
@@ -254,11 +255,11 @@
             this.getProjects();
             this.getParts();
             this.getUsers();
-            this.getGroups();   
+            this.getGroups();
             this.getStks();
             this.creditAccount();
-            this.getAccounts();  
-            this.getUoms();  
+            this.getAccounts();
+            this.getUoms();
             this.getCustomers();
             this.getPriceLists();
             this.getRequistion();
@@ -277,114 +278,114 @@
 
             },
             qty(){
-            
+
             if (isNaN(parseFloat(this.qty)) && !isFinite(this.qty) && this.qty < 0) {
-              //console.log('qqtyy....') 
-              this.qty = 1; 
+              //console.log('qqtyy....')
+              this.qty = 1;
             }
 
             },
             getExpenses(){
-            let customer; 
-            let item_array = [];  
+            let customer;
+            let item_array = [];
             let uoms;
-            this.uoms = [];        
-                if (this.form.customer_id) {                   
-                   customer =this.all_customers.find(q =>q.id ==this.form.customer_id)                      
-                   }         
-                        
+            this.uoms = [];
+                if (this.form.customer_id) {
+                   customer =this.all_customers.find(q =>q.id ==this.form.customer_id)
+                   }
+
                 for (let p=0; p < this.parts.length; p++){
                     for (let i=0; i < this.form.inventory_items_internal.length; i++){
                            if (this.form.inventory_items_internal[i]['part'] === this.parts[p]['id']){
-                            //Uom alGo goes here                            
+                            //Uom alGo goes here
                                 uoms = this.units.filter(u =>u.id_units == this.parts[p]['uom_stock_id'] || u.id_units == this.parts[p]['uom_purchase_id'] || u.id_units == this.parts[p]['uom_sellunit_id'])
-                             
+
                         if (uoms.length) {
-                          this.form.inventory_items_internal[i]['uom'] = uoms[0]['description']                      
+                          this.form.inventory_items_internal[i]['uom'] = uoms[0]['description']
                        }
-                        this.form.inventory_items_internal[i]['qty_available'] = this.parts[p]['qty_on_hand'] 
-                        if (this.form.inventory_items_internal[i]['quantity'] !=='' && this.form.inventory_items_internal[i]['part'] !==''){                             
+                        this.form.inventory_items_internal[i]['qty_available'] = this.parts[p]['qty_on_hand']
+                        if (this.form.inventory_items_internal[i]['quantity'] !=='' && this.form.inventory_items_internal[i]['part'] !==''){
                             if(this.form.inventory_items_internal[i]['quantity'] < 0 || (isNaN(parseFloat(this.form.inventory_items_internal[i]['quantity'])) && !isFinite(this.form.inventory_items_internal[i]['quantity']))){
-                               this.form.inventory_items_internal[i]['quantity'] = 1; 
-                            }                    
+                               this.form.inventory_items_internal[i]['quantity'] = 1;
+                            }
                           if (this.form.inventory_items_internal[i]['quantity'] > this.parts[p]['qty_on_hand']) {
                             this.form.inventory_items_internal[i]['quantity'] ='';
                             return this.$toastr.e('Sorry, requested Qty cannot be greater than available Qty.');
                           }
                                 if(!customer){
-                                    this.form.inventory_items_internal[i]['unit_cost'] = this.parts[p]['cost'];                              
+                                    this.form.inventory_items_internal[i]['unit_cost'] = this.parts[p]['cost'];
                                 this.form.inventory_items_internal[i]['total_cost_inclusive'] = ((this.parts[p]['cost'] * 116/100) * this.form.inventory_items_internal[i]['quantity']).toFixed(2);
-                                this.form.inventory_items_internal[i]['total_cost'] = (this.parts[p]['cost'] * this.form.inventory_items_internal[i]['quantity']).toFixed(2); 
-                              }                               
+                                this.form.inventory_items_internal[i]['total_cost'] = (this.parts[p]['cost'] * this.form.inventory_items_internal[i]['quantity']).toFixed(2);
+                              }
                                 item_array.push({
                                     'id' : this.parts[p]['id'],
-                                    'cost' : this.parts[p]['cost'],                                    
-                                    'qty': this.form.inventory_items_internal[i]['quantity']                               
+                                    'cost' : this.parts[p]['cost'],
+                                    'qty': this.form.inventory_items_internal[i]['quantity']
                                 })
                             }
                         }
                     }
                 }
-              
-                if (item_array.length && customer) {                   
+
+                if (item_array.length && customer) {
                      item_array.forEach(item => {
                      for(let q=0;q<this.form.inventory_items_internal.length;q++){
                       this.pricelists.forEach(m => {
-                       if(m.id ==item.id && this.form.inventory_items_internal[q]['part']==item.id){                     
-                      this.form.inventory_items_internal[q]['unit_cost'] = m.exclusive_price;       
-                      this.form.inventory_items_internal[q]['total_cost_inclusive'] = (m.inclusive_price * item.qty).toFixed(2); 
+                       if(m.id ==item.id && this.form.inventory_items_internal[q]['part']==item.id){
+                      this.form.inventory_items_internal[q]['unit_cost'] = m.exclusive_price;
+                      this.form.inventory_items_internal[q]['total_cost_inclusive'] = (m.inclusive_price * item.qty).toFixed(2);
                       this.form.inventory_items_internal[q]['total_cost'] = (m.exclusive_price * item.qty).toFixed(2);
                        }
-                       }); 
-                        }                     
-                         
-                    })         
+                       });
+                        }
+
+                    })
                 }
-    
+
             },
             getExternal(){
 
-            let customer; 
+            let customer;
             let item_array = [];
             let uoms;
-          
-                if (this.form.customer_id) {                   
-                   customer =this.all_customers.find(q =>q.id ==this.form.customer_id)                      
+
+                if (this.form.customer_id) {
+                   customer =this.all_customers.find(q =>q.id ==this.form.customer_id)
                    }
-                    
+
                 for (let p=0; p < this.parts.length; p++){
-                    for (let i=0; i < this.form.inventory_items_external.length; i++){                       
+                    for (let i=0; i < this.form.inventory_items_external.length; i++){
                             if (this.form.inventory_items_external[i]['part'] === this.parts[p]['id']){
-                              
+
                                 //uoms algo
                                  // console.log(`stock_id== ${this.parts[p]['uom_stock_id']} purchase_id== ${this.parts[p]['uom_purchase_id']} selling_id== ${this.parts[p]['uom_sellunit_id']}`)
                                 uoms = this.units.filter(u =>u.id_units == this.parts[p]['uom_stock_id'] || u.id_units == this.parts[p]['uom_purchase_id'] || u.id_units == this.parts[p]['uom_sellunit_id'])
 
                         if (uoms.length) {
-                          this.form.inventory_items_external[i]['uom'] = uoms[0]['description']                      
+                          this.form.inventory_items_external[i]['uom'] = uoms[0]['description']
                         }
 
-                        this.form.inventory_items_external[i]['qty_available'] = this.parts[p]['qty_on_hand'] 
-                        if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){                             
+                        this.form.inventory_items_external[i]['qty_available'] = this.parts[p]['qty_on_hand']
+                        if (this.form.inventory_items_external[i]['quantity'] !=='' && this.form.inventory_items_external[i]['part'] !==''){
                             if(this.form.inventory_items_external[i]['quantity'] < 0 || (isNaN(parseFloat(this.form.inventory_items_external[i]['quantity'])) && !isFinite(this.form.inventory_items_external[i]['quantity']))){
-                               this.form.inventory_items_external[i]['quantity'] = 1; 
-                            }                    
+                               this.form.inventory_items_external[i]['quantity'] = 1;
+                            }
                           if (this.form.inventory_items_external[i]['quantity'] > this.parts[p]['qty_on_hand']) {
                             this.form.inventory_items_external[i]['quantity'] ='';
                             return this.$toastr.e('Sorry, requested Qty cannot be greater than available Qty.');
                           }
-                           
+
                               if(!customer){
-                               this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']                                              
+                               this.form.inventory_items_external[i]['unit_price'] = this.parts[p]['cost']
                                 this.form.inventory_items_external[i]['total_price_inclusive'] = ((this.form.inventory_items_external[i]['unit_price']* 116/100) * this.form.inventory_items_external[i]['quantity']).toFixed(2);
                                 this.form.inventory_items_external[i]['total_price'] = (this.form.inventory_items_external[i]['unit_price'] * this.form.inventory_items_external[i]['quantity']).toFixed(2);
                             }
                             item_array.push({
                                     'id' : this.parts[p]['id'],
-                                    'cost' : this.parts[p]['cost'],                                
-                                    'qty': this.form.inventory_items_external[i]['quantity']                               
+                                    'cost' : this.parts[p]['cost'],
+                                    'qty': this.form.inventory_items_external[i]['quantity']
                                 })
-                        
+
 
 
                         }
@@ -392,28 +393,28 @@
                 }
             }
 
-                 if (item_array.length && customer) {                   
+                 if (item_array.length && customer) {
                      item_array.forEach(item => {
                      for(let q=0;q<this.form.inventory_items_external.length;q++){
                       this.pricelists.forEach(m => {
-                       if(m.id ==item.id && this.form.inventory_items_external[q]['part']==item.id){                     
-                      this.form.inventory_items_external[q]['unit_price'] = m.exclusive_price;     
-                      this.form.inventory_items_external[q]['total_price_inclusive'] = (m.inclusive_price * item.qty).toFixed(2); 
+                       if(m.id ==item.id && this.form.inventory_items_external[q]['part']==item.id){
+                      this.form.inventory_items_external[q]['unit_price'] = m.exclusive_price;
+                      this.form.inventory_items_external[q]['total_price_inclusive'] = (m.inclusive_price * item.qty).toFixed(2);
                       this.form.inventory_items_external[q]['total_price'] = (m.exclusive_price * item.qty).toFixed(2);;
                        }
-                       }); 
-                        }                     
-                         
-                    })         
+                       });
+                        }
+
+                    })
                 }
 
-    
+
             }
         },
-        computed:{ 
+        computed:{
         internalType(){
         return this.form.type =='Internal';
-        }   ,                     
+        }   ,
           getExpenses(){
             return [this.part,this.qty,this.form.inventory_items_internal,this.form.group_name,this.form.customer_id].join();
           },
@@ -422,23 +423,25 @@
             }
         },
 
-        methods:{ 
+        methods:{
           getRequistion(){
          axios.get(`requisitions/${this.form.id}`)
-         .then(res => { 
+         .then(res => {
              this.external_reqs = res.data.inventory_items_external;
-             this.internal_reqs = res.data.inventory_items_internal; 
-             //console.log(res.data.inventory_items_internal)       
+             this.internal_reqs = res.data.inventory_items_internal;
+             //console.log(res.data.inventory_items_internal)
          })
           },
             creditAccount(){
             axios.get('where-to-charge')
-            .then(res => {                
+            .then(res => {
                 if (res.data.length) {
-                  this.account = res.data[0]['account'];
-               this.form.credit_account_id  = res.data[0]['account_id']   
-                }            
-          
+                 let account = res.data.find(req => req.type =='Requisition');
+
+                 this.form.account = account.account;
+                 this.form.credit_account_id  = account.account_id;
+                }
+
             })
             },
             resetAccount(){
@@ -469,21 +472,18 @@
             getUoms(){
             axios.get('uom')
             .then(res => {
-                 this.units =  res.data;               
-               // console.log(this.units)  
-         
+                 this.units =  res.data;
+               // console.log(this.units)
+
             })
             },
         getAccounts(){
          axios.get('accounts')
          .then(res => {
-            console.log(this.form.credit_account_id)
-            let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
-            console.log(accounts.length);
-            console.log(res.data.length);
+           let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
             accounts.forEach(a => {
                 this.accounts.push({
-                    'value': a.id,
+                    'value': a.account_link,
                     'text': a.account
                 })
             })
@@ -494,8 +494,8 @@
          .then(res => {
             this.stks = res.data.requisitions
          })
-        }  ,              
-            costing(cost){          
+        }  ,
+            costing(cost){
             return cost;
             },
             checkQty(n){
@@ -506,10 +506,10 @@
                     this.form.group_name = '';
                 return this.$toastr.e('Please Select customer first');
                 }
-               
+
                 let items=[];
                  items = this.parts.filter(item => item.item_group == this.form.group_name);
-                 
+
              if (this.form.type =='Internal') {
                   this.items = [];
                 if (Object.values(this.form.inventory_items_internal[0])[0] !== '') {
@@ -518,11 +518,11 @@
                             if (p.id == this.form.inventory_items_internal[i]['part']) {
                                 items.push(p);
                             }
-                        })                    
-                       
+                        })
+
                     }
                 }
-             } 
+             }
 
                 if (this.form.type =='External') {
                       this.items = [];
@@ -532,19 +532,19 @@
                             if (p.id == this.form.inventory_items_external[i]['part']) {
                                 items.push(p);
                             }
-                        })                    
-                       
+                        })
+
                     }
                 }
-             }             
-                    
+             }
+
             items.forEach(p => {
                 this.items.push({
                     'value': p.id,
                     'text': p.item_group +'-'+p.description
                 })
-            })           
-           
+            })
+
             },
             getGroups(){
                 axios.get('stk-groups')
@@ -554,7 +554,7 @@
                             'value': stk.name,
                             'text': stk.name +'-'+stk.description
                         })
-                    })                  
+                    })
                 })
             },
             getUsers(){
@@ -566,7 +566,7 @@
             getParts(){
               axios.get('parts')
                   .then(parts => {
-                      this.parts = parts.data;                
+                      this.parts = parts.data;
                   })
             },
             convertDate(str) {
@@ -580,7 +580,7 @@
             },
             addItem() {
                 this.form.inventory_items_internal.push({part: '',uom:'', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''});
-               
+
             },
             removeItemExternal(i) {
              this.form.inventory_items_internal.splice(i, 1);
@@ -597,67 +597,70 @@
                         'text': p.name
                      })
                     })
-                      
+
                   })
             },
             saveRequisition(){
-          this.inventory_items_reversal = [];            
+          this.inventory_items_reversal = [];
                 if (Object.values(this.form.inventory_items_internal[0])[0] !== '' || Object.values(this.form.inventory_items_internal[0])[2] !== '') {
                     for (let i = 0; i < this.form.inventory_items_internal.length; i++) {
                         if (this.form.inventory_items_internal[i]['quantity'] === '') {
                             return this.$toastr.e('Inventory Item Quantity fields are required.');
-                        }     
-                                    
+                        }
+
                              this.inventory_items_reversal.push({
                              'part':this.form.inventory_items_internal[i]['part'],
                              'uom': this.form.inventory_items_internal[i]['uom'],
                              'quantity': this.form.inventory_items_internal[i]['quantity'],
-                             'unit_price': this.form.inventory_items_internal[i]['unit_cost'], 
+                             'unit_price': this.form.inventory_items_internal[i]['unit_cost'],
                              'total_price': this.form.inventory_items_internal[i]['total_cost'],
                              'total_price_inclusive': this.form.inventory_items_internal[i]['total_cost_inclusive'],
                              'qty_available': this.form.inventory_items_internal[i]['qty_available'],
                             });
-                    
-                        
+
+
                     }
                 }
-                
+
                 if (Object.values(this.form.inventory_items_external[0])[0] !== '' || Object.values(this.form.inventory_items_external[0])[2] !== '' || Object.values(this.form.inventory_items_external[0])[3] !== '') {
                     for (let i = 0; i < this.form.inventory_items_external.length; i++) {
                         if (this.form.inventory_items_external[i]['quantity'] === '') {
                             return this.$toastr.e('Inventory Item Quantity fields are required.');
-                        }                       
+                        }
                           this.inventory_items_reversal.push({
                              'part':this.form.inventory_items_external[i]['part'],
                              'uom': this.form.inventory_items_external[i]['uom'],
                              'quantity': this.form.inventory_items_external[i]['quantity'],
-                             'unit_price': this.form.inventory_items_external[i]['unit_price'], 
+                             'unit_price': this.form.inventory_items_external[i]['unit_price'],
                              'total_price': this.form.inventory_items_external[i]['total_price'],
                              'total_price_inclusive': this.form.inventory_items_external[i]['total_price_inclusive'],
                              'qty_available': this.form.inventory_items_external[i]['qty_available'],
                             });
                     }
-                  
+
                 }
                  this.inventory_items_reversal = this.inventory_items_reversal.filter(req => req.part !==null)
-                         
+                 //return console.log(this.form);
+
                 this.update();
             },
             save(){
+
                 delete this.form.id;
                 this.form.requested_by = User.id();
                 axios.post('requisitions',this.form)
-                    .then(res =>{                        
+                    .then(res =>{
                       eventBus.$emit('listReqs',res.data)
                     })
                     .catch(error => error.response)
             },
                 update(){
+                  this.show_text = true;
                 axios.post(`rev-reqs`,{'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id})
                     .then(res => {
-                      console.log(res.data)
-                         this.reverse = false;
-                        //this.edit_requisition = false;
+                         this.show_reversal = false;
+                         this.reverse_req = false;
+                        this.edit_requisition = false;
                          eventBus.$emit('updateRequisition',res.data);
                     })
                     .catch(error => error.response)
@@ -666,13 +669,14 @@
                 eventBus.$emit('cancel')
             },
             listen(){
-                 this.form = this.$store.state.requisitions;                                   
+                 this.form = this.$store.state.requisitions;
+                 console.log(this.form);
                    setTimeout(()=>{
-                   this.selectedGroup(); 
+                   this.selectedGroup();
                    this.getCustomers();
                    this.getParts();
-                   },5000)                
-                 },       
+                   },5000)
+                 },
         },
         components:{
             datepicker,

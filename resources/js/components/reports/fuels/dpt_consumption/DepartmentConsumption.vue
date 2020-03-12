@@ -60,28 +60,28 @@
                     return this.$toastr.e('Date from and Date to cannot be empty.')
                 }
                 axios.post('diesel-analysis',this.form)
-                    .then(res =>{                      
+                    .then(res =>{
                         let dept_obj = {};
                         let result = [];
                         for(let i=0;i<res.data.length;i++){
-                            if(!dept_obj[res.data[i]['asset_category_id']]){                   
-                                dept_obj[res.data[i]['asset_category_id']] = res.data[i];  
-                                 dept_obj[res.data[i]['asset_category_id']]['total'] = res.data[i]['rate'] * res.data[i]['litres'];    
+                            if(!dept_obj[res.data[i]['asset_category_id']]){
+                                dept_obj[res.data[i]['asset_category_id']] = res.data[i];
+                                 dept_obj[res.data[i]['asset_category_id']]['total'] = res.data[i]['rate'] * res.data[i]['litres'];
                             }
-                            else if(dept_obj[res.data[i]['asset_category_id']]){               
-                              dept_obj[res.data[i]['asset_category_id']]['litres'] += res.data[i]['litres'];  
-                               dept_obj[res.data[i]['asset_category_id']]['total'] += (res.data[i]['rate'] * res.data[i]['litres']);   
+                            else if(dept_obj[res.data[i]['asset_category_id']]){
+                              dept_obj[res.data[i]['asset_category_id']]['litres'] += res.data[i]['litres'];
+                               dept_obj[res.data[i]['asset_category_id']]['total'] += (res.data[i]['rate'] * res.data[i]['litres']);
                             }
-                        }                       
+                        }
                         for(var i in dept_obj){
                             if(dept_obj.hasOwnProperty(i)){
                                result.push({
-                                'department': this.departments.find(d => d.id == dept_obj[i]['asset_category_id']).name,
+                                'department': this.departments.find(d => d.project_link == dept_obj[i]['asset_category_id']).name,
                                 'qty': dept_obj[i]['litres'],
-                                'percentage': ((dept_obj[i]['litres']/dept_obj[i]['total'])*100).toFixed(2)  
+                                'percentage': ((dept_obj[i]['litres']/dept_obj[i]['total'])*100).toFixed(2)
                                })
                             }
-                        }                     
+                        }
                         this.show_fuel = true;
                         this.$store.dispatch('listconsumptionReports',result)
                          this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})

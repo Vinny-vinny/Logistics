@@ -29,29 +29,29 @@
                                 </div>
                                 <div class="form-group" v-if="show_customers">
                                      <span class="reset_btn pull-right" @click="resetCustomer">reset</span>
-                                    <label>Customer</label>                                   
+                                    <label>Customer</label>
                                     <model-select :options="filtered_customers"
                                         v-model="form.customer_id"
-                                        @input="getJobDetails()"                           
+                                        @input="getJobDetails()"
                                         >
                                         </model-select>
                                 </div>
                                     <div class="form-group">
-                                    <label>Project</label>                                   
+                                    <label>Project</label>
                                     <model-select :options="projects"
-                                        v-model="form.asset_category_id"  
-                                        @input="subProject()"                    
+                                        v-model="form.asset_category_id"
+                                        @input="subProject()"
                                         required>
-                                        </model-select> 
+                                        </model-select>
                                 </div>
                                 <div class="form-group">
                                     <span class="reset_btn pull-right" @click="resetVehicle">reset</span>
-                                    <label>Vehicle</label>                                  
+                                    <label>Vehicle</label>
                                     <model-select :options="subprojects"
-                                        v-model="form.machine_id"  
-                                        @input="getAssetDetails()"                    
+                                        v-model="form.machine_id"
+                                        @input="getAssetDetails()"
                                         >
-                                        </model-select> 
+                                        </model-select>
                                 </div>
                                 <div class="form-group" v-if="this.form.machine_id">
                                     <label>Track By:</label> {{track_name}}
@@ -71,11 +71,11 @@
                                             {{job_type.name}} - {{job_type.currency}} {{job_type.hourly_rate}}
                                         </option>
                                     </select>
-                                </div>                               
+                                </div>
                                 <div class="form-group">
                                     <label>Mechanic</label>
                                         <model-select :options="mechanics"
-                                        v-model="form.mechanic_id"                           
+                                        v-model="form.mechanic_id"
                                         >
                                         </model-select>
                                 </div>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Cost Code</label>
-                                    <input type="text" class="form-control" v-model="form.cost_code">                                                                   
+                                    <input type="text" class="form-control" v-model="form.cost_code">
                                 </div>
                                 <div class="form-group">
                                     <label>Servicing Date</label>
@@ -132,7 +132,7 @@
                                 <div class="form-group">
                                     <label>Assigned To: </label> {{driver}}
                                 </div>
-                                
+
                                 <div class="form-group" v-if="show_track_by">
                                     <label class="pull-left">Previous {{track_name}} Reading:
                                         {{previous_readings}}</label>
@@ -148,24 +148,24 @@
                                     <label>Next {{track_name}} Maintenance</label>
                                     <input type="number" step="0.001" class="form-control" v-model="form.next_readings"
                                             :disabled="!show_next_readings">
-                                </div>                            
+                                </div>
 
                                 <div class="form-group" v-if="this.form.machine_id">
                                     <label>Lobour Cost</label>
                                     <input type="text" class="form-control" v-model="form.labour_cost" disabled>
-                                </div>                                
+                                </div>
                                  <div class="form-group">
                                 <label>Standing fee charged</label>
                                 <input type="number" step="0.001" v-model="form.standing_fee" class="form-control" required>
                             </div>
-                            </div>                         
-                        </div>                      
+                            </div>
+                        </div>
 
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                      <fieldset class="the-fieldset">
-                               <legend class="the-legend"><label class="fyr">Maintenance</label></legend>                                
+                               <legend class="the-legend"><label class="fyr">Maintenance</label></legend>
                                     <table style="width:100%">
                                         <tr>
                                             <th>Category</th>
@@ -177,7 +177,7 @@
                                              <td>
                                              <model-select :options="categories"
                                             v-model="m.category"
-                                            class="i_p_2"                           
+                                            class="i_p_2"
                                             >
                                             </model-select>
                                             </td>
@@ -213,7 +213,7 @@
 
                                 <div class="form-group" v-if="show_inventory && filtered_rq=='Internal'">
                                  <fieldset class="the-fieldset">
-                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>    
+                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>
                                     <table style="width:100%">
                                         <tr>
                                             <th align="right">Part</th>
@@ -224,10 +224,10 @@
 
                                         </tr>
                                         <tr v-for="(m,i) in filtered_items_internal">
-                                            <td>                                              
+                                            <td>
                                             <model-select :options="stk_items"
                                             v-model="m.part"
-                                            class="i_p"                           
+                                            class="i_p"
                                             >
                                             </model-select>
                                             </td>
@@ -254,7 +254,7 @@
                                 </div>
                                 <div class="form-group" v-if="show_inventory && filtered_rq=='External'">
                                      <fieldset class="the-fieldset">
-                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend> 
+                               <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>
                                     <table style="width:100%">
                                         <tr>
                                             <th align="right">Part</th>
@@ -265,10 +265,10 @@
 
                                         </tr>
                                         <tr v-for="(m,i) in filtered_items_external">
-                                            <td>                                    
+                                            <td>
                                             <model-select :options="stk_items"
                                             v-model="m.part"
-                                            class="i_p"                           
+                                            class="i_p"
                                             >
                                             </model-select>
 
@@ -300,6 +300,7 @@
                             'Save'}}
                         </button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                        <button type="button" class="btn btn-info" @click="sendInvoice()" v-if="edit && form.requisition_id && form.invoiced==0" :disabled="invoice_text">{{invoice_text ? 'Please Wait' :'Send Invoice'}}</button>
                         <button type="button" class="btn btn-warning" @click="close" v-if="edit_jobcard && status==1">
                             Close Jobcard
                         </button>
@@ -311,7 +312,7 @@
 </template>
 <script>
     import datepicker from 'vuejs-datepicker';
-     import { ModelSelect } from 'vue-search-select'; 
+     import { ModelSelect } from 'vue-search-select';
     export default {
         props: ['edit'],
         data() {
@@ -325,7 +326,7 @@
                     actual_date: '',
                     completion_date: '',
                     time_in: '',
-                    time_out: '',                    
+                    time_out: '',
                     next_readings: 0,
                     next_service_date: '',
                     current_readings: '',
@@ -337,13 +338,14 @@
                     cost_code: '',
                     customer_id: '',
                     requisition_id: '',
-                    labour_cost: 0,  
-                    hours_spent:'',                
+                    labour_cost: 0,
+                    hours_spent:'',
                     id: '',
                     maintenance: [{category: '', description: '', root_cause: ''}],
 
                 },
                 checklist: '',
+                invoice_text:false,
                 edit_jobcard: this.edit,
                 machines: {},
                 tracks: {},
@@ -388,12 +390,12 @@
                 subprojects:[],
                 transactions:{},
                 stk_items:[],
-                show_rqs:false                      
+                show_rqs:false
 
             }
         },
         watch: {
-            labours(){                
+            labours(){
             if (this.form.hours_spent > 0 && this.form.job_type_id) {
                        axios.get('job-types')
                         .then(res => {
@@ -401,7 +403,7 @@
                             this.job_types = res.data;
                             if (this.form.job_type_id) {
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
-                             total += this.form.hours_spent * cost;  
+                             total += this.form.hours_spent * cost;
                             }
                            this.form.labour_cost =  total.toFixed(2);
                         })
@@ -462,7 +464,7 @@
                             this.job_types = res.data;
                             if (this.form.job_type_id) {
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
-                             total += time_in_minutes / 60 * cost;  
+                             total += time_in_minutes / 60 * cost;
                             }
                            // this.form.labour_cost =  total;
                         })
@@ -480,7 +482,7 @@
             this.getMachines();
             this.getUsers();
             this.getTracks();
-            this.getServiceTypes();          
+            this.getServiceTypes();
             this.getParts();
             this.getCategories();
             this.getProjects();
@@ -490,8 +492,8 @@
             this.getCustomers();
             this.getRequisitions();
             this.filteredRqs();
-            this.getCustomerTypes(); 
-                     
+            this.getCustomerTypes();
+
 
         },
         filters: {
@@ -499,7 +501,7 @@
                 return moment(date);
             }
         },
-       
+
         computed: {
             labours(){
             return [this.form.hours_spent,this.form.job_type_id].join();
@@ -524,22 +526,28 @@
 
         },
         methods: {
-
+            sendInvoice(){
+             this.invoice_text = true;
+            axios.post(`invoice-job-card`,this.form)
+            .then(res => {
+              eventBus.$emit('cancel')
+            })
+            },
             getJobDetails(){
-              this.show_rqs = false; 
+              this.show_rqs = false;
              if(this.form.customer_id){
                 this.form.asset_category_id='';
                let req_details = this.requisitions.find(req => req.customer_id ==this.form.customer_id);
-               if(req_details) {                
-                this.form.asset_category_id = req_details.project_id; 
+               if(req_details) {
+                this.form.asset_category_id = req_details.project_id;
                 this.form.machine_id = req_details.subproject_id;
 
-                this.subProject(); 
+                this.subProject();
                 this.getAssetDetails();
                 this.rqs = this.requisitions.filter(req => req.customer_id ==this.form.customer_id)
-                this.show_rqs = true;               
+                this.show_rqs = true;
                }
-               
+
              }
             },
             resetReqs(){
@@ -556,14 +564,14 @@
             },
             resetVehicle(){
             this.form.machine_id = '';
-            },           
-             subProject(){       
+            },
+             subProject(){
+            this.subprojects = [];
             let subp = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
-            this .subprojects = [];
-             subp.forEach(p => {
+                subp.forEach(p => {
                 this.subprojects.push({
-                    'value': p.id,
-                    'text': p.code
+                    'value': p.project_link,
+                    'text': p.description
                 })
              })
             },
@@ -604,12 +612,12 @@
                 //         if(this.requisitions[i]['type'] ==='Internal'){
                 //             this.filtered_rq ='Internal';
                 //                 this.filtered_items_internal = this.requisitions[i]['inventory_items_internal'];
-                          
+
                 //         }
                 //         if(this.requisitions[i]['type'] ==='External'){
-                //             this.filtered_rq ='External';                       
+                //             this.filtered_rq ='External';
                 //             this.filtered_items_external = this.requisitions[i]['inventory_items_external'];
-                         
+
                 //         }
 
                 //     }
@@ -626,7 +634,7 @@
             },
             customerType() {
                 this.filtered_customers = [];
-                this.show_customers = true; 
+                this.show_customers = true;
                setTimeout(()=>{
                 if (this.form.customer_type_id) {
                       let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
@@ -635,10 +643,10 @@
                         'value': cus.id,
                         'text': cus.name
                     })
-                 }); 
+                 });
                 }
-             
-               },500)              
+
+               },500)
             },
             getCustomers() {
                 axios.get('customers')
@@ -660,7 +668,7 @@
                                 'value': m.id,
                                 'text': m.name
                             })
-                        })                     
+                        })
                     })
             },
             getJobCategories() {
@@ -674,10 +682,10 @@
               .then(res => {
                 res.data.forEach(p => {
                     this.projects.push({
-                        'value': p.id,
+                        'value': p.project_link,
                         'text': p.name
                     })
-                })        
+                })
               })
             },
             addService(i) {
@@ -717,7 +725,7 @@
                                 'value': c.id,
                                 'text': c.name
                             })
-                        })                  
+                        })
                     })
             },
             getParts() {
@@ -753,7 +761,7 @@
             getAssetDetails() {
                 setTimeout(()=>{
               this.machines.forEach(machine => {
-                    if (machine.id === this.form.machine_id) {                    
+                    if (machine.id === this.form.machine_id) {
                         this.make = machine.make;
                         this.previous_readings = machine.current_readings;
                         this.form.track_by_id = machine.track_by_id;
@@ -794,8 +802,8 @@
                             return this.$toastr.e('Please all Maintenance fields are required.');
                         }
                     }
-                }               
-               
+                }
+
 
                 if (this.form.service_type =='External' && this.form.customer_id =='') {
                     return this.$toastr.e('Please Customer field is mandatory.');
@@ -803,7 +811,7 @@
                if (this.form.service_type =='Internal' && this.form.asset_category_id =='') {
                 return this.$toastr.e('Please select project first.');
                }
-               
+
                 this.edit_jobcard ? this.update() : this.save();
 
             },
@@ -811,7 +819,7 @@
                 this.saveJob();
             },
             saveJob() {
-                delete this.form.id;              
+                delete this.form.id;
                this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : ''
                 this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : ''
                 this.form.actual_date !== '' ? this.form.actual_date = this.convertDate(this.form.actual_date) : ''
@@ -828,12 +836,12 @@
                     day = ("0" + date.getDate()).slice(-2);
                 return [date.getFullYear(), mnth, day].join("-");
             },
-            update() {                      
+            update() {
                 this.form.next_service_date !== null && this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : '';
                   this.form.actual_date !== null && this.form.actual_date !== '' ? this.form.actual_date = this.convertDate(this.form.actual_date) : '';
                     this.form.completion_date !== null && this.form.completion_date !== '' ? this.form.completion_date = this.convertDate(this.form.completion_date) : '';
-                
-                axios.patch(`job-card/${this.form.id}`, this.form).then(res => {                
+
+                axios.patch(`job-card/${this.form.id}`, this.form).then(res => {
                     this.$toastr.s('Jobcard updated Successfully.');
                     eventBus.$emit('updateJobcard', res.data)
                 })
@@ -857,7 +865,7 @@
                     .then(service_types => {
                         this.services = service_types.data;
                     })
-            },           
+            },
             getUsers() {
                 axios.get('users')
                     .then(users => {
@@ -877,37 +885,37 @@
                     this.make = this.$store.state.job_card.make;
                     this.driver = this.$store.state.job_card.driver;
                     this.service_types = this.form.service_types;
-                   
+
                     this.status = this.$store.state.job_card.status;
-                    this.show_customers = true;                                   
-                    
+                    this.show_customers = true;
+
                      setTimeout(()=>{
-                     this.subProject();   
+                     this.subProject();
                      this.customerType();
-                     this.getCustomers(); 
+                     this.getCustomers();
                      this.ServiceTypes();
                      this.getMachines();
                        if (this.form.requisition_id) {
                        this.disable_rq = true;
-                       this.show_inventory = true;   
+                       this.show_inventory = true;
                        this.editedRequisitions();
                     }
                      },3000)
-                                          
+
                 }
             },
-           
+
               editedRequisitions() {
                this.rqs = [];
-               let req = this.requisitions.find(rq => rq.id ==this.form.requisition_id);         
+               let req = this.requisitions.find(rq => rq.id ==this.form.requisition_id);
                 if(req.type=='External'){
-                this.filtered_rq ='External';            
-                 this.filtered_items_external =req.inventory_items_external; 
-               
+                this.filtered_rq ='External';
+                 this.filtered_items_external =req.inventory_items_external;
+
                 }
                 if(req.type=='Internal'){
-                this.filtered_rq ='Internal';                 
-                this.filtered_items_internal =req.inventory_items_internal;  
+                this.filtered_rq ='Internal';
+                this.filtered_items_internal =req.inventory_items_internal;
                 }
             },
 
@@ -922,7 +930,7 @@
                         }
                     });
             },
-          
+
         },
         components: {
             datepicker,
@@ -937,7 +945,7 @@
     }
     .i_p_2{
        margin-bottom: 8px;
-       width: 300px !important;   
+       width: 300px !important;
     }
     .qty, .cost {
         margin-left: 5px;

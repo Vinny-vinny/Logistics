@@ -24,7 +24,7 @@ class JobcardResource extends JsonResource
             'customer_id' => $this->customer_id,
             'mechanic_id' => $this->mechanic_id,
             'asset_category_id' => $this->asset_category_id,
-            'project' => $this->project ? $this->project->name : '' ,
+            'project' => $this->project ? $this->project->description : '' ,
             'jobcard_category_id' => $this->jobcard_category_id,
             'category' => $this->category ? $this->category->name : '',
             'service_type' => $this->service_type,
@@ -32,7 +32,7 @@ class JobcardResource extends JsonResource
             'next_readings' => $this->next_readings,
             'current_readings' => $this->current_readings,
             'previous_readings' => $this->machine ? $this->machine->current_readings:'',
-            'next_service_date' => $this->next_service_date,        
+            'next_service_date' => $this->next_service_date,
             'actual_date' => $this->actual_date,
             'start_date' => $this->actual_date ? Carbon::parse($this->actual_date)->format('d/m/Y') : '',
             'complete_date' =>$this->completion_date ? Carbon::parse($this->completion_date)->format('d/m/Y') : '',
@@ -42,9 +42,9 @@ class JobcardResource extends JsonResource
             'maintenance' => json_decode($this->maintenance),
             'card_no' => $this->card_no,
             'standing_fee' => $this->standing_fee,
-            'driver' =>$this->machine ? $this->machine->user->name :'',
-            'machine' => $this->machine ? $this->machine->code :'',
-            'plate_no' =>$this->machine ? $this->machine->plate_no : '', 
+            'driver' =>$this->project ? $this->project->user->name :'',
+            'machine' => $this->project ? $this->project->description :'',
+            'plate_no' =>$this->machine ? $this->machine->plate_no : '',
             'cost_center' => $this->machine ? $this->machine->cost_center : '',
             'mechanic' => $this->mechanic ? $this->mechanic->name :'',
             'track_name' => $this->trackby ? $this->trackby->name :'',
@@ -57,13 +57,14 @@ class JobcardResource extends JsonResource
             'checklist_assigned' => $this->checklist_assigned,
             'service_types' => $this->machine ? $this->machine->service_types : '',
             'labour_cost' => $this->labour_cost,
-            'closed_at' => $this->closed_at,           
+            'closed_at' => $this->closed_at,
             'fuel' => $this->fuel ? $this->fuel->id : '',
             'checklist' => $this->checklist ? $this->checklist->id :'',
             'requisitions' => $this->requisition,
             'hours_spent' => $this->hours_spent,
             'inventory_items_reversal' =>  json_decode($this->inventory_items_reversal),
-             'reversal_ref' => $this->reversal_ref
+             'reversal_ref' => $this->reversal_ref,
+             'invoiced'=> $this->invoiced
         ];
     }
 }

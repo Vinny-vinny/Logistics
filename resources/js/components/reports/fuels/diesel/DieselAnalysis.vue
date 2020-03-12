@@ -66,7 +66,7 @@
                     return this.$toastr.e('Date from and Date to cannot be empty.')
                 }
                 axios.post('diesel-analysis',this.form)
-                    .then(res =>{                      
+                    .then(res =>{
                         let result = [];
                         for(let i=0;i<res.data.length;i++){
                           result.push({
@@ -77,13 +77,13 @@
                             'quantity': res.data[i]['litres'],
                             'unit_cost': res.data[i]['rate'],
                             'amount': res.data[i]['rate'] * res.data[i]['litres'],
-                            'project': this.projects.find(p => p.id == res.data[i]['asset_category_id']).name
+                            'project': this.projects.find(p => p.project_link == res.data[i]['asset_category_id']).name
                           })
-                        }   
-                       // console.log(result)                     
+                        }
+                       // console.log(result)
                         this.show_diesel = true;
                         this.$store.dispatch('listDieselReports',result)
-                         this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")}) 
+                         this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})
                     })
                     .catch(error => error.response)
             },

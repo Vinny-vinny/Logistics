@@ -34,7 +34,7 @@
                             <td>
                                <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
                                <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
-                                <button class="btn btn-danger btn-sm" @click="reverseRequisition(rq)" v-if="!rq.reversal_ref && rq.type=='Internal'"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                                <button class="btn btn-danger btn-sm" @click="reverseRequisition(rq)" v-if="!rq.reversal_ref && rq.type=='Internal' && rq.used==1"><i class="fa fa-undo" aria-hidden="true"></i></button>
 <!--                               <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->                            </td>
                         </tr>
                         </tbody>
@@ -97,7 +97,7 @@
                     .catch(error => Exception.handle(error))
             },
             listen(){
-                eventBus.$on('listReqs',(rq) =>{                  
+                eventBus.$on('listReqs',(rq) =>{
                     this.tableData.unshift(rq);
                     this.add_requisition =false;
                     this.initDatable();

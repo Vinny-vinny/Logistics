@@ -16,18 +16,18 @@
                                     <input type="text" class="form-control" v-model="form.external_reference" required>
                                 </div>
                                 <div class="form-group" v-if="company">
-                                    <label>Project</label>                                   
+                                    <label>Project</label>
                                       <model-select :options="projects"
-                                        v-model="form.asset_category_id"  
-                                        @input="subProject()"                    
+                                        v-model="form.asset_category_id"
+                                        @input="subProject()"
                                         >
                                         </model-select>
                                 </div>
                                 <div class="form-group" v-if="company">
-                                    <label>Vehicle</label>                                   
+                                    <label>Vehicle</label>
                                       <model-select :options="subprojects"
-                                        v-model="form.vehicle_id"  
-                                        @input="getFuelType()"                    
+                                        v-model="form.vehicle_id"
+                                        @input="getFuelType()"
                                         >
                                         </model-select>
                                 </div>
@@ -109,20 +109,20 @@
                                    </div>
 
                                    <fieldset class="the-fieldset" v-if="show_issue">
-                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>  
+                               <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>
                                   <div>
                                <div class="form-group">
                                    <label>Credit Account</label>
                                    <input type="text" class="form-control" :value="account" disabled>
                                </div>
-                            
-                         <div class="form-group">                           
+
+                         <div class="form-group">
                             <label>Debit Account</label>
                              <model-select :options="accounts"
-                            v-model="form.where_to_charge"                                      
+                            v-model="form.where_to_charge"
                             placeholder="Where to charge"
                             required>
-                            </model-select>                          
+                            </model-select>
                         </div>
                        </div>
                    </fieldset>
@@ -137,9 +137,9 @@
                                 </div>
                                 <div class="form-group" v-if="show_customer">
                                     <span class="reset_btn pull-right" @click="resetCustomer">reset</span>
-                                    <label>Customer</label>                                   
+                                    <label>Customer</label>
                                       <model-select :options="filtered_customers"
-                                        v-model="form.customer_id"                         
+                                        v-model="form.customer_id"
                                         required>
                                         </model-select>
                                 </div>
@@ -147,7 +147,7 @@
                                 <div class="form-group">
                                     <label>Authorized By</label>
                                     <input type="text" class="form-control" v-model="username" disabled>
-                                </div>                              
+                                </div>
                                 <div class="form-group">
                                     <label>Requested By</label>
                                     <input type="text" class="form-control" v-model="form.requested_by" required>
@@ -160,7 +160,8 @@
                             </div>
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-                        <button type="button" class="btn btn-success" @click="cancel" v-if="edit_fuel && checkCatgory"><i class="fa fa-check" aria-hidden="true"></i> Issue Stock</button>
+                        <button type="button" class="btn btn-success" @click="IssueFuel()" v-if="edit_fuel && checkCatgory && form.status !=0" :disabled="issue_text"><i class="fa fa-check" aria-hidden="true"></i> {{issue_text ? 'Please Wait' :'Issue Stock'}}</button>
+                        <button type="button" class="btn btn-success" @click="InvoiceFuel()" v-if="edit_fuel && form.customer_id && form.invoiced !=1 && form.job_card_id" :disabled="invoice_text"><i class="fa fa-check" aria-hidden="true"></i> {{invoice_text ? 'Please Wait' :'Send Invoice'}}</button>
                     </form>
                 </div>
             </div>
@@ -169,7 +170,7 @@
 </template>
 <script>
     import datepicker from 'vuejs-datepicker';
-    import { ModelSelect } from 'vue-search-select'; 
+    import { ModelSelect } from 'vue-search-select';
     export default {
         props: ['edit', 'other_fuel', 'add_fuel'],
         data() {
@@ -178,7 +179,7 @@
                     litres: '',
                     vehicle_id: '',
                     fuel_on: '',
-                    customer_id: '',                  
+                    customer_id: '',
                     expense_id: '',
                     fuel_type_id: '',
                     authorized_by: '',
@@ -195,10 +196,12 @@
                     status:1,
                     rate:0,
                     credit_account_id:'',
-                    where_to_charge:'',                    
+                    where_to_charge:'',
                     id: ''
                 },
                 edit_fuel: this.edit,
+                issue_text:false,
+                invoice_text:false,
                 other_fuel_asset: this.other_fuel,
                 customers: {},
                 vehicles: {},
@@ -210,7 +213,7 @@
                 fuel_type: '',
                 total: 0,
                 show_fuel_type: false,
-                show_rate: false,             
+                show_rate: false,
                 parts: {},
                 total_expenses:0,
                 pa:{},
@@ -248,10 +251,10 @@
             this.creditAccount();
             this.getFuelCategories();
             this.getAccounts();
-          
+
 
         },
-       watch:{            
+       watch:{
         'form.fuel_category_id'(){
             if (this.form.fuel_category_id=='stock_issue') {
             this.show_issue = true;
@@ -264,10 +267,10 @@
         },
         numConversion(){
          if(this.form.odometer_readings < 0 || (isNaN(parseFloat(this.form.odometer_readings)) && !isFinite(this.form.odometer_readings))){
-             this.form.odometer_readings = 1; 
+             this.form.odometer_readings = 1;
             }
              if(this.form.litres < 0 || (isNaN(parseFloat(this.form.litres)) && !isFinite(this.form.litres))){
-             this.form.litres = 1; 
+             this.form.litres = 1;
             }
         },
          'form.vehicle_id'(){
@@ -309,16 +312,30 @@
                 return total.toFixed(2);
             }
         },
-        methods: {           
+        methods: {
+        InvoiceFuel(){
+            this.invoice_text = true;
+         axios.post(`invoice-fuel`,this.form)
+         .then(res => {
+           eventBus.$emit('listFuels', res.data)
+         })
+        },
+        IssueFuel(){
+            this.issue_text = true;
+        axios.post(`issue-fuel`,this.form)
+        .then(res => {
+        eventBus.$emit('listFuels', res.data)
+        })
+        },
             creditAccount(){
             axios.get('where-to-charge')
-            .then(res => {                
+            .then(res => {
                 if (res.data.length) {
-                 let account = res.data.find(req => req.type =='Fueling');               
+                 let account = res.data.find(req => req.type =='Fueling');
                  this.account = account.account;
-                 this.form.credit_account_id  = account.account_id;   
-                }            
-          
+                 this.form.credit_account_id  = account.account_id;
+                }
+
             })
             },
           getAccounts(){
@@ -330,7 +347,7 @@
             console.log(res.data.length);
             accounts.forEach(a => {
                 this.accounts.push({
-                    'value': a.id,
+                    'value': a.account_link,
                     'text': a.account
                 })
             })
@@ -338,7 +355,7 @@
         }  ,
            getFuelCategories(){
           axios.get('fuel-category')
-          .then(res => {           
+          .then(res => {
             this.fuel_categories = res.data;
           })
             },
@@ -353,8 +370,8 @@
              let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
              subp.forEach(p => {
                 this.subprojects.push({
-                    'value': p.id,
-                    'text': p.code
+                    'value': p.project_link,
+                    'text': p.description
                 })
              })
             },
@@ -363,11 +380,11 @@
               .then(res => {
                 res.data.forEach(p => {
                     this.projects.push({
-                        'value': p.id,
+                        'value': p.project_link,
                         'text': p.name
                     })
                 })
-                 
+
               })
             },
             getFuels(){
@@ -387,25 +404,25 @@
                 .then(res => {
                     this.customer_types = res.data;
                 })
-            },            
+            },
             fuelRate(){
             setTimeout(()=>{
                 let item =this.stks.find(s => s.id == this.form.fuel_type_id);
                 this.form.rate = item.cost;
-                this.fuel_type = item.description;              
+                this.fuel_type = item.description;
             },100)
 
             },
             customerTypes(){
                 this.filtered_customers = [];
                 this.show_customer = true;
-                let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);              
+                let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
                  customers.forEach(c => {
                     this.filtered_customers.push({
                         'value': c.id,
                         'text': c.name
                     })
-                 })                 
+                 })
 
             },
             genExpenses(){
@@ -430,7 +447,7 @@
             getFuelType() {
                 this.vehicles.forEach(vehicle => {
                     if (vehicle.id === this.form.vehicle_id) {
-                         this.form.previous_odometer = vehicle.odometer_readings;                                  
+                         this.form.previous_odometer = vehicle.odometer_readings;
                     }
                 })
             },
@@ -501,10 +518,9 @@
                 if (this.form.fuel_on =='') {
                     return this.$toastr.e('Please enter fueled on date.');
                 }
-                this.form.fuel_on = this.convertDate(this.form.fuel_on);  
+                this.form.fuel_on = this.convertDate(this.form.fuel_on);
 
                 this.other_fuel_asset ? this.form.asset_type = 'other' : this.form.asset_type = 'company';
-
               this.edit_fuel ? this.update() : this.save();
             },
             save() {
@@ -516,7 +532,7 @@
                     .catch(error => error.response)
             },
             update() {
-                axios.patch(`fuel/${this.form.id}`, this.form)
+                     axios.patch(`fuel/${this.form.id}`, this.form)
                     .then(res => {
                         this.edit_fuel = false;
                         eventBus.$emit('updateFuel', res.data);
@@ -540,10 +556,10 @@
                     .then(res => {
                         this.username = res.data.name;
                     })
-                    
+
                     this.form.asset_type ==='other' ? this.other =true : this.company = true;
-                     
-                   setTimeout(()=>{                    
+
+                   setTimeout(()=>{
                     this.subProject();
                     this.customerTypes();
                     this.getCustomers();
@@ -552,7 +568,7 @@
                    },4000)
                 }
             },
-           
+
         },
         components: {
             datepicker,

@@ -22,7 +22,7 @@ class RequisitionResource extends JsonResource
             'description' => $this->description,
             'where_to_charge' => $this->where_to_charge,
             'project_id' => $this->project_id,
-            'project' => $this->project ? $this->project->name : '',
+            'project' => $this->project ? $this->project->description : '',
             'requested_by' => $this->requested_by,
             'person_requested' => $this->user->name,
             'inventory_items_internal' => json_decode($this->inventory_items_internal),
@@ -37,7 +37,7 @@ class RequisitionResource extends JsonResource
             'customer_id' => $this->customer_id,
             'subproject_id' => $this->subproject_id,
             'reversal_ref' => $this->reversal_ref,
-            'inventory_items_reversal' => json_decode($this->inventory_items_reversal)
+            'inventory_items_reversal' => json_decode($this->inventory_items_reversal),            
         ];
     }
 }

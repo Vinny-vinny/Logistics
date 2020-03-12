@@ -71,23 +71,23 @@
                 }
                  let requistions = [];
                  axios.post('job-report',this.form)
-                    .then(res =>{   
+                    .then(res =>{
                      let jobs =res.data.filter(j => j.requistion_id !==null);
-            
+
             let internal_reqs = [];
-            let external_reqs = [];          
+            let external_reqs = [];
             let requistions = [];
             for(let p=0;p<jobs.length;p++){
               if (jobs[p]['requisitions'] !==null) {
                // console.log(jobs[n]['requisitions'])
                 if (jobs[p]['requisitions']['type'] =='Internal') {
                   let int_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_internal']);
-                   
-                  for(let k=0;k<int_reqs.length;k++){ 
-                                 
+
+                  for(let k=0;k<int_reqs.length;k++){
+
                        requistions.push({
-                            'date': jobs[p]['start_date'], 
-                            'code': this.parts.find(pa => pa.id ==int_reqs[k]['part']).code,               
+                            'date': jobs[p]['start_date'],
+                            'code': this.parts.find(pa => pa.id ==int_reqs[k]['part']).code,
                             'description': this.parts.find(pa => pa.id ==int_reqs[k]['part']).description,
                             'reference': jobs[p]['card_no'],
                             'quantity': int_reqs[k]['quantity'],
@@ -95,39 +95,41 @@
                             'amount': int_reqs[k]['total_cost'],
                             'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
                         })
-            
+
                   }
-               
+
                 }
-                 
+  console.log('dddd')
                 if (jobs[p]['requisitions']['type'] =='External') {
                   let ex_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_external']);
                   for(let k=0;k<ex_reqs.length;k++){
+                      console.log(ex_reqs[k])
                        requistions.push({
-                            'date': jobs[p]['start_date'], 
-                            'code': this.parts.find(pa => pa.id ==ex_reqs[k]['part']).code,               
+                            'date': jobs[p]['start_date'],
+                            'code': this.parts.find(pa => pa.id ==ex_reqs[k]['part']).code,
                             'description': this.parts.find(pa => pa.id ==ex_reqs[k]['part']).description,
                             'reference': jobs[p]['card_no'],
                             'quantity': ex_reqs[k]['quantity'],
                             'unit_cost': ex_reqs[k]['unit_price'],
                             'amount': ex_reqs[k]['total_price'],
-                            'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
+                            'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.project_link).name,
                         })
-            
+
                   }
-              
+
                 }
               }
-
-            }  
+  console.log('lll')
+            }
+            console.log('walla')
                  this.$store.dispatch('listJobReports',requistions)
-                 this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")}) 
+                 this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})
                  this.show_job = true;
-                 
+
 
                   })
                     .catch(error => error.response)
-                   
+
             },
                listen(){
                 eventBus.$on('back', ()=>{
