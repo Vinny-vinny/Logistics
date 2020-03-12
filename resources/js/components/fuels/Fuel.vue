@@ -160,7 +160,8 @@
                             </div>
                         <button type="submit" class="btn btn-primary">{{edit_fuel ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-                        <button type="button" class="btn btn-success" @click="cancel" v-if="edit_fuel && checkCatgory"><i class="fa fa-check" aria-hidden="true"></i> Issue Stock</button>
+                        <button type="button" class="btn btn-success" @click="IssueFuel()" v-if="edit_fuel && checkCatgory && form.status==0"><i class="fa fa-check" aria-hidden="true"></i> Issue Stock</button>
+                        <button type="button" class="btn btn-success" @click="InvoiceFuel()" v-if="edit_fuel && form.customer_id && form.invoiced==0 && form.job_card_id"><i class="fa fa-check" aria-hidden="true"></i> Send Invoice</button>
                     </form>
                 </div>
             </div>
@@ -309,7 +310,20 @@
                 return total.toFixed(2);
             }
         },
-        methods: {           
+        methods: { 
+        InvoiceFuel(){
+         axios.post(`invoice-fuel`,this.form)
+         .then(res => {
+           eventBus.$emit('listFuels', res.data)
+         })
+        },
+        IssueFuel(){
+        axios.post(`issue-fuel`,this.form)
+        .then(res => {
+         //   console.log(res.data)
+            eventBus.$emit('listFuels', res.data)
+        })
+        },          
             creditAccount(){
             axios.get('where-to-charge')
             .then(res => {                
@@ -330,7 +344,7 @@
             console.log(res.data.length);
             accounts.forEach(a => {
                 this.accounts.push({
-                    'value': a.id,
+                    'value': a.account_link,
                     'text': a.account
                 })
             })
@@ -353,8 +367,8 @@
              let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
              subp.forEach(p => {
                 this.subprojects.push({
-                    'value': p.id,
-                    'text': p.code
+                    'value': p.project_link,
+                    'text': p.description
                 })
              })
             },
@@ -363,7 +377,7 @@
               .then(res => {
                 res.data.forEach(p => {
                     this.projects.push({
-                        'value': p.id,
+                        'value': p.project_link,
                         'text': p.name
                     })
                 })
@@ -504,7 +518,6 @@
                 this.form.fuel_on = this.convertDate(this.form.fuel_on);  
 
                 this.other_fuel_asset ? this.form.asset_type = 'other' : this.form.asset_type = 'company';
-
               this.edit_fuel ? this.update() : this.save();
             },
             save() {
@@ -516,7 +529,7 @@
                     .catch(error => error.response)
             },
             update() {
-                axios.patch(`fuel/${this.form.id}`, this.form)
+                     axios.patch(`fuel/${this.form.id}`, this.form)
                     .then(res => {
                         this.edit_fuel = false;
                         eventBus.$emit('updateFuel', res.data);

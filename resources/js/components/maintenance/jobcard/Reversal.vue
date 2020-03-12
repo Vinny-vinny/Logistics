@@ -760,7 +760,7 @@
             update() {                
                 axios.post(`reverse-job-card`, {'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id}).then(res => {   
                  console.log(res.data);             
-                    // this.$toastr.s('Jobcard updated Successfully.');
+                    // this.$toastr.s('Jobcard updated Successfully.');                    
                      eventBus.$emit('updateJobcard', res.data)
                 })
                     .catch(error => error.response)

@@ -39,7 +39,7 @@ class Jobcard extends Model
 
     public function project()
     {
-        return $this->belongsTo(AssetCategory::class,'asset_category_id');
+        return $this->belongsTo(Machine::class,'machine_id','project_link');
     }
 
     public function requisition()
@@ -64,5 +64,6 @@ class Jobcard extends Model
     public function account(){
         return $this->belongsTo(Account::class,'cost_code');
     }
+  
 
 }

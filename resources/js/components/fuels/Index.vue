@@ -36,9 +36,7 @@
                                 <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
                                     class="fa fa-edit"></i></button>
                                 <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
-                                <button v-if="!fuel.reversal_ref" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
-<!--                                <button class="btn btn-danger btn-sm" @click="deleteFuel(fuel.id)"><i-->
-<!--                                    class="fa fa-trash"></i></button>-->
+                                <button v-if="!fuel.reversal_ref && fuel.fuel_category_id=='stock_issue'" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
                             </td>
                         </tr>
                         </tbody>

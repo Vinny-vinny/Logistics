@@ -115,16 +115,16 @@
                                   <div>
                                <div class="form-group">
                                    <label>Credit Account</label>
-                                   <input type="text" class="form-control" :value="account" disabled>
+                                      <model-select :options="accounts"
+                            v-model="form.where_to_charge"                                      
+                            placeholder="Where to charge">
+                            </model-select> 
                                </div>
                             
                          <div class="form-group">                           
                             <label>Debit Account</label>
-                             <model-select :options="accounts"
-                            v-model="form.where_to_charge"                                      
-                            placeholder="Where to charge"
-                            :is-disabled="true">
-                            </model-select>                          
+                          
+                             <input type="text" class="form-control" v-model="form.account" disabled>                        
                         </div>
                        </div>
                    </fieldset>
@@ -196,7 +196,8 @@
                     status:1,
                     rate:0,
                     credit_account_id:'',
-                    where_to_charge:'',                    
+                    where_to_charge:'',
+                     account:'',                    
                     id: ''
                 },
                 edit_fuel: this.edit,
@@ -229,7 +230,7 @@
                 accounts:[],
                 show_issue:false,
                 show_inv:false,
-                account:''
+               
 
             }
         },
@@ -316,7 +317,7 @@
             .then(res => {                
                 if (res.data.length) {
                  let account = res.data.find(req => req.type =='Fueling');               
-                 this.account = account.account;
+                 this.form.account = account.account;
                  this.form.credit_account_id  = account.account_id;   
                 }            
           
@@ -331,7 +332,7 @@
             console.log(res.data.length);
             accounts.forEach(a => {
                 this.accounts.push({
-                    'value': a.id,
+                    'value': a.account_link,
                     'text': a.account
                 })
             })
@@ -475,15 +476,16 @@
                     day = ("0" + date.getDate()).slice(-2);
                 return [date.getFullYear(), mnth, day].join("-");
             },
-            saveFuel() {              
+            saveFuel() {   
+            //return console.log(this.form);           
             this.update();
             },          
             update() {
-                axios.post(`reverse-fuel`, {'reversal_litres':this.form.litres,'id':this.form.id,'reversal_rate':this.form.rate})
+                axios.post(`reverse-fuel`, {'reversal_litres':this.form.litres,'id':this.form.id,'reversal_rate':this.form.rate,'where_to_charge':this.form.where_to_charge,'credit_account_id':this.form.credit_account_id})
                     .then(res => {
                         console.log(res.data);
                         // this.edit_fuel = false;
-                         eventBus.$emit('updateFuel', res.data);
+                        // eventBus.$emit('updateFuel', res.data);
                     })
                     .catch(error => error.response)
             },

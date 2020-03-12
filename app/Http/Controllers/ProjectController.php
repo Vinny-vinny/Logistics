@@ -40,7 +40,8 @@ class ProjectController extends Controller
     }
     public function importProjects()
     {
-        $assets = SageProject::select("ProjectLink","ProjectCode","ProjectName","ProjectDescription")->get();
+
+        $assets = SageProject::select("ProjectLink","ProjectCode","ProjectName","ProjectDescription","SubProjectOfLink")->get();
         $existing = Project::get();
         $found_assets = [];
         if ($existing->count() < 1){
@@ -67,7 +68,8 @@ class ProjectController extends Controller
                 'project_link' => $asset->ProjectLink,
                 'code' => $asset->ProjectCode,
                 'name' => $asset->ProjectName,
-                'description' => $asset->ProjectDescription
+                'description' => $asset->ProjectDescription,
+                'sub_project_of_link'=> $asset->SubProjectOfLink
             ]);
 
         }

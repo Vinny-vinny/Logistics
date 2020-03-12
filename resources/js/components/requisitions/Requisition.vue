@@ -202,7 +202,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary">{{edit_requisition ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-                          <button type="button" class="btn btn-info" @click="cancel" v-if="edit_requisition && internalType">Issue Stock</button>
+                          <button type="button" class="btn btn-info" @click="issueStock(form.id)" v-if="edit_requisition && internalType && form.used==0">Issue Stock</button>
                     </form>
                 </div>
             </div>
@@ -435,6 +435,14 @@
         },
 
         methods:{ 
+         issueStock(req_id){
+          axios.get(`issue-reqs/${req_id}`)
+          .then(res => {
+            //console.log(res.data)
+            eventBus.$emit('listReqs',res.data)
+          })
+        
+          },
            getVehicles() {
                 axios.get('machines')
                     .then(vehicle => {
@@ -446,8 +454,8 @@
              let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.project_id);
              subp.forEach(p => {
                 this.subprojects.push({
-                    'value': p.id,
-                    'text': p.code
+                    'value': p.project_link,
+                    'text': p.description
                 })
              })
             },
@@ -497,13 +505,10 @@
         getAccounts(){
          axios.get('accounts')
          .then(res => {
-            console.log(this.form.credit_account_id)
-            let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
-            console.log(accounts.length);
-            console.log(res.data.length);
+           let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)        
             accounts.forEach(a => {
                 this.accounts.push({
-                    'value': a.id,
+                    'value': a.account_link,
                     'text': a.account
                 })
             })
@@ -613,7 +618,7 @@
                   .then(project => {
                     project.data.forEach(p => {
                      this.projects.push({
-                        'value': p.id,
+                        'value': p.project_link,
                         'text': p.name
                      })
                     })

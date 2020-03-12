@@ -40,7 +40,7 @@
                                     <label>Project</label>                                   
                                     <model-select :options="projects"
                                         v-model="form.asset_category_id"  
-                                        @input="subProject()"                    
+                                        @input="subProject()"                   
                                         required>
                                         </model-select> 
                                 </div>
@@ -300,6 +300,7 @@
                             'Save'}}
                         </button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                        <button type="button" class="btn btn-info" @click="sendInvoice()" v-if="edit && form.requisition_id && form.invoiced==0">Send Invoice</button>
                         <button type="button" class="btn btn-warning" @click="close" v-if="edit_jobcard && status==1">
                             Close Jobcard
                         </button>
@@ -524,7 +525,13 @@
 
         },
         methods: {
-
+            sendInvoice(){
+            axios.post(`invoice-job-card`,this.form)
+            .then(res => {
+              console.log(res.data)
+              eventBus.$emit('listJobcards', res.data)
+            })
+            },
             getJobDetails(){
               this.show_rqs = false; 
              if(this.form.customer_id){
@@ -557,13 +564,13 @@
             resetVehicle(){
             this.form.machine_id = '';
             },           
-             subProject(){       
+             subProject(){  
+            this.subprojects = [];    
             let subp = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
-            this .subprojects = [];
-             subp.forEach(p => {
+                subp.forEach(p => {
                 this.subprojects.push({
-                    'value': p.id,
-                    'text': p.code
+                    'value': p.project_link,
+                    'text': p.description
                 })
              })
             },
@@ -674,7 +681,7 @@
               .then(res => {
                 res.data.forEach(p => {
                     this.projects.push({
-                        'value': p.id,
+                        'value': p.project_link,
                         'text': p.name
                     })
                 })        

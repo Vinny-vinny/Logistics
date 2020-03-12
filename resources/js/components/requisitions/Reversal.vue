@@ -63,17 +63,17 @@
                                <legend class="the-legend"><label class="fyr">Where To Charge</label></legend>  
                                   <div>
                                <div class="form-group">
-                                   <label>Credit Account</label>
-                                   <input type="text" class="form-control" :value="account" disabled>
+                           <label>Credit Account</label>
+                           <model-select :options="accounts"
+                            v-model="form.where_to_charge"                                      
+                            placeholder="Where to charge"
+                            >
+                            </model-select> 
                                </div>
                             
                          <div class="form-group">                           
-                            <label>Debit Account</label>
-                             <model-select :options="accounts"
-                            v-model="form.where_to_charge"                                      
-                            placeholder="Where to charge"
-                            :is-disabled="true">
-                            </model-select>                          
+                            <label>Debit Account</label>                              
+                           <input type="text" class="form-control" v-model="form.account" disabled>                    
                         </div>
                        </div>
                    </fieldset>
@@ -188,7 +188,7 @@
                             </table>
                         </fieldset>
                         </div>
-                        <button type="submit" class="btn btn-primary">Reverse</button>
+                        <button type="submit" class="btn btn-danger">Reverse</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
                           
                     </form>
@@ -205,7 +205,7 @@
         props:['reverse'],
         data(){
             return {
-                form:{
+                 form:{
                     project_id:'',
                     where_to_charge:'',
                     description:'',
@@ -215,6 +215,7 @@
                     person_collecting:'',
                     type:'Internal',
                     customer_id:'',
+                    account:'',
                     group_name:'',
                     credit_account_id:'',
                     inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
@@ -240,8 +241,7 @@
                 pricelists:{},
                 all_customers:{},
                 units:{},
-                filtered_uoms:{},
-                account:'',
+                filtered_uoms:{},               
                 show_issue:true,
                 show_customer:false,
                 external_reqs:[],
@@ -435,8 +435,10 @@
             axios.get('where-to-charge')
             .then(res => {                
                 if (res.data.length) {
-                  this.account = res.data[0]['account'];
-               this.form.credit_account_id  = res.data[0]['account_id']   
+                 let account = res.data.find(req => req.type =='Requisition');
+
+                 this.form.account = account.account;
+                 this.form.credit_account_id  = account.account_id;  
                 }            
           
             })
@@ -477,13 +479,10 @@
         getAccounts(){
          axios.get('accounts')
          .then(res => {
-            console.log(this.form.credit_account_id)
-            let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
-            console.log(accounts.length);
-            console.log(res.data.length);
+           let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)        
             accounts.forEach(a => {
                 this.accounts.push({
-                    'value': a.id,
+                    'value': a.account_link,
                     'text': a.account
                 })
             })
@@ -640,6 +639,7 @@
                   
                 }
                  this.inventory_items_reversal = this.inventory_items_reversal.filter(req => req.part !==null)
+                 //return console.log(this.form);
                          
                 this.update();
             },
@@ -655,9 +655,9 @@
                 update(){
                 axios.post(`rev-reqs`,{'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id})
                     .then(res => {
-                      console.log(res.data)
+                    //  console.log(res.data)
                          this.reverse = false;
-                        //this.edit_requisition = false;
+                        this.edit_requisition = false;
                          eventBus.$emit('updateRequisition',res.data);
                     })
                     .catch(error => error.response)
@@ -666,7 +666,8 @@
                 eventBus.$emit('cancel')
             },
             listen(){
-                 this.form = this.$store.state.requisitions;                                   
+                 this.form = this.$store.state.requisitions; 
+                 console.log(this.form);                                  
                    setTimeout(()=>{
                    this.selectedGroup(); 
                    this.getCustomers();

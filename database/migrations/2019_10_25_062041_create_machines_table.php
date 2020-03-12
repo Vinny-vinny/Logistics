@@ -47,6 +47,7 @@ class CreateMachinesTable extends Migration
             $table->date('start_date')->nullable();
             $table->date('expiry_date')->nullable();
             $table->integer('reminder_before')->nullable()->default(0);
+            $table->integer('project_link')->nullable();
             $table->timestamps();
         });
     }

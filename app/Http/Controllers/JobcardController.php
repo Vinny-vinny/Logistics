@@ -11,6 +11,7 @@ use App\Requisition;
 use App\Part;
 use App\Customer;
 use App\JobcardCategory;
+use App\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
@@ -84,13 +85,89 @@ class JobcardController extends Controller
     {
     InvoiceRepo::init()->generateInvoice($id);
     }
+   //Invoice Jobcard Items
+    public function invoiceJob(Request $request){
+        $date = Carbon::now()->format('Y-d-m');
+        $job_details =Jobcard::find($request->get('id')); 
+        $job_details->update(['invoiced' =>1]);
+        $req_details =Requisition::find($job_details->requisition_id); 
+        $inv_code = $job_details->category->inv_item->transaction_id;
+        $stk_code = $job_details->category->stk_item->transaction_id;   
+           $invoice_xml = "<root>
+                         <row>
+                          <INV_TYPE>I</INV_TYPE>
+                          <INV_TRCODE>$inv_code</INV_TRCODE>
+                          <STK_TRCODE>$stk_code</STK_TRCODE>
+                          <CUST_ID>$job_details->customer_id</CUST_ID>
+                          <INV_DATE>$date</INV_DATE>
+                          <ORDER_NO>$job_details->card_no</ORDER_NO>
+                          <PROJ_ID>$job_details->machine_id</PROJ_ID>
+                          </row>
+                          </root>";   
+                          $invoice_items_details="<root>";  
+        foreach (json_decode($req_details->inventory_items_external) as $key => $invoice) {  
+        $stk_id = Part::find($invoice->part)->stock_link;                            
+         $invoice_items_details.="<row>
+                              <STK_ID>$stk_id</STK_ID>
+                              <EXCL_PRICE>$invoice->total_price</EXCL_PRICE>
+                              <INCL_PRICE>$invoice->total_price_inclusive</INCL_PRICE>
+                              <QTY>$invoice->quantity</QTY>
+                              <VAT_APPLICABLE>True</VAT_APPLICABLE>
+                              <VAT_RATE>16</VAT_RATE>
+                              <LINE_DISC>0</LINE_DISC>
+                              </row>";    
+       
+             }
+          $invoice_items_details.="</root>";
+         $invoice = WizPostTx::CREATE(['XMLText' => $invoice_xml]);
+         $details = WizPostTx::CREATE(['XMLText' => $invoice_items_details]);
+         DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo_Hdr= "'.$invoice->SNo.'",@SNo_Det = "'.$details->SNo.'"');
+      return response()->json(new JobcardResource($job_details ));
+    }
 
-//reverse jobcard 
+   //reverse jobcard 
     public function reverseJob(Request $request){
         $request['inventory_items_reversal'] = json_encode($request->get('inventory_items_reversal'));
+         $request['reversal_ref'] = 'REV00'.$request->get('id');
+         Jobcard::find($request->get('id'))->update($request->all());
+        $request['inventory_items_reversal'] = json_encode($request->get('inventory_items_reversal'));
         $request['reversal_ref'] = 'REV00'.$request->get('id');
-        Jobcard::find($request->get('id'))->update($request->all());
-        return response()->json(new JobcardResource(Jobcard::find($request->get('id'))));
+        $ref=$request['reversal_ref'];
+        $date = Carbon::now()->format('Y-m-d');
+        $job_details = Jobcard::find($request->id);
+        $inv_code = $job_details->category->inv_item->transaction_id;
+        $stk_code = $job_details->category->stk_item->transaction_id;
+         $reverse_xml = "<root>
+                         <row>
+                          <INV_TYPE>C</INV_TYPE>
+                          <INV_TRCODE>$inv_code</INV_TRCODE>
+                          <STK_TRCODE>$stk_code</STK_TRCODE>
+                          <CUST_ID>$job_details->customer_id</CUST_ID>
+                          <INV_DATE>$date</INV_DATE>
+                          <ORDER_NO>$ref</ORDER_NO>
+                          <PROJ_ID>$job_details->machine_id</PROJ_ID>
+                          </row>
+                          </root>";
+         $reverse_items_details="<root>";                
+         foreach ((array)json_decode($request->get('inventory_items_reversal')) as $key => $invoice) {  
+        $stk_id = Part::find($invoice->part)->stock_link;        
+                          
+          $reverse_items_details.="<row>
+                              <STK_ID>$stk_id</STK_ID>
+                              <EXCL_PRICE>$invoice->total_price</EXCL_PRICE>
+                              <INCL_PRICE>$invoice->total_price_inclusive</INCL_PRICE>
+                              <QTY>$invoice->quantity</QTY>
+                              <VAT_APPLICABLE>True</VAT_APPLICABLE>
+                              <VAT_RATE>16</VAT_RATE>
+                              <LINE_DISC>0</LINE_DISC>
+                              </row>";
+         return response()->json($reverse_items_details);
+         }     
+         $reverse_items_details.="</root>";
+        $invoice_reversal = WizPostTx::CREATE(['XMLText' => $reverse_xml]);
+         $details = WizPostTx::CREATE(['XMLText' => $reverse_items_details]);
+         DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo_Hdr= "'.$invoice_reversal->SNo.'",@SNo_Det = "'.$details->SNo.'"');
+        return response()->json(['rverseral he== '=>$reverse_xml,'details == '=>$reverse_items_details]);
     }
     /**
      * Update the specified resource in storage.

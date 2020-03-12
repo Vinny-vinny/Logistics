@@ -40,6 +40,7 @@ class MachineResource extends JsonResource
             'plate_no' => $this->plate_no,
             'asset_category_id' => $this->asset_category_id,             
             'type' => $this->type,
+            'project_link' => $this->project_link
              ];
     }
 }

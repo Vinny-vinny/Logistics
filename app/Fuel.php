@@ -10,7 +10,7 @@ class Fuel extends Model
 
     public function vehicle()
     {
-        return $this->belongsTo(Machine::class,'vehicle_id');
+        return $this->belongsTo(Machine::class,'vehicle_id','project_link');
     }
 
     public function fueltype()

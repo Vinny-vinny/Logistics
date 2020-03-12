@@ -40,6 +40,7 @@ class CreateFuelsTable extends Migration
             $table->string('reversal_ref')->nullable();
             $table->float('reversal_litres')->nullable();
             $table->float('reversal_rate')->nullable();
+            $table->integer('invoiced')->default(0)->nullable();
             $table->timestamps();
         });
     }
