@@ -442,7 +442,6 @@
           .then(res => {
            eventBus.$emit('listReqs',res.data)
           })
-
           },
            getVehicles() {
                 axios.get('machines')
