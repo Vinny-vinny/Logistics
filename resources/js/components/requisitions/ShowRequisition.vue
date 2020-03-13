@@ -25,6 +25,10 @@
                                 <td>Person Requesting & Signature</td>
                                 <td>{{requisition.person_requested}}</td>
                             </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>{{requisition.description}}</td>
+                            </tr>
 
                         </table>
                         <br>
