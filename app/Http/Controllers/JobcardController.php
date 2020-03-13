@@ -87,7 +87,7 @@ class JobcardController extends Controller
     }
    //Invoice Jobcard Items
     public function invoiceJob(Request $request){
-        $date = Carbon::now()->format('Y-d-m');
+        $date = Carbon::now()->format('Y-m-d');
         $job_details =Jobcard::find($request->get('id'));
         $job_details->update(['invoiced' =>1]);
         $req_details =Requisition::find($job_details->requisition_id);

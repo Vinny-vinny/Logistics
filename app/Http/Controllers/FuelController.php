@@ -55,7 +55,7 @@ class FuelController extends Controller
     public function IssueFuel(Request $request){
      $fuel = Fuel::find($request->id);
      $fuel->update(['status'=>0]);
-     $date = Carbon::now()->format('Y-d-m');
+     $date = Carbon::now()->format('Y-m-d');
           $stk_id = Part::find($fuel->fuel_type_id)->stock_link;
           $price_excl = $fuel->rate*$fuel->litres;
           $price_incl = $fuel->rate*$fuel->litres*(116/100);

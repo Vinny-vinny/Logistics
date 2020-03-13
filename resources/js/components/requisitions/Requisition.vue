@@ -200,7 +200,7 @@
                             </table>
                         </fieldset>
                         </div>
-                        <button type="submit" class="btn btn-primary" v-if="checkDetails()">{{edit_requisition ? 'Update' : 'Save'}}</button>
+                        <button type="submit" class="btn btn-primary">{{edit_requisition ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
                           <button type="button" class="btn btn-info" @click="issueStock(form.id)" v-if="edit_requisition && internalType && form.used !=1" :disabled="issue_text">{{issue_text ? 'Please Wait' :'Issue Stock'}}</button>
                     </form>
@@ -436,11 +436,6 @@
         },
 
         methods:{
-            checkDetails(){
-              if(this.edit_requisition){
-                  return this.form.used !==1;
-              }
-            },
          issueStock(req_id){
           this.issue_text = true;
           axios.get(`issue-reqs/${req_id}`)

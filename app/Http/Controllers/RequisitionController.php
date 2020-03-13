@@ -49,15 +49,15 @@ class RequisitionController extends Controller
     {
         return response()->json(new RequisitionResource(Requisition::find($id)));
     }
- 
+
    //Issue Requisition Items
     public function IssueRequisition($id){
      $req = Requisition::find($id);
-     $date = Carbon::now()->format('Y-d-m');
+     $date = Carbon::now()->format('Y-m-d');
      $req->update(['used'=>1]);
      $journal_details = "<root>";
      foreach (json_decode($req->inventory_items_internal) as $key => $value) {
-          $stk_id = Part::find($value->part)->stock_link; 
+          $stk_id = Part::find($value->part)->stock_link;
 
           $journal_details.="<row>
                           <TX_DATE>$date</TX_DATE>
@@ -71,9 +71,9 @@ class RequisitionController extends Controller
                           <PROJECT>$req->subproject_id</PROJECT>
                           <DESCRIPTION>$req->description</DESCRIPTION>
                           <REFERENCE>$req->req_no</REFERENCE>
-                         </row>";               
-          
-        } 
+                         </row>";
+
+        }
          $journal_details.= "</root>" ;
           $details = WizPostTx::CREATE(['XMLText' => $journal_details]);
          DB::connection('sqlsrv2')->statement('exec WIZ_STOCK_JOURNAL @STK_XML_SNO= "'.$details->SNo.'"');
@@ -84,11 +84,11 @@ class RequisitionController extends Controller
        $request['inventory_items_reversal'] = json_encode($request->get('inventory_items_reversal'));
         $request['reversal_ref'] = 'REV00'.$request->get('id');
         $ref = $request['reversal_ref'];
-        $date = Carbon::now()->format('Y-d-m');
-        $req_details =Requisition::find($request->get('id'));  
+        $date = Carbon::now()->format('Y-m-d');
+        $req_details =Requisition::find($request->get('id'));
          $req_details->update($request->all());
-         $reverse_items_details="<root>";       
-        foreach ((array)json_decode($request->get('inventory_items_reversal')) as $key => $invoice) {  
+         $reverse_items_details="<root>";
+        foreach ((array)json_decode($request->get('inventory_items_reversal')) as $key => $invoice) {
         $stk_id = Part::find($invoice->part)->stock_link;
          $reverse_items_details.="<row>
                           <INV_TYPE>C</INV_TYPE>
@@ -101,12 +101,12 @@ class RequisitionController extends Controller
                           <PROJ_ID>$req_details->subproject_id</PROJ_ID>
                           </row>";
          }
-         $reverse_items_details.="</root>";       
+         $reverse_items_details.="</root>";
          $details = WizPostTx::CREATE(['XMLText' => $reverse_items_details]);
          DB::connection('sqlsrv2')->statement('exec WIZ_STOCK_JOURNAL @STK_XML_SNO= "'.$details->SNo.'"');
        return response()->json(new RequisitionResource($req_details));
     }
-   
+
 
     /**
      * Update the specified resource in storage.
