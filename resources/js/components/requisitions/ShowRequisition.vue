@@ -26,7 +26,7 @@
                                 <td>{{requisition.person_requested}}</td>
                             </tr>
                             <tr>
-                                <td>Description</td>
+                               <td>Narration</td>
                                 <td>{{requisition.description}}</td>
                             </tr>
 
