@@ -5,9 +5,16 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Partner Reports</h3>                 
-                     <button class="btn btn-primary pull-right" v-on:click="onexport" v-if="results.length"><i class="fa fa-file-excel-o" aria-hidden="true"></i>  Download</button>
-                    <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
+                    <h3 class="box-title">Partner Reports</h3>
+                    <download-excel
+                        :data = "results"
+                        :title = "title"
+                        v-if="results.length"
+                        name="PARTNER REPORTS.xls"
+                        class="btn btn-primary pull-right">
+                        <i class="fa fa-file-excel-o"></i> Export Excel
+                    </download-excel>
+                   <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
@@ -38,11 +45,12 @@
     </div>
 </template>
 <script>
-import XLSX from 'xlsx'
+
     export default {
         data(){
          return {
-            results:[]
+            results:[],
+             title:''
          }
         },
         mounted(){
@@ -55,37 +63,32 @@ import XLSX from 'xlsx'
             },
              dates(){
               return this.$store.state.dates;
-            } 
+            }
 
         },
         methods:{
-        onexport () {      
-      var animalWS = XLSX.utils.json_to_sheet(this.results)    
-
-      // A workbook is the name given to an Excel file
-      var wb = XLSX.utils.book_new() // make Workbook of Excel
-      // add Worksheet to Workbook
-      // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, animalWS, `Partn. ${this.dates.from} to ${this.dates.to}`) // sheetAName is name of Worksheet     
-
-      // export Excel file
-      XLSX.writeFile(wb, `PARTNER REPORTS AS FROM ${this.dates.from} to ${this.dates.to}.xls`) // name of the file is 'book.xlsx'
-    },
-             partners(){
+              partners(){
                 let results = [];
                setTimeout(()=>{
+                   let total_distance=0;
+                   let total_fuel_used = 0;
+                   let total_km = 0;
               for(let k=0;k<this.fuels.length;k++){
+                  total_distance+=parseInt(this.fuels[k]['distance']);
+                  total_fuel_used += parseFloat(this.fuels[k]['fuel_used']);
+                  total_km += parseFloat(this.fuels[k]['km_per_ltrs']);
                             this.results.push({
-                            'Reg': this.fuels[k]['reg_no'] ,                            
+                            'Reg': this.fuels[k]['reg_no'] ,
                             'Start Odo':this.fuels[k]['start_odo'],
                             'End Odo': this.fuels[k]['end_odo'],
                             'Distance': this.fuels[k]['distance'],
-                            'Fuel Used(Ltr)': this.fuels[k]['fuel_used'],
-                            'LTRS/HR & KM/LTR':this.fuels[k]['km_per_ltrs']
-                              
+                            'FuelUsed': this.fuels[k]['fuel_used'],
+                            'KMPerLTR':this.fuels[k]['km_per_ltrs']
+
                           });
                          }
-                         return results;
+                   this.results.push({Reg:'Total',Distance:total_distance,FuelUsed:total_fuel_used,KMPerLTR:total_km})
+                   this.title = "PARTNERS REPORTS AS FROM "+this.dates.from+" TO "+ this.dates.to
                },1000)
             },
             back(){

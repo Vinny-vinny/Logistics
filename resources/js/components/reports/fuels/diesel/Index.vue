@@ -5,8 +5,15 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Diesel Analysis</h3>              
-                    <button class="btn btn-primary pull-right" v-on:click="onexport" v-if="diesels.length"><i class="fa fa-file-excel-o" aria-hidden="true"></i>  Download</button>
+                    <h3 class="box-title">Diesel Analysis</h3>
+                    <download-excel
+                        :data = "diesels"
+                        :title = "title"
+                        v-if="diesels.length"
+                        name="DIESEL ANALYSIS.xls"
+                        class="btn btn-primary pull-right">
+                        <i class="fa fa-file-excel-o"></i> Export Excel
+                    </download-excel>
                     <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
                 </div>
                 <div class="box-body">
@@ -46,7 +53,8 @@ import XLSX from 'xlsx'
     export default {
         data(){
             return {
-                diesels:[]
+                diesels:[],
+                title:''
             }
         },
         mounted(){
@@ -59,35 +67,30 @@ import XLSX from 'xlsx'
             },
             dates(){
               return this.$store.state.dates;
-            } 
+            }
         },
         methods:{
-             onexport () {      
-      var animalWS = XLSX.utils.json_to_sheet(this.diesels)    
-
-      // A workbook is the name given to an Excel file
-      var wb = XLSX.utils.book_new() // make Workbook of Excel
-      // add Worksheet to Workbook
-      // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, animalWS, `Diesel ${this.dates.from} to ${this.dates.to}`) // sheetAName is name of Worksheet     
-
-      // export Excel file
-      XLSX.writeFile(wb, `DIESEL ANALYSIS AS FROM ${this.dates.from} to ${this.dates.to}.xls`) // name of the file is 'book.xlsx'
-    },
             getDiesels(){
              setTimeout(()=>{
+                 let total_qty=0;
+                 let total_unit_cost = 0;
+                 let total_amount = 0;
               for(let i=0;i<this.fuels.length;i++){
+                  total_qty+=parseInt(this.fuels[i]['quantity']);
+                  total_unit_cost += parseFloat(this.fuels[i]['unit_cost']);
+                  total_amount += parseFloat(this.fuels[i]['amount']);
               this.diesels.push({
-                'Item Code': this.fuels[i]['item_code'],
+                'ItemCode': this.fuels[i]['item_code'],
                 'Item Description': this.fuels[i]['decription'],
                 'Reference': this.fuels[i]['reference'],
                 'Quantity': this.fuels[i]['quantity'],
-                'Unit Cost': this.fuels[i]['unit_cost'],
+                'UnitCost': this.fuels[i]['unit_cost'],
                 'Amount': this.fuels[i]['amount'],
                 'Project': this.fuels[i]['project']
               })
               }
-              console.log(this.diesels)
+                 this.diesels.push({ItemCode:'Total',Quantity:total_qty,UnitCost:total_unit_cost,Amount:total_amount})
+                 this.title = "DIESEL ANALYSIS AS FROM "+this.dates.from+" TO "+ this.dates.to
              },1000)
             },
             back(){

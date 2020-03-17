@@ -6,7 +6,15 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">KM Per Hr Reports</h3>
-                    <button class="btn btn-primary pull-right" v-on:click="onexport" v-if="results.length"><i class="fa fa-file-excel-o" aria-hidden="true"></i>  Download</button>
+                    <download-excel
+                        :data   = "results"
+                        :title = "title"
+                        v-if="results.length"
+                        name="KM PER HR.xls"
+                        class="btn btn-primary pull-right"
+                    >
+                        <i class="fa fa-file-excel-o"></i> Export Excel
+                    </download-excel>
                    <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
                 </div>
                 <div class="box-body">
@@ -39,13 +47,13 @@
     </div>
 </template>
 <script>
-  import XLSX from 'xlsx'
-    export default {
+   export default {
         data(){
             return {
                 results:[],
                 fuels:[],
-                machines:{}
+                machines:{},
+                title:''
             }
         },
        mounted(){
@@ -103,35 +111,30 @@
                       }
 
                     }
+                       let total_km_hr = 0;
+                       let total_fuel_used = 0;
+                       let total_distance = 0;
                     for(let k=0;k<this.fuels.length;k++){
+                        total_km_hr += parseFloat(this.fuels[k]['km_per_ltrs']);
+                        total_fuel_used +=  parseFloat(this.fuels[k]['fuel_used']);
+                        total_distance += parseFloat(this.fuels[k]['distance']);
                             this.results.push({
                             'Reg': this.fuels[k]['reg_no'] ,
                             'Start Odo':this.fuels[k]['start_odo'],
                             'End Odo': this.fuels[k]['end_odo'],
                             'Distance': this.fuels[k]['distance'],
-                            'Fuel Used(Ltr)': this.fuels[k]['fuel_used'],
-                            'LTRS/HR & KM/LTR':this.fuels[k]['km_per_ltrs']
-
+                            'FuelUsed': this.fuels[k]['fuel_used'],
+                            'KmPerLtr':this.fuels[k]['km_per_ltrs']
                           });
                          }
+              this.results.push({Reg:'Total',Distance:total_distance,FuelUsed:total_fuel_used,KmPerLtr:total_km_hr});
+              this.title = "KM Per Hr AS FROM "+this.dates.from+" TO "+ this.dates.to;
                   this.initDatable();
           },1000)
           }
         },
         methods:{
-      onexport () {
-      var animalWS = XLSX.utils.json_to_sheet(this.results)
-
-      // A workbook is the name given to an Excel file
-      var wb = XLSX.utils.book_new() // make Workbook of Excel
-      // add Worksheet to Workbook
-      // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, animalWS, `kmhr ${this.dates.from} to ${this.dates.to}`) // sheetAName is name of Worksheet
-
-      // export Excel file
-      XLSX.writeFile(wb, `KM PER HOUR AS FROM ${this.dates.from} to ${this.dates.to}.xls`) // name of the file is 'book.xlsx'
-    } ,
-        getMachines(){
+         getMachines(){
         axios('machines')
         .then(res => this.machines = res.data)
         },

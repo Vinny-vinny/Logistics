@@ -5,8 +5,16 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Fuel Reports</h3>                   
-                    <button class="btn btn-primary pull-right" v-on:click="onexport" v-if="daily_issues.length"><i class="fa fa-file-excel-o" aria-hidden="true"></i>  Download</button>
+                    <h3 class="box-title">Daily Fuel Issue</h3>
+                    <download-excel
+                        :data   = "daily_issues"
+                        :title = "title"
+                        v-if="daily_issues.length"
+                        name="DAILY FUEL ISSUE.xls"
+                        class="btn btn-primary pull-right"
+                    >
+                        <i class="fa fa-file-excel-o"></i> Export Excel
+                    </download-excel>
                     <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
                 </div>
                 <div class="box-body">
@@ -47,7 +55,8 @@
     export default {
         data(){
         return {
-            daily_issues:[]
+            daily_issues:[],
+            title:''
         }
         },
         mounted(){
@@ -60,35 +69,31 @@
             },
             dates(){
               return this.$store.state.dates;
-            } 
+            }
         },
         methods:{
-              onexport () {      
-      var animalWS = XLSX.utils.json_to_sheet(this.daily_issues)    
-
-      // A workbook is the name given to an Excel file
-      var wb = XLSX.utils.book_new() // make Workbook of Excel
-      // add Worksheet to Workbook
-      // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, animalWS, `Fuel ${this.dates.from} to ${this.dates.to}`) // sheetAName is name of Worksheet     
-
-      // export Excel file
-      XLSX.writeFile(wb, `DAILY FUEL ISSUE AS FROM ${this.dates.from} to ${this.dates.to}.xls`) // name of the file is 'book.xlsx'
-    },
             dailyIssue(){
+                let total_qty=0;
+                let total_unit_cost = 0;
+                let total_amount = 0;
             setTimeout(()=>{
              for(let i=0;i<this.fuels.length;i++){
+                 total_qty+=parseInt(this.fuels[i]['quantity']);
+                 total_unit_cost += parseFloat(this.fuels[i]['unit_cost']);
+                 total_amount += parseFloat(this.fuels[i]['amount']);
               this.daily_issues.push({
                 'Date': this.fuels[i]['date'],
                 'Item Code': this.fuels[i]['item_code'],
                 'Item Description': this.fuels[i]['description'],
                 'Reference': this.fuels[i]['reference'],
                 'Quantity': this.fuels[i]['quantity'],
-                'Unit Cost': this.fuels[i]['unit_cost'],
+                'UnitCost': this.fuels[i]['unit_cost'],
                 'Amount': this.fuels[i]['amount'],
                 'Project': this.fuels[i]['project']
               });
              }
+                this.daily_issues.push({Date:'Total',Quantity:total_qty,UnitCost:total_unit_cost,Amount:total_amount})
+                this.title = "DAILY FUEL ISSUE AS FROM "+this.dates.from+" TO "+ this.dates.to
             },1000)
             },
             back(){

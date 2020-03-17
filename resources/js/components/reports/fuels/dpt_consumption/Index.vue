@@ -5,9 +5,16 @@
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Fuel Reports</h3>
-                   <button class="btn btn-primary pull-right" v-on:click="onexport" v-if="results.length"><i class="fa fa-file-excel-o" aria-hidden="true"></i>  Download</button>
-                    <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
+                    <h3 class="box-title">Department Consumption% Reports</h3>
+                    <download-excel
+                        :data = "results"
+                        :title = "title"
+                        v-if="results.length"
+                        name="DEPARTMENT CONSUMPTION%.xls"
+                        class="btn btn-primary pull-right">
+                        <i class="fa fa-file-excel-o"></i> Export Excel
+                    </download-excel>
+                     <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
@@ -16,7 +23,7 @@
                             <th>Department</th>
                             <th>QTY In Ltrs</th>
                             <th style="display:none">QTY In Ltrs</th>
-                            <th>Percentage</th>                         
+                            <th>Percentage</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -24,7 +31,7 @@
                             <td>{{fuel.department}}</td>
                             <td>{{fuel.qty}}</td>
                             <td style="display:none">{{fuel.qty}}</td>
-                            <td>{{fuel.percentage}}</td>                          
+                            <td>{{fuel.percentage}}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -34,12 +41,11 @@
     </div>
 </template>
 <script>
-import XLSX from 'xlsx'
-
     export default {
         data(){
          return {
-            results:[]
+            results:[],
+             title:''
          }
         },
         mounted(){
@@ -55,28 +61,23 @@ import XLSX from 'xlsx'
             }
         },
         methods:{
-        onexport () {      
-      var animalWS = XLSX.utils.json_to_sheet(this.results)    
-
-      // A workbook is the name given to an Excel file
-      var wb = XLSX.utils.book_new() // make Workbook of Excel
-      // add Worksheet to Workbook
-      // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, animalWS, `Dept% ${this.dates.from} to ${this.dates.to}`) // sheetAName is name of Worksheet     
-
-      // export Excel file
-      XLSX.writeFile(wb, `DEPARTMENT CONSUMPTION % AS FROM ${this.dates.from} to ${this.dates.to}.xls`) // name of the file is 'book.xlsx'
-    },
             consumptions(){
             setTimeout(()=>{
+                let total_qty = 0;
+                let total_percentage = 0;
             for(let i=0;i<this.fuels.length;i++){
+                total_qty += parseFloat(this.fuels[i]['qty'])
+                total_percentage += parseFloat(this.fuels[i]['percentage']);
                 this.results.push({
                  'Department': this.fuels[i]['department'],
-                 'QTY In Ltrs': this.fuels[i]['qty'],
+                 'QtyInLtrs': this.fuels[i]['qty'],
                  'Percentage': this.fuels[i]['percentage']
                 });
             }
-            },1000) 
+                this.results.push({Department:'Total',QtyInLtrs:total_qty,Percentage:total_percentage})
+                this.title = "DEPARTMENT CONSUMPTION% AS FROM "+this.dates.from+" TO "+ this.dates.to
+            },1000)
+
             },
             back(){
                 eventBus.$emit('back');
