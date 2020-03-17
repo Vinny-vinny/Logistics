@@ -64,10 +64,11 @@ class JobcardController extends Controller
     //Auto generate Jobcard
     public function generateJobcard(Request $request)
     {
-        $request['track_by_id'] = Machine::find($request->machine_id)->track_by_id;
+        $request['track_by_id'] = Machine::where('project_link',$request->machine_id)->first()->track_by_id;
+        $request['maintenance'] = json_encode($request->maintenance);
         $jobcard_no = Jobcard::count()+1;
-        $request['card_no'] = substr('LEWA-' . $jobcard_no . '-' . Machine::find($request->machine_id)->code, 0, 20);
-        $card = Jobcard::create($request->all());
+        $request['card_no'] = substr('LEWA-' . $jobcard_no . '-' . Machine::where('project_link',$request->machine_id)->first()->code, 0, 20);
+           $card = Jobcard::create($request->all());
         return response()->json($card);
     }
     /**
@@ -183,13 +184,12 @@ class JobcardController extends Controller
         $request['maintenance'] = json_encode($request->get('maintenance'));
         $jobcard = Jobcard::find($id);
         $request['card_no'] = 'Job00'.$id;
-        $jobcard->update($request->except(['service_types','files','driver','machine','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist','cost_center','requisitions','costcode']));
-        if ($request->machine_id) {
-             Machine::find($request->machine_id)->update([
+        $jobcard->update($request->except(['service_types','files','driver','machine','costcode','project','make','customer_type','track_name','category','previous_readings','start_date','complete_date','inventory_items','fuel','plate_no','mechanic','checklist','cost_center','requisitions','inventory_items_reversal']));
+          if ($request->machine_id) {
+             Machine::where('project_link',$request->machine_id)->first()->update([
             'current_readings' => $request->get('current_readings'),
             'next_readings' => $request->get('next_readings'),
-            'next_service_date' => $request->get('next_service_date'),
-            'fuel_balance_id' => $request->get('fuel_balance_id'),
+            'next_service_date' => $request->get('next_service_date')
         ]);
         }
 
@@ -201,40 +201,7 @@ class JobcardController extends Controller
     {
         $job = Jobcard::find($id);
         $job->update(['closed_at' => Carbon::now(),'status' =>0]);
-        if ($job->requisition_id) {
-        $job_cat = JobcardCategory::find($job->jobcard_category_id);
-        $inv_date = date('Y-m-d');
-        $inv_id =  $job_cat->inv_item ? $job_cat->inv_item->transaction_id : 0;
-        $stk_id =  $job_cat->stk_item ? $job_cat->stk_item->transaction_id : 0;
-        $line_desc =$job->requisition->description;
-        $customer = Customer::find($job->customer_id);
-
-
-        if ($job->requisition->type =='Internal') {
-            foreach (json_decode($job->requisition->inventory_items_internal) as $value) {
-             $stk = Part::find($value->part)->stock_link;
-             $incl_price = $value->unit_cost/16*100;
-
-             $xml_data_in ="<root><row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><EXCL_PRICE>$value->unit_cost</EXCL_PRICE><INCL_PRICE>$incl_price</INCL_PRICE><QTY>$value->quantity</QTY><VAT_APPLICABLE>True</VAT_APPLICABLE><VAT_RATE>16</VAT_RATE><LINE_DISC>0</LINE_DISC><INV_DATE> $inv_date</INV_DATE><ORDER_NO>$job->card_no</ORDER_NO><PROJ_ID>0</PROJ_ID></row></root>";
-         $wiz_in = WizPostTx::CREATE(['XMLText' => $xml_data_in]);
-         DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo='."'".$wiz_in->SNo."'");
-          //DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @XML='."'". $xml_data_in."'");
-         }
-        }
-       if ($job->requisition->type=='External') {
-             foreach (json_decode($job->requisition->inventory_items_external) as $value) {
-             $stk = Part::find($value->part)->stock_link;
-             $incl_price = $value->unit_price/16*100;
-             $xml_data_ex ="<root><row><INV_TRCODE>$inv_id</INV_TRCODE><STK_TRCODE>$stk_id</STK_TRCODE><CUST_ID>$customer->dc_link</CUST_ID><STK_ID>$stk</STK_ID><EXCL_PRICE>$value->unit_price</EXCL_PRICE><INCL_PRICE>$incl_price</INCL_PRICE><QTY>$value->quantity</QTY><VAT_APPLICABLE>True</VAT_APPLICABLE><VAT_RATE>16</VAT_RATE><LINE_DISC>0</LINE_DISC><INV_DATE>$inv_date</INV_DATE><ORDER_NO>$job->card_no</ORDER_NO><PROJ_ID>0</PROJ_ID></row></root>";
-
-        //DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @XML='."'". $xml_data_ex."'");
-         $wiz_ex = WizPostTx::CREATE(['XMLText' => $xml_data_ex]);
-         DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo='."'".$wiz_ex->SNo."'");
-        }
-        }
-
-        return response('success');
-    }
+        return response()->json(new JobcardResource($job));
     }
 
     /**

@@ -10,7 +10,7 @@
                         :data   = "requistions"
                         :title = "title"
                         v-if="requistions.length"
-                        name="STOCK ISSUE.xls"
+                        name="STOCK_ISSUE.xlsx"
                         class="btn btn-primary pull-right"
                          >
                       <i class="fa fa-file-excel-o"></i> Export Excel

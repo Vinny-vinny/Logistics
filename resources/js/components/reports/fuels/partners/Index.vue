@@ -10,7 +10,7 @@
                         :data = "results"
                         :title = "title"
                         v-if="results.length"
-                        name="PARTNER REPORTS.xls"
+                        name="PARTNER_REPORTS.xlsx"
                         class="btn btn-primary pull-right">
                         <i class="fa fa-file-excel-o"></i> Export Excel
                     </download-excel>

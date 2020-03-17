@@ -14,7 +14,7 @@
                         <table class="customers">
                             <tr>
                                 <td>Cost Dept.</td>
-                                <td class="opacity_0">uuuuuuuuuuuuuuuuuuuuuu</td>
+                                <td>{{requisition.project}}</td>
                             </tr>
                             <tr>
                                 <td>Charge To:</td>
@@ -164,34 +164,20 @@
     export default {
         data(){
             return {
-                requisition:{},
-                form:{
-                    requested_by:User.id(),
-                    inventory_items_internal: [{part: '', quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:''}],
-                    inventory_items_external: [{part: '', quantity: '',unit_price:'',total_price:'',total_price_inclusive:''}],
-                }
+                requisition:{}
             }
         },
         created() {
-            this.save();
+            this.requisition = this.$store.state.req_data;
+            this.print();
         },
         methods:{
-            save(){
-               axios.post('/generate-requisition',this.form)
-                .then(res => {
-                    this.requisition = res.data;
-                    this.print();
-                })
-
-            },
             print(){
                 setTimeout(()=>{
                     window.print();
                     eventBus.$emit('hide_form');
                 },200)
-
             }
-
         }
     }
 </script>

@@ -119,7 +119,7 @@ class RequisitionController extends Controller
     {
         $request['inventory_items_internal'] = json_encode($request->inventory_items_internal);
         $request['inventory_items_external'] = json_encode($request->inventory_items_external);
-        Requisition::find($id)->update($request->except(['date_requested','project','person_requested','user']));
+        Requisition::find($id)->update($request->except(['date_requested','project','person_requested','user','vehicle']));
         return response()->json(new RequisitionResource(Requisition::find($id)));
     }
     //auto generate requisition
@@ -131,7 +131,7 @@ class RequisitionController extends Controller
         $req = Requisition::count() +1;
         $request['req_no'] = 'REQ00'.$req;
         $rq = Requisition::create($request->all());
-        return response()->json($rq);
+        return response()->json(new RequisitionResource($rq));
     }
 
     /**

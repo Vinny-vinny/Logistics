@@ -31,9 +31,16 @@
                             <model-select :options="projects"
                             v-model="form.project_id"
                             placeholder="select Project"
+                            @input="subProject()"
                             :is-disabled="true">
                             </model-select>
                         </div>
+                               <div class="form-group">
+                                    <label>Sub Project</label>
+                                    <model-select :options="subprojects"
+                                            v-model="form.subproject_id">
+                                    </model-select>
+                                </div>
                            <div class="form-group">
                             <label>Stk Group</label>
                             <model-select :options="stk_groups"
@@ -218,6 +225,7 @@
                     account:'',
                     group_name:'',
                     credit_account_id:'',
+                     subproject_id:'',
                     inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
                     inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
                     id:''
@@ -247,7 +255,8 @@
                 show_customer:false,
                 external_reqs:[],
                 internal_reqs:[],
-                requisition:{}
+                requisition:{},
+                subprojects:[]
             }
         },
         created(){
@@ -263,9 +272,14 @@
             this.getCustomers();
             this.getPriceLists();
             this.getRequistion();
-
+            this.getVehicles();
            },
         watch:{
+            'form.project_id'(){
+             setTimeout(()=>{
+             this.subProject();
+             },3000)
+            },
             'form.type'(){
              if (this.form.type =='External') {
              this.show_customer = true;
@@ -424,6 +438,24 @@
         },
 
         methods:{
+            getVehicles() {
+                axios.get('machines')
+                    .then(vehicle => {
+                        this.vehicles = vehicle.data;
+
+                    })
+            },
+            subProject(){
+                console.log('wallala')
+                this.subprojects =[];
+                let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.project_id);
+                subp.forEach(p => {
+                    this.subprojects.push({
+                        'value': p.project_link,
+                        'text': p.description
+                    })
+                })
+            },
           getRequistion(){
          axios.get(`requisitions/${this.form.id}`)
          .then(res => {
@@ -593,7 +625,7 @@
                   .then(project => {
                     project.data.forEach(p => {
                      this.projects.push({
-                        'value': p.id,
+                        'value': p.project_link,
                         'text': p.name
                      })
                     })

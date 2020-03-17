@@ -37,7 +37,8 @@ export default new Vuex.Store({
         partners:{},
         dates:{},
         fuel_categories:{},
-        charges:{}
+        charges:{},
+        req_data:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -138,6 +139,9 @@ export default new Vuex.Store({
         },
         updateCharge(state,charge){
             state.charges = charge;
+        },
+        reqFormData(state,data){
+         state.req_data = data;
         }
     },
     actions:{
@@ -239,6 +243,9 @@ export default new Vuex.Store({
         },
         updateCharge({commit},charge){
             commit('updateCharge',charge);
+        },
+        reqFormData({commit},data){
+        commit('reqFormData',data);
         }
     }
 })

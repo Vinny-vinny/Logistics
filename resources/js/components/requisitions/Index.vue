@@ -1,15 +1,16 @@
 <template>
     <div>
-        <requisition v-if="add_requisition && !show_form && !show_reversal" :edit="editing"></requisition>
-        <reversal v-if="!add_requisition && !show_form && show_reversal" :reverse="reversing"></reversal>
-        <requisition-form v-if="show_form && !add_requisition && !show_reversal"></requisition-form>
+        <requisition v-if="add_requisition && !show_form && !show_reversal && !show_req_form" :edit="editing"></requisition>
+        <reversal v-if="!add_requisition && !show_form && show_reversal && !show_req_form" :reverse="reversing"></reversal>
+        <requisition-form v-if="show_form && !add_requisition && !show_reversal && !show_req_form"></requisition-form>
+        <req-form v-if="show_req_form && !show_form && !add_requisition && !show_reversal"></req-form>
         <!-- Main content -->
-        <section class="content" v-if="!add_requisition && !show_form && !show_reversal">
+        <section class="content" v-if="!add_requisition && !show_form && !show_reversal && !show_req_form">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                    <button class="btn btn-success pull-right" @click="show_form =true">Print Requisition Form</button>
+                    <button class="btn btn-success pull-right" @click="show_req_form =true">Print Requisition Form</button>
                     <button class="btn btn-primary pull-right mr" @click="add_requisition=true">Add Requisition</button>
                 </div>
                 <div class="box-body">
@@ -32,7 +33,7 @@
                             <td>{{rq.person_requested}}</td>
                             <td>{{rq.project}}</td>
                             <td>
-                               <button class="btn btn-success btn-sm" @click="editRequisition(rq)" v-if="rq.used !=1"><i class="fa fa-edit"></i></button>
+                               <button class="btn btn-success btn-sm" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
                                <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
                                 <button class="btn btn-danger btn-sm" @click="reverseRequisition(rq)" v-if="!rq.reversal_ref && rq.type=='Internal' && rq.used==1"><i class="fa fa-undo" aria-hidden="true"></i></button>
 <!--                            <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->                            </td>
@@ -48,6 +49,7 @@
     import Requisition from "./Requisition";
     import RequisitionForm from "./RequisitionForm";
     import Reversal from "./Reversal";
+    import ReqForm from "./ReqForm";
     export default {
         data(){
             return {
@@ -55,7 +57,8 @@
                 add_requisition: false,
                 editing: false,
                 show_form:false,
-                show_reversal:false
+                show_reversal:false,
+                show_req_form:false
             }
         },
         created(){
@@ -110,6 +113,10 @@
                     this.getRequisitions();
                     this.initDatable();
                 });
+                eventBus.$on('close_req_form',(req) => {
+                  this.show_req_form = false
+                  this.show_form = true;
+                });
                 eventBus.$on('updateRequisition',(rq)=>{
                     this.add_requisition = false;
                     this.editing = false;
@@ -150,7 +157,8 @@
         components:{
             Requisition,
             RequisitionForm,
-            Reversal
+            Reversal,
+            ReqForm
         }
     }
 </script>

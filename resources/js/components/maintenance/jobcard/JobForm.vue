@@ -1,6 +1,6 @@
 <template>
     <div>
-      
+
         <!-- Main content -->
         <section class="content" v-if="!show_print">
 
@@ -13,15 +13,18 @@
                               <form @submit.prevent="generateJob()">
                                   <div class="form-group">
                                     <label>Project</label>
-                                    <select v-model="form.asset_category_id" required class="form-control" @change="subProject()">
-                                     <option :value="project.id" v-for="project in projects" :key="project.id">{{project.name}}</option>
-                                    </select>
+                                    <model-select :options="projects"
+                                                    v-model="form.asset_category_id"
+                                                    @input="subProject()"
+                                                    required>
+                                    </model-select>
                                 </div>
                                   <div class="form-group">
                                       <label>Vehicle</label>
-                                      <select class="form-control" v-model="form.machine_id" required>
-                                          <option :value="m.id" v-for="m in subprojects" :key="m.id">{{m.code}}</option>
-                                      </select>
+                                      <model-select :options="subprojects"
+                                                    v-model="form.machine_id"
+                                      >
+                                      </model-select>
                                   </div>
                                   <div class="form-group">
                                       <label>Type</label>
@@ -39,6 +42,7 @@
     </div>
 </template>
 <script>
+    import { ModelSelect } from 'vue-search-select';
     export default {
         props:['printJob'],
         data(){
@@ -51,8 +55,8 @@
                 },
                 show_print:false,
                 machines:{},
-                projects:{},
-                subprojects:{}
+                projects:[],
+                subprojects:[]
             }
         },
         created() {
@@ -60,18 +64,27 @@
         this.getProjects();
             },
         methods:{
-          subProject(){
-            this.subprojects = {};
-           setTimeout(()=>{
- this.subprojects = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
-           },500)              
-
+            subProject(){
+                this.subprojects = [];
+                let subp = this.machines.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
+                subp.forEach(p => {
+                    this.subprojects.push({
+                        'value': p.project_link,
+                        'text': p.description
+                    })
+                })
             },
-          getProjects() {
-               axios.get('asset-category')
-              .then(res => {
-                  this.projects = res.data;
-              })
+
+            getProjects() {
+                axios.get('asset-category')
+                    .then(res => {
+                        res.data.forEach(p => {
+                            this.projects.push({
+                                'value': p.project_link,
+                                'text': p.name
+                            })
+                        })
+                    })
             },
             getMachines(){
                 axios.get('machines')
@@ -80,9 +93,9 @@
                     })
             },
             generateJob(){
-                this.form.maintenance = JSON.stringify(this.form.maintenance);
                 axios.post('generate-job',this.form)
                     .then(res => {
+                       // console.log(res.data)
                         this.$router.push({path:`/jobcard-form/${res.data.id}`});
                         eventBus.$emit('close_form');
                     })
@@ -92,7 +105,9 @@
                 eventBus.$emit('cancel_job');
             }
         },
-
+  components:{
+      ModelSelect
+  }
     }
 </script>
 

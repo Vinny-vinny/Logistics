@@ -10,7 +10,7 @@
                         :data = "diesels"
                         :title = "title"
                         v-if="diesels.length"
-                        name="DIESEL ANALYSIS.xls"
+                        name="DIESEL_ANALYSIS.xlsx"
                         class="btn btn-primary pull-right">
                         <i class="fa fa-file-excel-o"></i> Export Excel
                     </download-excel>

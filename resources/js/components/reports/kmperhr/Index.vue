@@ -10,7 +10,7 @@
                         :data   = "results"
                         :title = "title"
                         v-if="results.length"
-                        name="KM PER HR.xls"
+                        name="KM_PER_HR.xlsx"
                         class="btn btn-primary pull-right"
                     >
                         <i class="fa fa-file-excel-o"></i> Export Excel

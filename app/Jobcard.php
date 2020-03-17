@@ -10,7 +10,7 @@ class Jobcard extends Model
 
     public function machine()
     {
-        return $this->belongsTo(Machine::class);
+        return $this->belongsTo(Machine::class,'machine_id','project_link');
     }
     public function trackby()
     {
@@ -64,6 +64,6 @@ class Jobcard extends Model
     public function account(){
         return $this->belongsTo(Account::class,'cost_code');
     }
-  
+
 
 }

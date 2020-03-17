@@ -233,8 +233,8 @@
                         <tr>
                             <td>Miscellaneous</td>
                             <td>{{job.standing_fee}}</td>
-                            
-                        </tr>                      
+
+                        </tr>
                         <tr>
                             <td>Cost</td>
                             <td>{{cost | number}}</td>
@@ -302,20 +302,20 @@
                         <td>{{(job.labour_cost + cost + job.standing_fee) | number}}</td>
                     </tr>
                 </table>
-                    <div style="margin-left: 40px; height:100%;margin-top: -20px;">
-                        <p style="margin-bottom:0">This information is accurate to my knowledge</p>
+                    <div style="margin-left: 100px; height:100%;margin-top: -20px;">
+                        <p style="margin-bottom:12px;margin-top:12px">This information is accurate to my knowledge</p>
                 <table class="customers">
                     <tr>
                         <td>CONSTRUCTION MANAGERS SIGN</td>
                         <td style="opacity:0">uuuuuuuuuuuuuuuuuuu</td>
                     </tr>
                 </table>
-                <p style="margin-bottom:0">I approve the coding allocated to this project</p>
+                <p style="margin-bottom:12px;margin-top:12px">I approve the coding allocated to this project</p>
                 <table class="customers">
                     <tr>
                         <td>WORKS MANAGERS SIGN</td>
                         <td style="opacity:0">uuuuuuuuuuuuuuuuuuuu</td>
-                    </tr>
+                    </tr>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
                 </table>
                     </div>
                 </div>

@@ -10,7 +10,7 @@
                         :data   = "daily_issues"
                         :title = "title"
                         v-if="daily_issues.length"
-                        name="DAILY FUEL ISSUE.xls"
+                        name="DAILY_FUEL_ISSUE.xlsx"
                         class="btn btn-primary pull-right"
                     >
                         <i class="fa fa-file-excel-o"></i> Export Excel

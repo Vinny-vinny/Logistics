@@ -38,9 +38,7 @@
                          <div class="form-group">
                           <label>Sub Project</label>
                           <model-select :options="subprojects"
-                          v-model="form.subproject_id"
-
-                                        >
+                          v-model="form.subproject_id">
                           </model-select>
                                 </div>
                                  <div class="form-group" v-show="show_customer">
@@ -125,9 +123,8 @@
                                         </model-select>
                                     </td>
                                        <td>
-                                       <input type="text" class="form-control qty" v-model="item.uom">
+                                       <input type="text" class="form-control qty" v-model="item.uom" disabled>
                                     </td>
-
                                     <td><input type="text" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty" @keyup="qty = item.quantity">
                                     </td>
@@ -176,7 +173,7 @@
                                         </model-select>
                                     </td>
                                         <td>
-                                      <input type="text" class="form-control qty" v-model="item.uom">
+                                      <input type="text" class="form-control qty" v-model="item.uom" disabled>
                                     </td>
                                     <td><input type="number" class="form-control qty" v-model="item.quantity"
                                                placeholder="Qty"  @keyup="qty = item.quantity">
@@ -200,7 +197,7 @@
                             </table>
                         </fieldset>
                         </div>
-                        <button type="submit" class="btn btn-primary">{{edit_requisition ? 'Update' : 'Save'}}</button>
+                        <button type="submit" class="btn btn-primary" v-if="form && form.used !=1">{{edit_requisition ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
                           <button type="button" class="btn btn-info" @click="issueStock(form.id)" v-if="edit_requisition && internalType && form.used !=1" :disabled="issue_text">{{issue_text ? 'Please Wait' :'Issue Stock'}}</button>
                     </form>

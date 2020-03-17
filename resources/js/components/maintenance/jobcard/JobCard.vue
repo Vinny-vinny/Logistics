@@ -342,7 +342,6 @@
                     hours_spent:'',
                     id: '',
                     maintenance: [{category: '', description: '', root_cause: ''}],
-
                 },
                 checklist: '',
                 invoice_text:false,
@@ -705,9 +704,11 @@
                 if (confirm('Do you really want to close?')) {
                     axios.post(`close-jobcard/${this.form.id}`)
                         .then(res => {
-                          //  console.log(res.data);
-                            this.$toastr.s(`Jobcard ${this.$store.state.job_card.card_no} was successfully closed.`)
-                            eventBus.$emit('cancel');
+                            this.$toastr.s(`Jobcard was successfully closed.`);
+                            setTimeout(()=>{
+                             eventBus.$emit('cancel');
+                            },1000)
+
                         })
                 }
             },
@@ -844,6 +845,7 @@
                 axios.patch(`job-card/${this.form.id}`, this.form).then(res => {
                     this.$toastr.s('Jobcard updated Successfully.');
                     eventBus.$emit('updateJobcard', res.data)
+                   // console.log(res.data)
                 })
                     .catch(error => error.response)
             },
