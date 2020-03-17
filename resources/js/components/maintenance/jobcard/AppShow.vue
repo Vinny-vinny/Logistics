@@ -315,7 +315,7 @@
                     <tr>
                         <td>WORKS MANAGERS SIGN</td>
                         <td style="opacity:0">uuuuuuuuuuuuuuuuuuuu</td>
-                    </tr>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                    </tr>
                 </table>
                     </div>
                 </div>
