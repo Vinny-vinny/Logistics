@@ -210,7 +210,6 @@
                                         </option>
                                     </select>
                                 </div>
-
                                 <div class="form-group" v-if="show_inventory && filtered_rq=='Internal'">
                                  <fieldset class="the-fieldset">
                                <legend class="the-legend"><label class="fyr">Inventory Items</label></legend>
@@ -529,7 +528,8 @@
              this.invoice_text = true;
             axios.post(`invoice-job-card`,this.form)
             .then(res => {
-              eventBus.$emit('cancel')
+                console.log(res.data)
+             // eventBus.$emit('cancel')
             })
             },
             getJobDetails(){

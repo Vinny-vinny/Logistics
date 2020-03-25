@@ -42,6 +42,7 @@ import WhereToCharge from "../components/wheretocharge/Index";
 import ReversalList from "../components/requisitions/ReversalList";
 import JobReversalList from "../components/maintenance/jobcard/RevesalList";
 import FuelReversalList from "../components/fuels/ReversalList";
+import Charge from "../components/charges/Index";
 
 Vue.use(VueRouter);
 function guard(to, from, next) {
@@ -94,6 +95,7 @@ const routes = [
     {path:'/reversed-requisitions',component:ReversalList, beforeEnter: guard},
     {path:'/reversed-jobcards',component:JobReversalList, beforeEnter: guard},
     {path:'/reversed-fuel',component:FuelReversalList, beforeEnter: guard},
+    {path:'/charges',component:Charge, beforeEnter: guard},
 
 ];
 

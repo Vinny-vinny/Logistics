@@ -43,7 +43,7 @@ class PartsController extends Controller
     }
     public function importParts()
     {
-        $parts = StkItem::select("StockLink","Code","Description_1","AveUCst","ItemGroup","iUOMStockingUnitID","iUOMDefPurchaseUnitID","iUOMDefSellUnitID","Qty_On_Hand")->get();
+        $parts = StkItem::select("StockLink","Code","Description_1","AveUCst","ItemGroup","iUOMStockingUnitID","iUOMDefPurchaseUnitID","iUOMDefSellUnitID","Qty_On_Hand","ServiceItem")->get();
         $existing = Part::get();
         $found_parts = [];
         if ($existing->count() < 1){
@@ -76,7 +76,8 @@ class PartsController extends Controller
                 'uom_stock_id' => $asset->iUOMStockingUnitID,
                 'uom_purchase_id' => $asset->iUOMDefPurchaseUnitID,
                 'uom_sellunit_id' => $asset->iUOMDefSellUnitID,
-                'qty_on_hand' => $asset->Qty_On_Hand
+                'qty_on_hand' => $asset->Qty_On_Hand,
+                'service_item' => $asset->ServiceItem
                 ]);
 
         }

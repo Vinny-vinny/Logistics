@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Charge;
 use App\Http\Resources\JobcardResource;
 use App\Http\Resources\MaintenanceResource;
 use App\Jobcard;
@@ -90,10 +91,12 @@ class JobcardController extends Controller
     public function invoiceJob(Request $request){
         $date = Carbon::now()->format('Y-m-d');
         $job_details =Jobcard::find($request->get('id'));
-        $job_details->update(['invoiced' =>1]);
+       // $job_details->update(['invoiced' =>1]);
         $req_details =Requisition::find($job_details->requisition_id);
         $inv_code = $job_details->category->inv_item->transaction_id;
         $stk_code = $job_details->category->stk_item->transaction_id;
+        $std_d = Charge::where('name','Standing Charge')->first();
+        $labour_id = Charge::where('name','Labour Charge')->first();
            $invoice_xml = "<root>
                          <row>
                           <INV_TYPE>I</INV_TYPE>
@@ -119,7 +122,16 @@ class JobcardController extends Controller
                               </row>";
 
              }
+         $invoice_items_details.= "<row>
+                                  <STD_ID>$std_d->stock_link</STD_ID>
+                                  <STD_COST>$job_details->standing_charge</STD_COST>
+                                  </row>";
+        $invoice_items_details.= "<row>
+                                  <LABOUR_ID>$labour_id->stock_link</LABOUR_ID>
+                                  <LABOUR_COST>$job_details->labour_cost</LABOUR_COST>
+                                  </row>";
           $invoice_items_details.="</root>";
+        return response()->json($invoice_items_details);
          $invoice = WizPostTx::CREATE(['XMLText' => $invoice_xml]);
          $details = WizPostTx::CREATE(['XMLText' => $invoice_items_details]);
          DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo_Hdr= "'.$invoice->SNo.'",@SNo_Det = "'.$details->SNo.'"');

@@ -18,8 +18,8 @@
             <ul class="sidebar-menu" data-widget="tree">
                 <li class="header"></li>
                 <!-- Optionally, you can add icons to the links -->
-                <li><router-link to="/machines"><i class="fa fa-shopping-basket angle-left"></i> <span>Assets</span></router-link></li>               
-               
+                <li><router-link to="/machines"><i class="fa fa-shopping-basket angle-left"></i> <span>Assets</span></router-link></li>
+
                    <li class="treeview">
                   <a href="#"><i class="fa fa-shopping-basket angle-left"></i> <span>Requisitions</span>
                         <span class="pull-right-container">
@@ -31,7 +31,7 @@
                         <li><router-link to="/reversed-requisitions" class="fa fa-circle-o"> Reversed</router-link></li>
 
                         </ul>
-                </li>                 
+                </li>
                   <li class="treeview">
                   <a href="#"><i class="fa fa-tag"></i> <span>Job Card</span>
                         <span class="pull-right-container">
@@ -44,7 +44,7 @@
 
                         </ul>
                 </li>
-                  
+
                     <li class="treeview">
                   <a href="#"><i class="fa fa-check-square-o"></i> <span>Checklists</span>
                         <span class="pull-right-container">
@@ -56,7 +56,7 @@
                         <li><router-link to="/assign-checklist" class="fa fa-circle-o"> Assign Checklists</router-link></li>
 
                         </ul>
-                </li>            
+                </li>
 
                 <li class="treeview">
                   <a href="#"><i class="fa fa-database"></i> <span>Fuel</span>
@@ -92,7 +92,7 @@
               </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><router-link to="/users" class="fa fa-circle-o"> Users</router-link></li> 
+                        <li><router-link to="/users" class="fa fa-circle-o"> Users</router-link></li>
                         <li style="display:none"><router-link to="/fuel-types" class="fa fa-circle-o"> Fuel Types</router-link></li>
                         <li><router-link to="/track-by" class="fa fa-circle-o"> Track By</router-link></li>
                         <li><router-link to="/service-types" class="fa fa-circle-o"> Service Types</router-link></li>
@@ -110,6 +110,7 @@
                           <li style="display:none"><router-link to="/fuel-category" class="fa fa-circle-o"> Fuel Categories</router-link></li>
                         <li><router-link to="/checklist-tool" class="fa fa-circle-o"> Checklist Tools</router-link></li>
                         <li><router-link to="/where-to-charge" class="fa fa-circle-o"> Where To Charge</router-link></li>
+                        <li><router-link to="/charges" class="fa fa-circle-o"> Labour / Standing Charges</router-link></li>
                     </ul>
                 </li>
             </ul>

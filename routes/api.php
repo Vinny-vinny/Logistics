@@ -74,6 +74,7 @@ Route::post('km-per-hr','ReportsController@KmPerHr');
 Route::post('diesel-analysis','ReportsController@DieselAnalysis');
 Route::apiResource('fuel-category','FuelCategoryController');
 Route::apiResource('where-to-charge','WheretochargeController');
+Route::apiResource('charges','ChargesController');
 
 
 Route::group([
