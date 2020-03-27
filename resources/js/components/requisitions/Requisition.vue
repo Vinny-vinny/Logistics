@@ -689,7 +689,7 @@
                    this.getCustomers();
                    this.getParts();
                    this.subProject();
-                   },5000)
+                   },8000)
                 }
 
             },
