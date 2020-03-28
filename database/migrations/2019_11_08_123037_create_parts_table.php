@@ -23,7 +23,7 @@ class CreatePartsTable extends Migration
             $table->integer('uom_stock_id')->nullable();
             $table->integer('uom_purchase_id')->nullable();
             $table->integer('uom_sellunit_id')->nullable();
-            $table->integer('qty_on_hand')->nullable();
+            $table->float('qty_on_hand')->nullable();
             $table->string('service_item')->nullable();
             $table->timestamps();
         });

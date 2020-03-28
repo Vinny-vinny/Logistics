@@ -27,7 +27,7 @@ class PartsSeeder extends Seeder
                 'uom_stock_id' => $asset->iUOMStockingUnitID,
                 'uom_purchase_id' => $asset->iUOMDefPurchaseUnitID,
                 'uom_sellunit_id' => $asset->iUOMDefSellUnitID,
-                'qty_on_hand' => (int)$asset->Qty_On_Hand,
+                'qty_on_hand' => (float)$asset->Qty_On_Hand,
                 'service_item' => $asset->ServiceItem
             ]);
 
