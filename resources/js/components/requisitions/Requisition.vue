@@ -567,12 +567,16 @@
                 this.form.inventory_items_external.push({part: '',uom:'', quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''});
             },
             getProjects(){
-                    this.$store.state.all_my_projects.forEach(p => {
-                     this.projects.push({
-                        'value': p.project_link,
-                        'text': p.name
-                     })
+             axios.get('asset-category')
+                .then(res => {
+                    res.data.forEach(p => {
+                        this.projects.push({
+                            'value': p.project_link,
+                            'text': p.name
+                        })
                     })
+                })
+
             },
             saveRequisition(){
                 if (Object.values(this.form.inventory_items_internal[0])[0] !== '' || Object.values(this.form.inventory_items_internal[0])[2] !== '') {

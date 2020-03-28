@@ -59,11 +59,7 @@
                 show_form:false,
                 show_reversal:false,
                 show_req_form:false,
-                customers:{},
-                vehicles:{},
-                parts:{},
-                uoms:{},
-                pricelists:{}
+                projects:{}
             }
         },
         created(){
@@ -84,6 +80,7 @@
                 axios.get('requisitions')
                     .then(res => {
                         this.tableData = res.data.requisitions;
+                        this.projects = res.data.projects;
                         this.$store.dispatch('my_customers',res.data.customers);
                         this.$store.dispatch('my_vehicles',res.data.machines);
                         this.$store.dispatch('my_parts',res.data.parts);
