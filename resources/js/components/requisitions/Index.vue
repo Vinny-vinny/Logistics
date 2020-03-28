@@ -10,7 +10,7 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                    <button class="btn btn-success pull-right" @click="show_req_form =true">Print Requisition Form</button>
+                      <button class="btn btn-success pull-right" @click="show_req_form =true">Print Requisition Form</button>
                     <button class="btn btn-primary pull-right mr" @click="add_requisition=true">Add Requisition</button>
                 </div>
                 <div class="box-body">
@@ -59,19 +59,29 @@
                 show_form:false,
                 show_reversal:false,
                 show_req_form:false,
-                projects:{}
+                projects:{},
+                users:{}
             }
         },
         created(){
+            this.$store.dispatch('loadUsers');
             this.listen();
             this.getRequisitions();
             this.getAllAccounts();
-        },
 
+
+        },
+        computed:{
+            get_users(){
+            return this.$store.state.get_users;
+            }
+        },
         methods:{
             getAllAccounts(){
+                console.log(this.get_users)
                 axios.get('accounts')
                     .then(res => {
+
                         this.$store.dispatch('my_accounts',res.data);
                     })
             },

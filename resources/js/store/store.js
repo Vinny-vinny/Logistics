@@ -58,12 +58,17 @@ export default new Vuex.Store({
         all_my_service_types:{},
         all_my_tracks:{},
         all_my_categories:{},
-        all_my_mechanics:{}
+        all_my_mechanics:{},
+        get_users:{}
     },
+
     mutations:{
      pathTo(state, to) {
      state.path_to = to;
      },
+        getAllUsers(state,data){
+            state.get_users = data;
+        },
         updateServiceType(state,service){
          state.service_types = service;
         },
@@ -228,6 +233,12 @@ export default new Vuex.Store({
     pathTo({commit},to){
      commit('pathTo',to);
     },
+        loadUsers({commit}){
+        axios.get('accounts')
+            .then(res => {
+                commit('getAllUsers',res.data)
+            })
+        },
         updateServiceType({commit},service){
         commit('updateServiceType',service);
         },

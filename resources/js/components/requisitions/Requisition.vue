@@ -9,6 +9,7 @@
                 </div>
                 <div class="box-body">
                     <form @submit.prevent="saveRequisition()">
+                        {{get_users}}
                         <div class="row">
                             <div class="col-md-6">
                             <div class="form-group">
@@ -265,6 +266,7 @@
             this.creditAccount();
             this.getAccounts();
             this.getCustomers();
+            this.$store.dispatch('loadUsers');
             },
 
         watch:{
@@ -415,6 +417,9 @@
             }
         },
         computed:{
+            get_users(){
+                return this.$store.state.get_users;
+            },
         internalType(){
         return this.form.type =='Internal';
         },
@@ -465,7 +470,6 @@
                 this.users = this.$store.state.all_my_users;
                 this.parts = this.$store.state.all_my_parts;
                 this.vehicles = this.$store.state.all_my_vehicles;
-                console.log(this.$store.state.all_my_accounts);
 
             },
             getCustomers(){
