@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
          $this->call(PriceListSeeder::class);
          $this->call(UomSeeder::class);
          $this->call(AccountsSeeder::class);
-        
+
 
 
 
