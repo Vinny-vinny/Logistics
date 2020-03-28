@@ -234,7 +234,6 @@
                 edit_requisition: this.edit,
                 issue_text:false,
                 projects:[],
-                parts:{},
                 qty:'',
                 part:'',
                 unit_price:'',
@@ -243,7 +242,6 @@
                 stk_groups:[],
                 items:[],
                 initial_unit_cost:'',
-                stks:{},
                 accounts:[],
                 uoms:[],
                 customers:[],
@@ -254,24 +252,21 @@
                 account:'',
                 show_issue:true,
                 show_customer:false,
-                subprojects:[]
+                subprojects:[],
+                parts:{},
+
             }
         },
         created(){
+            this.getAllDetails();
             this.listen();
             this.getProjects();
-            this.getParts();
-            this.getUsers();
             this.getGroups();
-            this.getStks();
             this.creditAccount();
             this.getAccounts();
-            this.getUoms();
             this.getCustomers();
-            this.getPriceLists();
-            this.getVehicles();
+            },
 
-           },
         watch:{
             'form.type'(){
              if (this.form.type =='External') {
@@ -302,7 +297,6 @@
                 if (this.form.customer_id) {
                    customer =this.all_customers.find(q =>q.id ==this.form.customer_id)
                    }
-
                 for (let p=0; p < this.parts.length; p++){
                     for (let i=0; i < this.form.inventory_items_internal.length; i++){
                            if (this.form.inventory_items_internal[i]['part'] === this.parts[p]['id']){
@@ -423,7 +417,7 @@
         computed:{
         internalType(){
         return this.form.type =='Internal';
-        }   ,
+        },
           getExpenses(){
             return [this.part,this.qty,this.form.inventory_items_internal,this.form.group_name,this.form.customer_id].join();
           },
@@ -431,7 +425,6 @@
              return [this.part,this.qty,this.unit_price,this.form.inventory_items_external,this.form.group_name,this.form.customer_id].join();
             }
         },
-
         methods:{
          issueStock(req_id){
           this.issue_text = true;
@@ -440,12 +433,6 @@
            eventBus.$emit('listReqs',res.data)
           })
           },
-           getVehicles() {
-                axios.get('machines')
-                    .then(vehicle => {
-                        this.vehicles = vehicle.data;
-                    })
-            },
            subProject(){
              this.subprojects =[];
              let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.project_id);
@@ -457,15 +444,12 @@
              })
             },
             creditAccount(){
-            axios.get('where-to-charge')
-            .then(res => {
-                if (res.data.length) {
-                 let account = res.data.find(req => req.type =='Requisition');
+                if (this.$store.state.all_my_charges.length) {
+                 let account = this.$store.state.all_my_charges.find(req => req.type =='Requisition');
                  this.account = account.account;
                  this.form.credit_account_id  = account.account_id;
                 }
 
-            })
             },
             resetAccount(){
             this.form.where_to_charge = '';
@@ -473,50 +457,34 @@
             resetCustomer(){
             this.form.customer_id = '';
             },
-            getPriceLists(){
-            axios.get('price-list')
-            .then(res => {
-                this.pricelists = res.data;
-            })
+                getAllDetails(){
+                this.all_customers = this.$store.state.all_my_customers;
+                this.pricelists = this.$store.state.all_my_pricelists;
+                this.units = this.$store.state.all_my_uoms;
+                this.users = this.$store.state.all_my_users;
+                this.parts = this.$store.state.all_my_parts;
+                this.vehicles = this.$store.state.all_my_vehicles;
+
             },
             getCustomers(){
-            axios.get('customers')
-            .then(res => {
-                this.all_customers = res.data;
-                res.data.forEach(c => {
+                this.$store.state.all_my_customers.forEach(c => {
                     this.customers.push({
                         'value': c.id,
                         'text': c.name
                     })
                 })
-            })
-            },
-            getUoms(){
-            axios.get('uom')
-            .then(res => {
-                 this.units =  res.data;
-               // console.log(this.units)
-
-            })
             },
         getAccounts(){
-         axios.get('accounts')
-         .then(res => {
-           let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
+           let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
             accounts.forEach(a => {
                 this.accounts.push({
                     'value': a.account_link,
                     'text': a.account
                 })
             })
-         })
-        }  ,
-        getStks(){
-         axios.get('requisitions')
-         .then(res => {
-            this.stks = res.data.requisitions
-         })
-        }  ,
+
+        },
+
             costing(cost){
             return cost;
             },
@@ -579,18 +547,6 @@
                     })
                 })
             },
-            getUsers(){
-              axios.get('users')
-                  .then(users => {
-                      this.users = users.data;
-                  })
-            },
-            getParts(){
-              axios.get('parts')
-                  .then(parts => {
-                      this.parts = parts.data;
-                  })
-            },
             convertDate(str) {
                 var date = new Date(str),
                     mnth = ("0" + (date.getMonth() + 1)).slice(-2),
@@ -611,16 +567,12 @@
                 this.form.inventory_items_external.push({part: '',uom:'', quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''});
             },
             getProjects(){
-              axios.get('asset-category')
-                  .then(project => {
-                    project.data.forEach(p => {
+                    this.$store.state.all_my_projects.forEach(p => {
                      this.projects.push({
                         'value': p.project_link,
                         'text': p.name
                      })
                     })
-
-                  })
             },
             saveRequisition(){
                 if (Object.values(this.form.inventory_items_internal[0])[0] !== '' || Object.values(this.form.inventory_items_internal[0])[2] !== '') {
@@ -684,14 +636,14 @@
             listen(){
                 if (this.edit){
                     this.form = this.$store.state.requisitions;
-                   setTimeout(()=>{
-                   this.selectedGroup();
-                   this.getCustomers();
-                   this.getParts();
-                   this.subProject();
-                   },8000)
+                    this.all_customers = this.$store.state.all_my_customers;
+                    this.vehicles = this.$store.state.all_my_vehicles;
+                    this.parts = this.$store.state.all_my_parts;
+                    this.units = this.$store.state.all_my_uoms;
+                    this.pricelists = this.$store.state.all_my_pricelists;
+                    this.subProject();
+                    this.selectedGroup();
                 }
-
             },
         },
         components:{

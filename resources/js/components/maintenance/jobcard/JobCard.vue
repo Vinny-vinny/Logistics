@@ -395,16 +395,12 @@
         watch: {
             labours(){
             if (this.form.hours_spent > 0 && this.form.job_type_id) {
-                       axios.get('job-types')
-                        .then(res => {
                             let total =0;
-                            this.job_types = res.data;
                             if (this.form.job_type_id) {
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
                              total += this.form.hours_spent * cost;
                             }
                            this.form.labour_cost =  total.toFixed(2);
-                        })
             }
             },
             getCost() {
@@ -456,16 +452,13 @@
                     let time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
 
                     if (this.form.job_type_id !== '') {
-                     axios.get('job-types')
-                        .then(res => {
                             let total =0;
-                            this.job_types = res.data;
                             if (this.form.job_type_id) {
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
                              total += time_in_minutes / 60 * cost;
                             }
                            // this.form.labour_cost =  total;
-                        })
+
 
                     }
 
@@ -476,24 +469,15 @@
             this.initDate();
         },
         created() {
-            this.listen();
-            this.getMachines();
-            this.getUsers();
-            this.getTracks();
-            this.getServiceTypes();
-            this.getParts();
+            this.getAllDetails();
             this.getCategories();
-            this.getProjects();
-            this.getJobCategories();
             this.getMechanics();
-            this.getJobtypes();
-            this.getCustomers();
-            this.getRequisitions();
+            this.getProjects();
+            this.getParts();
             this.filteredRqs();
-            this.getCustomerTypes();
+            this.listen();
 
-
-        },
+            },
         filters: {
             moment: function (date) {
                 return moment(date);
@@ -529,7 +513,7 @@
             axios.post(`invoice-job-card`,this.form)
             .then(res => {
                 console.log(res.data)
-             // eventBus.$emit('cancel')
+              eventBus.$emit('cancel')
             })
             },
             getJobDetails(){
@@ -574,69 +558,48 @@
                 })
              })
             },
-            getCustomerTypes() {
-                axios.get('customer-types')
-                    .then(res => {
-                        this.customer_types = res.data;
-                    })
-            },
+
             filteredRqs() {
-                axios.get('requisitions')
-                    .then(rq => {
-                        for (let i = 0; i < rq.data.length; i++) {
-                            if (rq.data[i]['used'] == 0 || rq.data[i]['used'] == null && rq.data[i]['type'] !==null) {
-                                this.rqs.push(rq.data[i]);
-                            }
-                        }
-                    })
+               for (let i = 0; i < this.requisitions.length; i++) {
+                if (this.requisitions[i]['used'] == 0 || this.requisitions[i]['used'] == null && this.requisitions[i]['type'] !==null) {
+                    this.rqs.push(this.requisitions[i]);
+                }
+            }
+
             },
             getDetails() {
                 this.show_inventory = true;
-                this.filtered_items_internal = [];
                 this.filtered_items_external = [];
-                   if (this.rqs[0]['type'] =='Internal') {
-                    console.log('internal')
-                   this.filtered_rq ='Internal';
-                   this.filtered_items_internal = this.rqs[0]['inventory_items_internal'];
-                }
-                else if (this.rqs[0]['type'] =='External') {
-                    console.log('external')
                    this.filtered_rq ='External';
                    this.filtered_items_external = this.rqs[0]['inventory_items_external'];
-                   console.log(  this.filtered_items_external)
-                }
 
-                // for (let i = 0; i < this.requisitions.length; i++) {
-                //     if (this.requisitions[i]['id'] === this.form.requisition_id) {
-                //         if(this.requisitions[i]['type'] ==='Internal'){
-                //             this.filtered_rq ='Internal';
-                //                 this.filtered_items_internal = this.requisitions[i]['inventory_items_internal'];
-
-                //         }
-                //         if(this.requisitions[i]['type'] ==='External'){
-                //             this.filtered_rq ='External';
-                //             this.filtered_items_external = this.requisitions[i]['inventory_items_external'];
-
-                //         }
-
-                //     }
-                //     console.log('inside')
-                // }
-                console.log('end....')
 
             },
-            getRequisitions() {
-                axios.get('requisitions')
-                    .then(rq => {
-                        this.requisitions = rq.data
-                    })
+            getAllDetails(){
+                this.customers = this.$store.state.all_my_customers;
+                this.requisitions = this.$store.state.all_my_reqs;
+                this.parts = this.$store.state.all_my_parts;
+                this.machines = this.$store.state.all_my_vehicles;
+                this.job_categories = this.$store.state.all_my_job_categories;
+                this.customer_types = this.$store.state.all_my_customer_types;
+                this.services = this.$store.state.all_my_service_types;
+                this.tracks = this.$store.state.all_my_tracks;
+                this.users = this.$store.state.all_my_users;
+                this.job_types = this.$store.state.all_my_job_types;
+            },
+            getParts() {
+                        this.parts.forEach(p => {
+                            this.stk_items.push({
+                                'value': p.id,
+                                'text': p.code +'-'+p.description
+                            })
+                        })
             },
             customerType() {
                 this.filtered_customers = [];
                 this.show_customers = true;
-               setTimeout(()=>{
-                if (this.form.customer_type_id) {
-                      let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
+                  if (this.form.customer_type_id) {
+                  let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
                  customers.forEach(cus => {
                     this.filtered_customers.push({
                         'value': cus.id,
@@ -644,50 +607,32 @@
                     })
                  });
                 }
-
-               },500)
             },
-            getCustomers() {
-                axios.get('customers')
-                    .then(customers => {
-                        this.customers = customers.data;
+            getCategories() {
+                this.$store.state.all_my_categories.forEach(c => {
+                    this.categories.push({
+                        'value': c.id,
+                        'text': c.name
                     })
-            },
-            getJobtypes() {
-                axios.get('job-types')
-                    .then(res => {
-                        this.job_types = res.data;
-                    })
+                })
             },
             getMechanics() {
-                axios.get('mechanics')
-                    .then(res => {
-                        res.data.forEach(m => {
-                            this.mechanics.push({
-                                'value': m.id,
-                                'text': m.name
-                            })
-                        })
+                this.$store.state.all_my_mechanics.forEach(m => {
+                    this.mechanics.push({
+                        'value': m.id,
+                        'text': m.name
                     })
-            },
-            getJobCategories() {
-                axios.get('jobcard-category')
-                    .then(category => {
-                        this.job_categories = category.data;
-                    })
+                })
             },
             getProjects() {
-               axios.get('asset-category')
-              .then(res => {
-                res.data.forEach(p => {
+                this.$store.state.all_my_projects.forEach(p => {
                     this.projects.push({
                         'value': p.project_link,
                         'text': p.name
                     })
                 })
-              })
             },
-            addService(i) {
+               addService(i) {
                 this.form.service_required.push({
                     category: '',
                     part: '',
@@ -718,29 +663,7 @@
             removeItem(i) {
                 this.form.maintenance.splice(i, 1);
             },
-            getCategories() {
-                axios.get('categories')
-                    .then(category => {
-                        category.data.forEach(c => {
-                            this.categories.push({
-                                'value': c.id,
-                                'text': c.name
-                            })
-                        })
-                    })
-            },
-            getParts() {
-                axios.get('parts')
-                    .then(res => {
-                        this.parts = res.data
-                        res.data.forEach(p => {
-                            this.stk_items.push({
-                                'value': p.id,
-                                'text': p.code +'-'+p.description
-                            })
-                        })
-                    })
-            },
+
             nextReadings() {
                 this.services.forEach(service => {
                     if (service.id === this.form.service_type_id) {
@@ -760,29 +683,14 @@
             },
 
             getAssetDetails() {
-                setTimeout(()=>{
-              this.machines.forEach(machine => {
-                    if (machine.id === this.form.machine_id) {
+                        let machine = this.machines.find(m => m.project_link ===this.form.machine_id);
                         this.make = machine.make;
                         this.previous_readings = machine.current_readings;
                         this.form.track_by_id = machine.track_by_id;
-                        this.tracks.forEach(track => {
-                            if (track.id === machine.track_by_id) {
-                                this.track_name = track.name;
-                                this.show_track_by = true;
-                            }
-                        });
-                        this.users.forEach(user => {
-                            if (user.id === machine.assign_to) {
-                                this.driver = user.name;
-                                return;
-                            }
-                        })
-                        this.service_types = machine.service_types
-                    }
-                    return;
-                })
-                },300)
+                        this.track_name  = this.tracks.find(t => t.id === machine.track_by_id).name;
+                        this.show_track_by = true;
+                        this.driver = this.users.find(u => u.id === machine.assign_to).name;
+                        this.service_types = machine.service_types;
             },
             saveJobcard() {
                 for (let i = 0; i < this.machines.length; i++) {
@@ -849,31 +757,6 @@
                 })
                     .catch(error => error.response)
             },
-            getMachines() {
-                axios.get('machines')
-                    .then(machines => {
-                        this.machines = machines.data;
-                    })
-            },
-            getTracks() {
-                axios.get('track-by')
-                    .then(tracks => {
-                        this.tracks = tracks.data;
-                    })
-            },
-
-            getServiceTypes() {
-                axios.get('service-types')
-                    .then(service_types => {
-                        this.services = service_types.data;
-                    })
-            },
-            getUsers() {
-                axios.get('users')
-                    .then(users => {
-                        this.users = users.data;
-                    })
-            },
             cancel() {
                 eventBus.$emit('cancel')
             },
@@ -887,22 +770,18 @@
                     this.make = this.$store.state.job_card.make;
                     this.driver = this.$store.state.job_card.driver;
                     this.service_types = this.form.service_types;
-
                     this.status = this.$store.state.job_card.status;
                     this.show_customers = true;
 
-                     setTimeout(()=>{
-                     this.subProject();
-                     this.customerType();
-                     this.getCustomers();
-                     this.ServiceTypes();
-                     this.getMachines();
+                    this.ServiceTypes();
+                    this.subProject();
+                    this.customerType();
+
                        if (this.form.requisition_id) {
                        this.disable_rq = true;
                        this.show_inventory = true;
                        this.editedRequisitions();
                     }
-                     },3000)
 
                 }
             },
@@ -910,27 +789,18 @@
               editedRequisitions() {
                this.rqs = [];
                let req = this.requisitions.find(rq => rq.id ==this.form.requisition_id);
-                if(req.type=='External'){
-                this.filtered_rq ='External';
+                 this.filtered_rq ='External';
                  this.filtered_items_external =req.inventory_items_external;
-
-                }
-                if(req.type=='Internal'){
-                this.filtered_rq ='Internal';
-                this.filtered_items_internal =req.inventory_items_internal;
-                }
             },
 
             ServiceTypes() {
-                axios.get('service-types')
-                    .then(res => {
-                        for (let i = 0; i < res.data.length; i++) {
-                            if (res.data[i]['id'] === this.form.service_type_id) {
-                                this.service_after = res.data[i]['service_after'];
+                        for (let i = 0; i < this.service_types.length; i++) {
+                            if (this.service_types[i]['id'] === this.form.service_type_id) {
+                                this.service_after = this.service_types[i]['service_after'];
                                 this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
                             }
                         }
-                    });
+
             },
 
         },

@@ -90,9 +90,7 @@
                                         <tr>
                                             <td style="font-size:16px"><b>Total Fuel Cost: </b>{{totalAmount | number}}</td>
                                         </tr>
-                                        <tr>
-                                            <td style="font-size:16px"><b>Total Expense: </b>{{(genExpenses()) | number}}</td>
-                                        </tr>
+
                                       <tr>
                                        <td style="font-size:16px"><b>Grand Total: </b>{{grandTotal}}</td>
                                       </tr>
@@ -113,7 +111,16 @@
                                   <div>
                                <div class="form-group">
                                    <label>Credit Account</label>
-                                   <input type="text" class="form-control" :value="account" disabled>
+                                   <div class="form-group">
+                                       <label>Debit Account</label>
+                                       <model-select :options="accountsd"
+                                                     v-model="form.credit_account_id"
+                                                     :is-disabled="true"
+                                                     required>
+                                       </model-select>
+                                   </div>
+
+
                                </div>
 
                          <div class="form-group">
@@ -209,7 +216,6 @@
                 expenses: {},
                 company: false,
                 other: false,
-                fuel_types: {},
                 fuel_type: '',
                 total: 0,
                 show_fuel_type: false,
@@ -227,33 +233,26 @@
                 projects:[],
                 subprojects:[],
                 stks:{},
-                fuel_categories:{},
                 accounts:[],
+                accountsd:[],
                 show_issue:false,
                 show_inv:false,
-                account:''
+                account:'',
+                charges:{}
 
             }
         },
         created() {
+            this.getAllDetails();
+            this.getProjects();
+            this.getAccounts();
             this.listen();
-            this.getCustomers();
-            this.getVehicles();
-            this.getDrivers();
-            this.getExpenses();
-            this.getFuelTypes();
             this.assetType();
             this.getParts();
-            this.getCustomerTypes();
-            this.getJobcards();
-            this.getFuels();
-            this.getProjects();
             this.creditAccount();
-            this.getFuelCategories();
-            this.getAccounts();
+            this.getAccountsDebit();
 
-
-        },
+            },
        watch:{
         'form.fuel_category_id'(){
             if (this.form.fuel_category_id=='stock_issue') {
@@ -274,11 +273,7 @@
             }
         },
          'form.vehicle_id'(){
-             this.jobs = {};
-             axios.get('job-card')
-                 .then(res => {
-                     this.jobs = res.data.filter(f => f.machine_id ==this.form.vehicle_id);
-                 })
+           this.jobs = this.jobcards.filter(f => f.machine_id ==this.form.vehicle_id);
          }
        },
         mounted: function () {
@@ -306,8 +301,8 @@
 
             grandTotal(){
                 let total = 0;
-                if (this.totalAmount > 0 || this.genExpenses() > 0){
-                    total += parseFloat(this.totalAmount) + parseFloat(this.genExpenses());
+                if (this.totalAmount > 0){
+                    total += parseFloat(this.totalAmount);
                 }
                 return total.toFixed(2);
             }
@@ -328,36 +323,11 @@
         })
         },
             creditAccount(){
-            axios.get('where-to-charge')
-            .then(res => {
-                if (res.data.length) {
-                 let account = res.data.find(req => req.type =='Fueling');
+                if (this.charges.length) {
+                 let account = this.charges.find(req => req.type =='Fueling');
                  this.account = account.account;
                  this.form.credit_account_id  = account.account_id;
                 }
-
-            })
-            },
-          getAccounts(){
-         axios.get('accounts')
-         .then(res => {
-            console.log(this.form.credit_account_id)
-            let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
-            console.log(accounts.length);
-            console.log(res.data.length);
-            accounts.forEach(a => {
-                this.accounts.push({
-                    'value': a.account_link,
-                    'text': a.account
-                })
-            })
-         })
-        }  ,
-           getFuelCategories(){
-          axios.get('fuel-category')
-          .then(res => {
-            this.fuel_categories = res.data;
-          })
             },
             resetCustomerType(){
             this.form.customer_type_id = '';
@@ -375,36 +345,44 @@
                 })
              })
             },
+            getAllDetails(){
+            this.fuels = this.$store.state.all_my_fuels;
+            this.customers = this.$store.state.all_my_customers;
+            this.customer_types = this.$store.state.all_my_customer_types;
+            this.jobcards = this.$store.state.all_my_jobcards;
+            this.charges = this.$store.state.all_my_charges;
+            this.parts = this.$store.state.all_my_parts;
+            this.drivers  = this.$store.state.all_my_users;
+            this.vehicles = this.$store.state.all_my_vehicles;
+
+            },
             getProjects(){
-              axios.get('asset-category')
-              .then(res => {
-                res.data.forEach(p => {
+                this.$store.state.all_my_projects.forEach(p => {
                     this.projects.push({
                         'value': p.project_link,
                         'text': p.name
                     })
                 })
-
-              })
             },
-            getFuels(){
-              axios.get('fuel')
-              .then(res => {
-                  this.fuels = res.data
-              })
+            getAccounts(){
+                  let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
+                  accounts.forEach(a => {
+                      this.accounts.push({
+                          'value': a.account_link,
+                          'text': a.account
+                      })
+                  })
             },
-            getJobcards(){
-              axios.get('job-card')
-              .then(res => {
-                  this.jobcards = res.data
-              })
-            },
-            getCustomerTypes(){
-              axios.get('customer-types')
-                .then(res => {
-                    this.customer_types = res.data;
+            getAccountsDebit(){
+                let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                accounts.forEach(a => {
+                    this.accountsd.push({
+                        'value': a.account_link,
+                        'text': a.account
+                    })
                 })
             },
+
             fuelRate(){
             setTimeout(()=>{
                 let item =this.stks.find(s => s.id == this.form.fuel_type_id);
@@ -425,25 +403,9 @@
                  })
 
             },
-            genExpenses(){
-                let total = 0;
-                if (this.form.expense_id !=='') {
-                    for (let i =0; i< this.expenses.length; i++){
-                        if (this.expenses[i]['id'] === this.form.expense_id){
-                            total += parseFloat(this.expenses[i]['cost']);
-                        }
-                    }
-                }
-                return total;
-            },
             getParts() {
-                axios.get('parts')
-                    .then(res => {
-                        this.parts = res.data
-                       this.stks = res.data.filter(p => p.code == 'LA0012' || p.code == 'LA0018');
-                    })
-
-            },
+                    this.stks = this.parts.filter(p => p.code == 'LA0012' || p.code == 'LA0018');
+                    },
             getFuelType() {
                 this.vehicles.forEach(vehicle => {
                     if (vehicle.id === this.form.vehicle_id) {
@@ -455,37 +417,7 @@
             assetType() {
                 this.other_fuel_asset ? this.other = true : this.company = true;
             },
-            getFuelTypes() {
-                axios.get('fuel-types')
-                    .then(types => {
-                        this.fuel_types = types.data;
-                    })
-            },
-            getCustomers() {
-                axios.get('customers')
-                    .then(customer => {
-                        this.customers = customer.data;
-                    })
-            },
-            getVehicles() {
-                axios.get('machines')
-                    .then(vehicle => {
-                        this.vehicles = vehicle.data;
-                    })
-            },
-            getDrivers() {
-                axios.get('users')
-                    .then(driver => {
-                        this.drivers = driver.data;
-                    })
-            },
-            getExpenses() {
-                axios.get('expense')
-                    .then(expense => {
-                        this.expenses = expense.data;
-                    })
-            },
-            convertDate(str) {
+              convertDate(str) {
                 var date = new Date(str),
                     mnth = ("0" + (date.getMonth() + 1)).slice(-2),
                     day = ("0" + date.getDate()).slice(-2);
@@ -552,20 +484,11 @@
                     this.form.previous_odometer = this.$store.state.fuels.previous_odometer;
                     this.show_rate = true;
                     this.show_customer = true;
-                    axios.get(`users/${this.form.authorized_by}`)
-                    .then(res => {
-                        this.username = res.data.name;
-                    })
 
+                    this.username = this.drivers.find(user => user.id === this.form.authorized_by).name;
                     this.form.asset_type ==='other' ? this.other =true : this.company = true;
-
-                   setTimeout(()=>{
                     this.subProject();
                     this.customerTypes();
-                    this.getCustomers();
-                    this.getVehicles();
-                    this.subProject();
-                   },4000)
                 }
             },
 

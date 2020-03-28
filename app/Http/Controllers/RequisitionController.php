@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Account;
+use App\AssetCategory;
+use App\Customer;
+use App\CustomerPriceList;
+use App\Http\Resources\MachineResource;
 use App\Http\Resources\RequisitionResource;
+use App\Machine;
+use App\Uom;
+use App\Wheretocharge;
 use Carbon\Carbon;
 use App\Requisition;
-use App\WhseStk;
 use App\Part;
 use Illuminate\Http\Request;
 use DB;
@@ -20,7 +27,17 @@ class RequisitionController extends Controller
      */
     public function index()
     {
-        return response()->json(RequisitionResource::collection(Requisition::all()));
+        return response()->json([
+            'requisitions' => RequisitionResource::collection(Requisition::all()),
+            'machines' =>  MachineResource::collection(Machine::all()),
+            'customers' => Customer::all(),
+            'parts' => Part::all(),
+            'uoms' => Uom::all(),
+            'pricelists' => CustomerPriceList::all(),
+            'accounts' => Account::all(),
+            'charges' => Wheretocharge::all(),
+            'projects' => AssetCategory::all()
+        ]);
     }
 
     /**
@@ -93,8 +110,8 @@ class RequisitionController extends Controller
          $reverse_items_details.="<row>
                           <INV_TYPE>C</INV_TYPE>
                           <INV_TRCODE>0</INV_TRCODE>
-                          <DR_CODE>$req_details->credit_account_id</DR_CODE>
-                          <CR_CODE>$request->where_to_charge</CR_CODE>
+                          <DR_CODE>$request->credit_account_id</DR_CODE>
+                          <CR_CODE>$req_details->where_to_charge</CR_CODE>
                           <CUST_ID>0</CUST_ID>
                           <INV_DATE>$date</INV_DATE>
                           <ORDER_NO>$ref</ORDER_NO>

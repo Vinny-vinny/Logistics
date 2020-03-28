@@ -59,6 +59,7 @@
         created(){
             this.listen();
             this.getJobs();
+            this.getReqs();
         },
         methods:{
                  reverseJob(rq){
@@ -71,7 +72,28 @@
             getJobs(){
                 axios.get('job-card')
                     .then(res =>{
-                        this.tableData = res.data;
+                        this.tableData = res.data.jobcards;
+                        this.$store.dispatch('my_job_types',res.data.job_types);
+                        this.$store.dispatch('my_job_categories',res.data.jobcard_categories);
+                        this.$store.dispatch('my_customer_types',res.data.customer_types);
+                        this.$store.dispatch('my_service_types',res.data.service_types);
+                        this.$store.dispatch('my_tracks',res.data.tracks);
+                        this.$store.dispatch('my_users',res.data.users);
+                        this.$store.dispatch('my_categories',res.data.categories);
+                        this.$store.dispatch('my_mechanics',res.data.mechanics);
+                        this.$store.dispatch('my_projects',res.data.asset_categories);
+                        this.initDatable()
+                    })
+                    .catch(error => Exception.handle(error))
+                this.initDatable();
+            },
+            getReqs(){
+                axios.get('requisitions')
+                    .then(res =>{
+                        this.$store.dispatch('my_customers',res.data.customers);
+                        this.$store.dispatch('my_parts',res.data.parts);
+                        this.$store.dispatch('my_vehicles',res.data.machines);
+                        this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.initDatable()
                     })
                     .catch(error => Exception.handle(error))

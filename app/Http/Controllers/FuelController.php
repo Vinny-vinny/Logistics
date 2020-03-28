@@ -1,6 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Account;
+use App\AssetCategory;
+use App\Customer;
+use App\CustomerType;
+use App\FuelType;
+use App\Http\Resources\JobcardResource;
+use App\Http\Resources\MachineResource;
+use App\User;
+use App\Wheretocharge;
 use Carbon\Carbon;
 use App\Part;
 use App\Fuel;
@@ -22,7 +31,20 @@ class FuelController extends Controller
      */
     public function index()
     {
-        return response()->json(FuelResource::collection(Fuel::all()));
+        return response()->json([
+            'fuels'=>FuelResource::collection(Fuel::all()),
+            'customers' => Customer::all(),
+            'customer_types' => CustomerType::all(),
+            'parts' => Part::all(),
+            'vehicles' => MachineResource::collection(Machine::all()),
+            'fuel_types' => FuelType::all(),
+            'jobcards' => JobcardResource::collection(Jobcard::all()),
+            'projects' => AssetCategory::all(),
+            'charges' => Wheretocharge::all(),
+            'accounts' => Account::all(),
+            'users' => User::all()
+
+        ]);
     }
 
      /**
@@ -120,7 +142,6 @@ class FuelController extends Controller
          $details = WizPostTx::CREATE(['XMLText' => $invoice_items_details]);
          DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo_Hdr= "'.$invoice->SNo.'",@SNo_Det = "'.$details->SNo.'"');
            return response()->json(new FuelResource($fuel));
-
     return response()->json($request->all());
     }
 

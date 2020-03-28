@@ -1,12 +1,12 @@
 <template>
-    <div>       
-        <show-reversal v-if="show_reversal" :reverse="show_reversal"></show-reversal> 
+    <div>
+        <show-reversal v-if="show_reversal" :reverse="show_reversal"></show-reversal>
         <!-- Main content -->
         <section class="content" v-if="!show_reversal">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Fuel Reversals</h3>                   
+                    <h3 class="box-title">Fuel Reversals</h3>
 
                 </div>
                 <div class="box-body">
@@ -40,7 +40,7 @@
         </section>
     </div>
 </template>
-<script>  
+<script>
     import ShowReversal from "./ShowReversal";
 
     export default {
@@ -63,20 +63,20 @@
         methods: {
             reverseFuel(fuel){
              this.$store.dispatch('updateFuel',fuel)
-                    .then(() =>{                       
+                    .then(() =>{
                         this.show_reversal = true;
                         this.add_fuel=false;
                         })
             },
             getFuels() {
                 axios.get('fuel')
-                    .then(res => this.tableData = res.data.filter(f => f.reversal_ref !=='' && f.reversal_ref !==null))
+                    .then(res => this.tableData = res.data.fuels.filter(f => f.reversal_ref !=='' && f.reversal_ref !==null))
                     .catch(error => Exception.handle(error))
             },
             editFuel(fuel) {
                 this.$store.dispatch('updateFuel', fuel)
                     .then(() => {
-                       this.show_reversal = true;                        
+                       this.show_reversal = true;
                     })
             },
             deleteFuel(id) {
@@ -137,7 +137,7 @@
                 },1000)
             },
         },
-        components: {           
+        components: {
             ShowReversal
         }
     }

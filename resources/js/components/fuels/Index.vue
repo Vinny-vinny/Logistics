@@ -3,8 +3,10 @@
         <fuel v-if="add_fuel" :edit="editing" :other_fuel="add_fuel_other"
               :add_fuel="add_fuel"></fuel>
              <reversal v-if="show_reversal" :reverse="show_reversal"></reversal>
+             <show-fuel v-if="show_print && !add_fuel && !add_fuel_other && !show_reversal"></show-fuel>
+
         <!-- Main content -->
-        <section class="content" v-if="!add_fuel && !add_fuel_other && !show_reversal">
+        <section class="content" v-if="!add_fuel && !add_fuel_other && !show_reversal && !show_print">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
@@ -35,7 +37,8 @@
                             <td>
                                 <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
                                     class="fa fa-edit"></i></button>
-                                <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>
+                                <button class="btn btn-info btn-sm" @click="showPrint(fuel)"><i class="fa fa-eye"></i></button>
+<!--                                <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>-->
                                 <button v-if="!fuel.reversal_ref && fuel.fuel_category_id=='stock_issue' && fuel.status !=0" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
                             </td>
                         </tr>
@@ -49,6 +52,7 @@
 <script>
     import Fuel from "./Fuel";
     import Reversal from "./Reversal";
+    import ShowFuel from "./ShowFuel";
     export default {
         data() {
             return {
@@ -56,15 +60,13 @@
                 add_fuel: false,
                 add_fuel_other: false,
                 editing: false,
-                show_reversal:false
+                show_reversal:false,
+                show_print:false
             }
         },
         created() {
              this.getFuels();
-        },
-        mounted() {
-            this.listen();
-            this.initDatable();
+             this.listen();
         },
         methods: {
             reverseFuel(fuel){
@@ -76,8 +78,28 @@
             },
             getFuels() {
                 axios.get('fuel')
-                    .then(res => this.tableData = res.data)
+                    .then(res => {
+                        this.tableData = res.data.fuels;
+                        this.$store.dispatch('my_fuels',res.data.fuels);
+                        this.$store.dispatch('my_customers',res.data.customers);
+                        this.$store.dispatch('my_customer_types',res.data.customer_types);
+                        this.$store.dispatch('my_jobcards',res.data.jobcards);
+                        this.$store.dispatch('my_charges',res.data.charges);
+                        this.$store.dispatch('my_parts',res.data.parts);
+                        this.$store.dispatch('my_users',res.data.users);
+                        this.$store.dispatch('my_vehicles',res.data.vehicles);
+                        this.$store.dispatch('my_projects',res.data.projects);
+                        this.$store.dispatch('my_accounts',res.data.accounts);
+                        this.initDatable();
+                    })
                     .catch(error => Exception.handle(error))
+            },
+            showPrint(fuel){
+             this.$store.dispatch('updateCustomer',this.$store.state.all_my_customers.find(c => c.id === fuel.customer_id));
+             this.$store.dispatch('updateFuel',fuel)
+                .then(() =>{
+                 this.show_print = true;
+                })
             },
             editFuel(fuel) {
                 this.$store.dispatch('updateFuel', fuel)
@@ -109,6 +131,7 @@
                     this.add_fuel_other = false;
                     this.editing = false;
                     this.show_reversal = false;
+                    this.show_print = false;
                     this.getFuels();
                     this.initDatable();
                 });
@@ -147,7 +170,8 @@
         },
         components: {
             Fuel,
-            Reversal
+            Reversal,
+            ShowFuel
         }
     }
 </script>

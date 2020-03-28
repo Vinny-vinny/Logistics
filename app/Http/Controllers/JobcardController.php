@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\AssetCategory;
+use App\Category;
 use App\Charge;
+use App\CustomerType;
 use App\Http\Resources\JobcardResource;
 use App\Http\Resources\MaintenanceResource;
 use App\Jobcard;
 use App\JobcardFile;
+use App\JobType;
 use App\Machine;
+use App\Mechanic;
 use App\Requisition;
 use App\Part;
 use App\Customer;
 use App\JobcardCategory;
+use App\ServiceType;
+use App\TrackBy;
 use App\Transaction;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
@@ -31,7 +39,22 @@ class JobcardController extends Controller
      */
     public function index()
     {
-      return response()->json(JobcardResource::collection(Jobcard::all()));
+      return response()->json([
+          'jobcards' =>JobcardResource::collection(Jobcard::all()),
+          'customer_types' => CustomerType::all(),
+          'customers' => Customer::all(),
+          'mechanics' => Mechanic::all(),
+          'jobcard_categories' => JobcardCategory::all(),
+          'asset_categories' => AssetCategory::all(),
+          'job_types' => JobType::all(),
+          'categories' => Category::all(),
+          'service_types' => ServiceType::all(),
+          'tracks' => TrackBy::all(),
+          'users' => User::all(),
+          'parts' => Part::all(),
+          'vehicles' => Machine::all(),
+          'requisitions' => Requisition::all()
+      ]);
     }
 
     /**
@@ -85,13 +108,13 @@ class JobcardController extends Controller
 
     public function addInvoice($id)
     {
-    InvoiceRepo::init()->generateInvoice($id);
+   //InvoiceRepo::init()->generateInvoice($id);
     }
    //Invoice Jobcard Items
     public function invoiceJob(Request $request){
         $date = Carbon::now()->format('Y-m-d');
         $job_details =Jobcard::find($request->get('id'));
-       // $job_details->update(['invoiced' =>1]);
+       $job_details->update(['invoiced' =>1]);
         $req_details =Requisition::find($job_details->requisition_id);
         $inv_code = $job_details->category->inv_item->transaction_id;
         $stk_code = $job_details->category->stk_item->transaction_id;
@@ -131,7 +154,6 @@ class JobcardController extends Controller
                                   <LABOUR_COST>$job_details->labour_cost</LABOUR_COST>
                                   </row>";
           $invoice_items_details.="</root>";
-        return response()->json($invoice_items_details);
          $invoice = WizPostTx::CREATE(['XMLText' => $invoice_xml]);
          $details = WizPostTx::CREATE(['XMLText' => $invoice_items_details]);
          DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo_Hdr= "'.$invoice->SNo.'",@SNo_Det = "'.$details->SNo.'"');
@@ -172,7 +194,7 @@ class JobcardController extends Controller
                               <VAT_RATE>16</VAT_RATE>
                               <LINE_DISC>0</LINE_DISC>
                               </row>";
-         return response()->json($reverse_items_details);
+         //return response()->json($reverse_items_details);
          }
          $reverse_items_details.="</root>";
         $invoice_reversal = WizPostTx::CREATE(['XMLText' => $reverse_xml]);

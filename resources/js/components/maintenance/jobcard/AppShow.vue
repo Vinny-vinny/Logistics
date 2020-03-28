@@ -378,13 +378,13 @@
             getRequisitions(){
               axios.get('requisitions')
               .then(res => {
-                  this.requisitions = res.data;
+                  this.requisitions = res.data.requisitions;
               })
             },
             getJob(){
               axios.get('job-card')
               .then(res => {
-                  this.job = res.data.find(j => j.id == this.$route.params['id']);
+                  this.job = res.data.jobcards.find(j => j.id == this.$route.params['id']);
                   this.cost_at = this.job.current_readings;
                   this.track_by = this.job.track_name;
                   axios.get('customers')
@@ -423,7 +423,7 @@
                    if (this.job.requisition_id){
                        axios.get('requisitions')
                        .then(res => {
-                        let req = res.data.find(r => r.id == this.job.requisition_id);
+                        let req = res.data.requisitions.find(r => r.id == this.job.requisition_id);
                         this.requisition = req;
                         if (req.type =='Internal'){
                             this.requisition_type = 'Internal';
@@ -497,7 +497,7 @@
                    this.has_fuel = true;
                     axios.get('fuel')
                     .then(res => {
-                        this.fuel_docket = res.data.find(f => f.id == this.job.fuel);
+                        this.fuel_docket = res.data.fuels.find(f => f.id == this.job.fuel);
                         if (this.fuel_docket.expense_id){
                             this.has_othercharges = true;
                             axios.get('expense')

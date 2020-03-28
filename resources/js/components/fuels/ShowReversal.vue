@@ -374,7 +374,7 @@
             getFuels(){
               axios.get('fuel')
               .then(res => {
-                  this.fuels = res.data
+                  this.fuels = res.data.fuels;
               })
             },
             getJobcards(){

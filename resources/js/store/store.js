@@ -39,7 +39,26 @@ export default new Vuex.Store({
         fuel_categories:{},
         charges:{},
         req_data:{},
-        all_charges:{}
+        all_charges:{},
+        all_my_parts:{},
+        all_my_customers:{},
+        all_my_vehicles:{},
+        all_my_uoms:{},
+        all_my_pricelists:{},
+        all_my_reqs:{},
+        all_my_job_types:{},
+        all_my_jobcards:{},
+        all_my_charges:{},
+        all_my_users:{},
+        all_my_customer_types:{},
+        all_my_fuels:{},
+        all_my_projects:{},
+        all_my_accounts:{},
+        all_my_job_categories:{},
+        all_my_service_types:{},
+        all_my_tracks:{},
+        all_my_categories:{},
+        all_my_mechanics:{}
     },
     mutations:{
      pathTo(state, to) {
@@ -146,6 +165,63 @@ export default new Vuex.Store({
         },
         updateCharges(state,charge){
          state.all_charges = charge;
+        },
+        my_parts(state,data){
+         state.all_my_parts = data;
+        },
+        my_customers(state,data){
+            state.all_my_customers = data;
+        },
+        my_vehicles(state,data){
+         state.all_my_vehicles = data;
+        },
+        my_uoms(state,data){
+         state.all_my_uoms = data;
+        },
+        my_pricelists(state,data){
+         state.all_my_pricelists = data;
+        },
+        my_reqs(state,data){
+         state.all_my_reqs = data;
+        },
+        my_job_types(state,data){
+         state.all_my_job_types = data;
+        },
+        my_jobcards(state,data){
+         state.all_my_jobcards = data;
+        },
+        my_charges(state,data){
+         state.all_my_charges = data;
+        },
+        my_users(state,data){
+         state.all_my_users = data;
+        },
+        my_customer_types(state,data){
+         state.all_my_customer_types = data;
+        },
+        my_fuels(state,data){
+         state.all_my_fuels = data;
+        },
+        my_projects(state,data){
+         state.all_my_projects = data;
+        },
+        my_accounts(state,data){
+         state.all_my_accounts = data;
+        },
+        my_job_categories(state,data){
+         state.all_my_job_categories = data;
+        },
+        my_service_types(state,data){
+         state.all_my_service_types = data;
+        },
+        my_tracks(state,data){
+         state.all_my_tracks = data;
+        },
+        my_categories(state,data){
+         state.all_my_categories = data;
+        },
+        my_mechanics(state,data){
+         state.all_my_mechanics = data;
         }
     },
     actions:{
@@ -253,6 +329,64 @@ export default new Vuex.Store({
         },
         updateCharges({commit},charge){
         commit('updateCharges',charge);
+        },
+        my_parts({commit},data){
+        commit('my_parts',data);
+        },
+        my_customers({commit},data){
+        commit('my_customers',data);
+        },
+        my_vehicles({commit},data){
+         commit('my_vehicles',data);
+        },
+        my_uoms({commit},data){
+         commit('my_uoms',data);
+        },
+        my_pricelists({commit},data){
+        commit('my_pricelists',data);
+        },
+        my_reqs({commit},data){
+        commit('my_reqs',data);
+        },
+        my_job_types({commit},data){
+        commit('my_job_types',data);
+        },
+        my_jobcards({commit},data){
+        commit('my_jobcards',data);
+        },
+        my_charges({commit},data){
+        commit('my_charges',data);
+        },
+        my_users({commit},data){
+        commit('my_users',data);
+        },
+        my_customer_types({commit},data){
+        commit('my_customer_types',data)
+        },
+        my_fuels({commit},data){
+        commit('my_fuels',data);
+        },
+        my_projects({commit},data){
+        commit('my_projects',data);
+        },
+        my_accounts({commit},data){
+        commit('my_accounts',data);
+        },
+        my_job_categories({commit},data){
+        commit('my_job_categories',data);
+        },
+        my_service_types({commit},data){
+        commit('my_service_types',data);
+        },
+        my_tracks({commit},data){
+        commit('my_tracks',data);
+        },
+        my_categories({commit},data){
+        commit('my_categories',data);
+        },
+        my_mechanics({commit},data){
+        commit('my_mechanics',data);
         }
+
     }
 })

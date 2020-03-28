@@ -1,6 +1,6 @@
 <template>
-    <div>       
-        <show-reversal v-if="show_reversal" :reverse="show_reversal"></show-reversal>         
+    <div>
+        <show-reversal v-if="show_reversal" :reverse="show_reversal"></show-reversal>
         <!-- Main content -->
         <section class="content" v-if="!add_jobcard && !show_form && !show_reversal">
             <!-- Default box -->
@@ -38,26 +38,26 @@
         </section>
     </div>
 </template>
-<script>    
-    import ShowReversal from "./ShowReversal";   
+<script>
+    import ShowReversal from "./ShowReversal";
     export default {
         data(){
             return {
                 tableData: [],
                 add_jobcard: false,
                 editing: false,
-                show_form:false,               
-                show_reversal:false         
+                show_form:false,
+                show_reversal:false
             }
         },
         created(){
             this.listen();
             this.getJobs();
-        },    
+        },
         methods:{
                  reverseJob(rq){
             this.$store.dispatch('updateJobcard',rq)
-                    .then(() =>{                       
+                    .then(() =>{
                         this.show_reversal = true;
                         this.add_jobcard=false;
                     })
@@ -65,7 +65,20 @@
             getJobs(){
                 axios.get('job-card')
                     .then(res =>{
-                        this.tableData = res.data.filter(job => job.reversal_ref !=='' && job.reversal_ref !==null);
+                        this.tableData = res.data.jobcards.filter(job => job.reversal_ref !=='' && job.reversal_ref !==null);
+                        this.$store.dispatch('my_job_types',res.data.job_types);
+                        this.$store.dispatch('my_job_categories',res.data.jobcard_categories);
+                        this.$store.dispatch('my_customer_types',res.data.customer_types);
+                        this.$store.dispatch('my_customers',res.data.customers);
+                        this.$store.dispatch('my_service_types',res.data.service_types);
+                        this.$store.dispatch('my_tracks',res.data.tracks);
+                        this.$store.dispatch('my_users',res.data.users);
+                        this.$store.dispatch('my_categories',res.data.categories);
+                        this.$store.dispatch('my_mechanics',res.data.mechanics);
+                        this.$store.dispatch('my_projects',res.data.asset_categories);
+                        this.$store.dispatch('my_parts',res.data.parts);
+                        this.$store.dispatch('my_vehicles',res.data.vehicles);
+                        this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.initDatable()
                     })
                     .catch(error => Exception.handle(error))
@@ -148,7 +161,7 @@
             },
         },
         components:{
-            ShowReversal            
+            ShowReversal
         }
     }
 </script>

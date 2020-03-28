@@ -86,7 +86,7 @@
                 let items;
                 axios.get('requisitions')
                 .then(res => {
-                    this.requisition = res.data.find(req => req.id == this.$route.params['id']);
+                    this.requisition = res.data.requisitions.find(req => req.id == this.$route.params['id']);
                    if (this.requisition.type ==='Internal'){
                        items = this.requisition.inventory_items_internal;
                    }

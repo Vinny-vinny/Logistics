@@ -1,14 +1,14 @@
 <template>
     <div>
         <requisition v-if="add_requisition && !show_form" :edit="editing"></requisition>
-     
+
         <!-- Main content -->
         <section class="content" v-if="!add_requisition && !show_form && !show_reversal">
             <!-- Default box -->
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Reversed Requisitions</h3>
-                  
+
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt" style="width:100%">
@@ -60,7 +60,18 @@
         methods:{
                 getRequisitions(){
                 axios.get('requisitions')
-                    .then(res => this.tableData = res.data.filter(req => req.reversal_ref !=='' && req.reversal_ref !==null))
+                    .then(res => {
+                        this.tableData = res.data.requisitions.filter(req => req.reversal_ref !=='' && req.reversal_ref !==null)
+                        this.$store.dispatch('my_customers',res.data.customers);
+                        this.$store.dispatch('my_vehicles',res.data.machines);
+                        this.$store.dispatch('my_parts',res.data.parts);
+                        this.$store.dispatch('my_uoms',res.data.uoms);
+                        this.$store.dispatch('my_pricelists',res.data.pricelists);
+                        this.$store.dispatch('my_reqs',res.data.requisitions);
+                        this.$store.dispatch('my_accounts',res.data.accounts);
+                        this.$store.dispatch('my_charges',res.data.charges);
+                        this.$store.dispatch('my_projects',res.data.projects);
+                    })
                     .catch(error => Exception.handle(error))
                 this.initDatable();
             },
@@ -70,9 +81,9 @@
                         this.editing=true;
                         this.add_requisition=true;
                     })
-            },           
+            },
             listen(){
-                eventBus.$on('listReqs',(rq) =>{                  
+                eventBus.$on('listReqs',(rq) =>{
                     this.tableData.unshift(rq);
                     this.add_requisition =false;
                     this.initDatable();
@@ -123,7 +134,7 @@
         },
         components:{
             Requisition,
-          
+
         }
     }
 </script>

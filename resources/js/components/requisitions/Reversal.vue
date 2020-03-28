@@ -73,6 +73,7 @@
                            <label>Credit Account</label>
                            <model-select :options="accounts"
                             v-model="form.where_to_charge"
+                             :is-disabled="true"
                             placeholder="Where to charge"
                             >
                             </model-select>
@@ -80,7 +81,11 @@
 
                          <div class="form-group">
                             <label>Debit Account</label>
-                           <input type="text" class="form-control" v-model="form.account" disabled>
+                             <model-select :options="accountsd"
+                              v-model="form.credit_account_id"
+                             >
+                             </model-select>
+
                         </div>
                        </div>
                    </fieldset>
@@ -225,7 +230,7 @@
                     account:'',
                     group_name:'',
                     credit_account_id:'',
-                     subproject_id:'',
+                    subproject_id:'',
                     inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
                     inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
                     id:''
@@ -256,23 +261,19 @@
                 external_reqs:[],
                 internal_reqs:[],
                 requisition:{},
-                subprojects:[]
+                subprojects:[],
+                accountsd:[]
             }
         },
         created(){
+            this.getAllDetails();
             this.listen();
             this.getProjects();
-            this.getParts();
-            this.getUsers();
             this.getGroups();
-            this.getStks();
             this.creditAccount();
             this.getAccounts();
-            this.getUoms();
             this.getCustomers();
-            this.getPriceLists();
-            this.getRequistion();
-            this.getVehicles();
+            this.getAccountsDebit();
            },
         watch:{
             'form.project_id'(){
@@ -438,15 +439,17 @@
         },
 
         methods:{
-            getVehicles() {
-                axios.get('machines')
-                    .then(vehicle => {
-                        this.vehicles = vehicle.data;
+            getAllDetails(){
+                this.all_customers = this.$store.state.all_my_customers;
+                this.pricelists = this.$store.state.all_my_pricelists;
+                this.units = this.$store.state.all_my_uoms;
+                this.users = this.$store.state.all_my_users;
+                this.parts = this.$store.state.all_my_parts;
+                this.vehicles = this.$store.state.all_my_vehicles;
 
-                    })
             },
+
             subProject(){
-                console.log('wallala')
                 this.subprojects =[];
                 let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.project_id);
                 subp.forEach(p => {
@@ -465,16 +468,14 @@
          })
           },
             creditAccount(){
-            axios.get('where-to-charge')
-            .then(res => {
-                if (res.data.length) {
-                 let account = res.data.find(req => req.type =='Requisition');
+                  if (this.$store.state.all_my_charges.length) {
+                 let account = this.$store.state.all_my_charges.find(req => req.type =='Requisition');
+               // console.log(account)
+                 //this.form.account = this.$store.state.all_my_accounts.;
 
-                 this.form.account = account.account;
                  this.form.credit_account_id  = account.account_id;
                 }
 
-            })
             },
             resetAccount(){
             this.form.where_to_charge = '';
@@ -489,44 +490,35 @@
             })
             },
             getCustomers(){
-            axios.get('customers')
-            .then(res => {
-                this.all_customers = res.data;
-               // console.log(this.all_customers.length)
-                res.data.forEach(c => {
+                this.all_customers.forEach(c => {
                     this.customers.push({
                         'value': c.id,
                         'text': c.name
                     })
                 })
-            })
-            },
-            getUoms(){
-            axios.get('uom')
-            .then(res => {
-                 this.units =  res.data;
-               // console.log(this.units)
 
-            })
             },
+
         getAccounts(){
-         axios.get('accounts')
-         .then(res => {
-           let accounts = res.data.filter(acc => acc.account_link !==this.form.credit_account_id)
+           let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
             accounts.forEach(a => {
                 this.accounts.push({
                     'value': a.account_link,
                     'text': a.account
                 })
             })
-         })
-        }  ,
-        getStks(){
-         axios.get('requisitions')
-         .then(res => {
-            this.stks = res.data.requisitions
-         })
-        }  ,
+
+        },
+            getAccountsDebit(){
+                let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                accounts.forEach(a => {
+                    this.accountsd.push({
+                        'value': a.account_link,
+                        'text': a.account
+                    })
+                })
+
+            },
             costing(cost){
             return cost;
             },
@@ -589,18 +581,7 @@
                     })
                 })
             },
-            getUsers(){
-              axios.get('users')
-                  .then(users => {
-                      this.users = users.data;
-                  })
-            },
-            getParts(){
-              axios.get('parts')
-                  .then(parts => {
-                      this.parts = parts.data;
-                  })
-            },
+
             convertDate(str) {
                 var date = new Date(str),
                     mnth = ("0" + (date.getMonth() + 1)).slice(-2),
@@ -621,16 +602,13 @@
                 this.form.inventory_items_external.push({part: '',uom:'', quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''});
             },
             getProjects(){
-              axios.get('asset-category')
-                  .then(project => {
-                    project.data.forEach(p => {
+                    this.$store.state.all_my_projects.forEach(p => {
                      this.projects.push({
                         'value': p.project_link,
                         'text': p.name
                      })
                     })
 
-                  })
             },
             saveRequisition(){
           this.inventory_items_reversal = [];
@@ -688,7 +666,7 @@
             },
                 update(){
                   this.show_text = true;
-                axios.post(`rev-reqs`,{'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id})
+                axios.post(`rev-reqs`,{'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id,'credit_account_id':this.form.credit_account_id})
                     .then(res => {
                          this.show_reversal = false;
                          this.reverse_req = false;
@@ -702,13 +680,9 @@
             },
             listen(){
                  this.form = this.$store.state.requisitions;
-                 console.log(this.form);
-                   setTimeout(()=>{
-                   this.selectedGroup();
-                   this.getCustomers();
-                   this.getParts();
-                   },5000)
-                 },
+                this.subProject();
+                this.selectedGroup();
+                },
         },
         components:{
             datepicker,

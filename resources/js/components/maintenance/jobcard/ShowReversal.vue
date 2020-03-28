@@ -423,24 +423,13 @@
             this.initDate();
         },
         created() {
-            this.listen();
-            this.getMachines();
-            this.getUsers();
-            this.getTracks();
-            this.getServiceTypes();
-            this.getParts();
+            this.getAllDetails();
             this.getCategories();
-            this.getProjects();
-            this.getJobCategories();
             this.getMechanics();
-            this.getJobtypes();
-            this.getCustomers();
-            this.getRequisitions();
+            this.getProjects();
+            this.getParts();
             this.filteredRqs();
-            this.getCustomerTypes();
-
-
-
+            this.listen();
         },
         filters: {
             moment: function (date) {
@@ -472,13 +461,22 @@
 
         },
         methods: {
+            getAllDetails(){
+                this.customers = this.$store.state.all_my_customers;
+                this.requisitions = this.$store.state.all_my_reqs;
+                this.parts = this.$store.state.all_my_parts;
+                this.machines = this.$store.state.all_my_vehicles;
+                this.job_categories = this.$store.state.all_my_job_categories;
+                this.customer_types = this.$store.state.all_my_customer_types;
+                this.services = this.$store.state.all_my_service_types;
+                this.tracks = this.$store.state.all_my_tracks;
+                this.users = this.$store.state.all_my_users;
+                this.job_types = this.$store.state.all_my_job_types;
+            },
+
               selectedGroup(){
-
-
                 let items=[];
                  items = this.parts.filter(item => item.item_group == this.form.group_name);
-
-
                       this.items = [];
                 if (Object.values(this.form.inventory_items_external[0])[0] !== '') {
                      for (let i = 0; i < this.form.inventory_items_external.length; i++) {
@@ -501,16 +499,13 @@
 
             },
                getParts(){
-              axios.get('parts')
-                  .then(parts => {
-                    parts.data.forEach( p =>{
+                    this.parts.forEach( p =>{
                         this.items.push({
                             'value': p.id,
                             'text': p.item_group +'-'+p.description
                         })
                     })
 
-                  })
             },
 
             getJobDetails(){
@@ -555,21 +550,14 @@
                 })
              })
             },
-            getCustomerTypes() {
-                axios.get('customer-types')
-                    .then(res => {
-                        this.customer_types = res.data;
-                    })
-            },
+
             filteredRqs() {
-                axios.get('requisitions')
-                    .then(rq => {
-                        for (let i = 0; i < rq.data.length; i++) {
-                            if (rq.data[i]['used'] == 0 || rq.data[i]['used'] == null && rq.data[i]['type'] !==null) {
-                                this.rqs.push(rq.data[i]);
-                            }
-                        }
-                    })
+                for (let i = 0; i < this.requisitions.length; i++) {
+                    if (this.requisitions[i]['used'] == 0 || this.requisitions[i]['used'] == null && this.requisitions[i]['type'] !==null) {
+                        this.rqs.push(this.requisitions[i]);
+                    }
+                }
+
             },
             getDetails() {
                 // this.show_inventory = true;
@@ -588,18 +576,12 @@
                 // }
 
               },
-            getRequisitions() {
-                axios.get('requisitions')
-                    .then(rq => {
-                        this.requisitions = rq.data
-                    })
-            },
+
             customerType() {
                 this.filtered_customers = [];
                 this.show_customers = true;
-               setTimeout(()=>{
                 if (this.form.customer_type_id) {
-                      let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
+                let customers = this.customers.filter(c => c.customer_type_id == this.form.customer_type_id);
                  customers.forEach(cus => {
                     this.filtered_customers.push({
                         'value': cus.id,
@@ -607,48 +589,22 @@
                     })
                  });
                 }
-
-               },500)
-            },
-            getCustomers() {
-                axios.get('customers')
-                    .then(customers => {
-                        this.customers = customers.data;
-                    })
-            },
-            getJobtypes() {
-                axios.get('job-types')
-                    .then(res => {
-                        this.job_types = res.data;
-                    })
             },
             getMechanics() {
-                axios.get('mechanics')
-                    .then(res => {
-                        res.data.forEach(m => {
-                            this.mechanics.push({
-                                'value': m.id,
-                                'text': m.name
-                            })
-                        })
+                this.$store.state.all_my_mechanics.forEach(m => {
+                    this.mechanics.push({
+                        'value': m.id,
+                        'text': m.name
                     })
-            },
-            getJobCategories() {
-                axios.get('jobcard-category')
-                    .then(category => {
-                        this.job_categories = category.data;
-                    })
+                })
             },
             getProjects() {
-               axios.get('asset-category')
-              .then(res => {
-                res.data.forEach(p => {
+                this.$store.state.all_my_projects.forEach(p => {
                     this.projects.push({
                         'value': p.project_link,
                         'text': p.name
                     })
                 })
-              })
             },
             addService(i) {
                 this.form.service_required.push({
@@ -686,15 +642,12 @@
                 this.inventory_items_external.splice(i, 1);
             },
             getCategories() {
-                axios.get('categories')
-                    .then(category => {
-                        category.data.forEach(c => {
-                            this.categories.push({
-                                'value': c.id,
-                                'text': c.name
-                            })
-                        })
+                this.$store.state.all_my_categories.forEach(c => {
+                    this.categories.push({
+                        'value': c.id,
+                        'text': c.name
                     })
+                })
             },
               nextReadings() {
                 this.services.forEach(service => {
@@ -779,37 +732,11 @@
                 })
                     .catch(error => error.response)
             },
-            getMachines() {
-                axios.get('machines')
-                    .then(machines => {
-                        this.machines = machines.data;
-                    })
-            },
-            getTracks() {
-                axios.get('track-by')
-                    .then(tracks => {
-                        this.tracks = tracks.data;
-                    })
-            },
-
-            getServiceTypes() {
-                axios.get('service-types')
-                    .then(service_types => {
-                        this.services = service_types.data;
-                    })
-            },
-            getUsers() {
-                axios.get('users')
-                    .then(users => {
-                        this.users = users.data;
-                    })
-            },
             cancel() {
                 eventBus.$emit('cancel')
             },
             listen() {
                     this.form = this.$store.state.job_card;
-                   console.log(this.form)
                     this.form.service_type = this.$store.state.job_card.service_type;
                     this.show_track_by = true;
                     this.track_name = this.$store.state.job_card.track_name;
@@ -821,28 +748,30 @@
                     this.status = this.$store.state.job_card.status;
                     this.show_customers = true;
 
+                this.ServiceTypes();
+                this.subProject();
+                this.customerType();
 
-                     setTimeout(()=>{
-                     this.subProject();
-                     this.customerType();
-                   //  this.getCustomers();
-                     this.ServiceTypes();
-                     //this.getMachines();
-                     },3000)
-
+                if (this.form.requisition_id) {
+                    this.disable_rq = true;
+                    this.show_inventory = true;
+                    this.editedRequisitions();
+                }
 
             },
-
+            editedRequisitions() {
+                this.rqs = [];
+                let req = this.requisitions.find(rq => rq.id ==this.form.requisition_id);
+                this.filtered_rq ='External';
+                this.inventory_items_external = req.inventory_items_external;
+            },
             ServiceTypes() {
-                axios.get('service-types')
-                    .then(res => {
-                        for (let i = 0; i < res.data.length; i++) {
-                            if (res.data[i]['id'] === this.form.service_type_id) {
-                                this.service_after = res.data[i]['service_after'];
-                                this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
-                            }
-                        }
-                    });
+                for (let i = 0; i < this.service_types.length; i++) {
+                    if (this.service_types[i]['id'] === this.form.service_type_id) {
+                        this.service_after = this.service_types[i]['service_after'];
+                        this.form.next_readings = parseFloat(this.form.current_readings) + parseFloat(this.service_after);
+                    }
+                }
             },
 
         },

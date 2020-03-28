@@ -70,7 +70,7 @@ class PartsController extends Controller
             $inserted[] = Part::create([
                 'code' => $asset->Code,
                 'description' => $asset->Description_1,
-                'cost' => $asset->AveUCst==0 ? $faker->unique()->numberBetween(10,2000) : $asset->AveUCst,
+                'cost' => $asset->AveUCst==0 ? $faker->unique()->numberBetween(10,200000) : $asset->AveUCst,
                 'stock_link' => $asset->StockLink,
                 'item_group' => $asset->ItemGroup,
                 'uom_stock_id' => $asset->iUOMStockingUnitID,

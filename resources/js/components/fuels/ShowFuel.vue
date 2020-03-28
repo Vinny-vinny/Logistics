@@ -8,7 +8,7 @@
                     <img src="/images/lewa.jpg" alt="Lewa Logo">
                     <h2  style="margin-left: 20px;">Fuel Issue Docket</h2>
                     <div style="height: 100%;margin-left: 100px">
-                        <table>
+                        <table v-if="checkCustomer()">
                             <tr><td><b>&nbsp;&nbsp;&nbsp; {{customer.name}}</b></td></tr>
                             <tr v-if="customer.address"><td><b>Address</b>: &nbsp;&nbsp;&nbsp;{{customer.address}}</td></tr>
                             <tr v-if="customer.telephone"><td><b>Telephone</b>: &nbsp;&nbsp;&nbsp;{{customer.telephone}}</td></tr>
@@ -82,7 +82,7 @@
                <div class="row print">
                    <div class="form-group">
                        <button class="btn btn-primary" @click="print()" style="margin-left: 50px;"> <i class="fa fa-print"></i> Print</button>
-                       <router-link to="/fuel" class="btn btn-outline-warning"> Back</router-link>
+                       <button @click="back()" class="btn btn-outline-warning"> Back</button>
                    </div>
                </div>
             </div>
@@ -103,18 +103,18 @@
             }
         },
         created(){
-            this.getFuel();
+         this.getAllDeatils();
         },
         methods:{
-            getFuel(){
-              axios.get('fuel')
-                .then(res => {
-                    this.fuel = res.data.find(f => f.id == this.$route.params['id']);
-                    axios.get('customers')
-                    .then(res => {
-                     this.customer = res.data.find(c => c.id == this.fuel.customer_id);
-                    })
-                })
+            back(){
+              eventBus.$emit('cancel');
+            },
+            getAllDeatils(){
+              this.fuel = this.$store.state.fuels;
+              this.customer = this.$store.state.customers;
+            },
+            checkCustomer(){
+              return  this.customer !==undefined;
             },
             print(){
                 window.print();

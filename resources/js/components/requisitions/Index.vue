@@ -58,7 +58,12 @@
                 editing: false,
                 show_form:false,
                 show_reversal:false,
-                show_req_form:false
+                show_req_form:false,
+                customers:{},
+                vehicles:{},
+                parts:{},
+                uoms:{},
+                pricelists:{}
             }
         },
         created(){
@@ -77,11 +82,24 @@
             },
             getRequisitions(){
                 axios.get('requisitions')
-                    .then(res => this.tableData = res.data)
+                    .then(res => {
+                        this.tableData = res.data.requisitions;
+                        this.$store.dispatch('my_customers',res.data.customers);
+                        this.$store.dispatch('my_vehicles',res.data.machines);
+                        this.$store.dispatch('my_parts',res.data.parts);
+                        this.$store.dispatch('my_uoms',res.data.uoms);
+                        this.$store.dispatch('my_pricelists',res.data.pricelists);
+                        this.$store.dispatch('my_reqs',res.data.requisitions);
+                        this.$store.dispatch('my_accounts',res.data.accounts);
+                        this.$store.dispatch('my_charges',res.data.charges);
+                        this.$store.dispatch('my_projects',res.data.projects);
+
+                    })
                     .catch(error => Exception.handle(error))
                 this.initDatable();
             },
             editRequisition(rq){
+                //return alert('walla');
                 this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
                         this.editing=true;
