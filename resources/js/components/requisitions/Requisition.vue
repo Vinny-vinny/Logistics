@@ -464,6 +464,7 @@
                 this.users = this.$store.state.all_my_users;
                 this.parts = this.$store.state.all_my_parts;
                 this.vehicles = this.$store.state.all_my_vehicles;
+                console.log(this.$store.state.all_my_accounts);
 
             },
             getCustomers(){
