@@ -65,9 +65,16 @@
         created(){
             this.listen();
             this.getRequisitions();
+            this.getAllAccounts();
         },
 
         methods:{
+            getAllAccounts(){
+                axios.get('accounts')
+                    .then(res => {
+                        this.$store.dispatch('my_accounts',res.data);
+                    })
+            },
             reverseRequisition(rq){
             this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
@@ -87,7 +94,6 @@
                         this.$store.dispatch('my_uoms',res.data.uoms);
                         this.$store.dispatch('my_pricelists',res.data.pricelists);
                         this.$store.dispatch('my_reqs',res.data.requisitions);
-                        this.$store.dispatch('my_accounts',res.data.accounts);
                         this.$store.dispatch('my_charges',res.data.charges);
                         this.$store.dispatch('my_projects',res.data.projects);
 

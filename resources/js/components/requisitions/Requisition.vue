@@ -426,6 +426,7 @@
             }
         },
         methods:{
+
          issueStock(req_id){
           this.issue_text = true;
           axios.get(`issue-reqs/${req_id}`)
