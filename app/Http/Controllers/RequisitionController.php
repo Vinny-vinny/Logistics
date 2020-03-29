@@ -28,15 +28,15 @@ class RequisitionController extends Controller
     public function index()
     {
         return response()->json([
-            'requisitions' => RequisitionResource::collection(Requisition::all()),
-//            'machines' =>  MachineResource::collection(Machine::all()),
-//            'customers' => Customer::all(),
-//            'parts' => Part::all(),
-//            'uoms' => Uom::all(),
-//            'pricelists' => CustomerPriceList::all(),
-//            'accounts' => Account::all(),
-//            'charges' => Wheretocharge::all(),
-//            'projects' => AssetCategory::all()
+            'requisitions' => RequisitionResource::collection(Requisition::get()->chunk(100)),
+            'machines' =>  Machine::get()->chunk(100),
+            'customers' => Customer::get()->chunk(100),
+            'parts' => Part::get()->chunk(100),
+            'uoms' => Uom::get()->chunk(100),
+            'pricelists' => CustomerPriceList::get()->chunk(100),
+            'accounts' => Account::get()->chunk(100),
+            'charges' => Wheretocharge::get()->chunk(100),
+            'projects' => AssetCategory::get()->chunk(100)
         ]);
     }
 

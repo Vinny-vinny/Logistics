@@ -67,9 +67,6 @@
             this.$store.dispatch('loadUsers');
             this.listen();
             this.getRequisitions();
-            this.getAllAccounts();
-
-
         },
         computed:{
             get_users(){
@@ -77,14 +74,6 @@
             }
         },
         methods:{
-            getAllAccounts(){
-                console.log(this.get_users)
-                axios.get('accounts')
-                    .then(res => {
-                      console.log(res.data)
-                        this.$store.dispatch('my_accounts',res.data);
-                    })
-            },
             reverseRequisition(rq){
             this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
@@ -97,15 +86,16 @@
                 axios.get('requisitions')
                     .then(res => {
                         this.tableData = res.data.requisitions;
-                        // this.projects = res.data.projects;
-                        // this.$store.dispatch('my_customers',res.data.customers);
-                        // this.$store.dispatch('my_vehicles',res.data.machines);
-                        // this.$store.dispatch('my_parts',res.data.parts);
-                        // this.$store.dispatch('my_uoms',res.data.uoms);
-                        // this.$store.dispatch('my_pricelists',res.data.pricelists);
-                        // this.$store.dispatch('my_reqs',res.data.requisitions);
-                        // this.$store.dispatch('my_charges',res.data.charges);
-                        // this.$store.dispatch('my_projects',res.data.projects);
+                        this.projects = res.data.projects;
+                        this.$store.dispatch('my_customers',res.data.customers);
+                        this.$store.dispatch('my_vehicles',res.data.machines);
+                        this.$store.dispatch('my_parts',res.data.parts);
+                        this.$store.dispatch('my_uoms',res.data.uoms);
+                        this.$store.dispatch('my_pricelists',res.data.pricelists);
+                        this.$store.dispatch('my_reqs',res.data.requisitions);
+                        this.$store.dispatch('my_charges',res.data.charges);
+                        this.$store.dispatch('my_projects',res.data.projects);
+                        this.$store.dispatch('my_accounts',res.data.accounts);
 
                     })
                     .catch(error => Exception.handle(error))

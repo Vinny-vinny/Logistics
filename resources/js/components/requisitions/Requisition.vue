@@ -294,7 +294,6 @@
 
             },
             getExpenses(){
-
             let customer;
             let item_array = [];
             let uoms;
