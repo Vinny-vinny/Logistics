@@ -67,6 +67,9 @@
             this.$store.dispatch('loadUsers');
             this.listen();
             this.getRequisitions();
+            this.getAllAccounts();
+
+
         },
         computed:{
             get_users(){
@@ -74,6 +77,14 @@
             }
         },
         methods:{
+            getAllAccounts(){
+                console.log(this.get_users)
+                axios.get('accounts')
+                    .then(res => {
+                      console.log(res.data)
+                        this.$store.dispatch('my_accounts',res.data);
+                    })
+            },
             reverseRequisition(rq){
             this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
@@ -95,7 +106,7 @@
                         this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.$store.dispatch('my_charges',res.data.charges);
                         this.$store.dispatch('my_projects',res.data.projects);
-                        this.$store.dispatch('my_accounts',res.data.accounts);
+                       // this.$store.dispatch('my_accounts',res.data.accounts);
 
                     })
                     .catch(error => Exception.handle(error))
