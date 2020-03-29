@@ -6,6 +6,8 @@ use App\Part;
 use App\StkItem;
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PartsController extends Controller
 {
@@ -16,7 +18,14 @@ class PartsController extends Controller
      */
     public function index()
     {
-        return response()->json(Part::all());
+        if (Cache::has('parts')){
+         $parts = Cache::get('parts');
+        }
+        else{
+           $parts =  DB::table('parts')->get();
+           Cache::put('parts',$parts,3600);
+        }
+        return response()->json($parts);
     }
 
     /**

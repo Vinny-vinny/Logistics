@@ -420,9 +420,6 @@
             }
         },
         computed:{
-            get_users(){
-                return this.$store.state.get_users;
-            },
         internalType(){
         return this.form.type =='Internal';
         },
@@ -434,7 +431,6 @@
             }
         },
         methods:{
-
          issueStock(req_id){
           this.issue_text = true;
           axios.get(`issue-reqs/${req_id}`)
@@ -474,7 +470,6 @@
                 this.parts = this.$store.state.all_my_parts;
                 this.vehicles = this.$store.state.all_my_vehicles;
                 this.all_accounts = this.$store.state.all_my_accounts;
-
             },
             getCustomers(){
                 this.all_customers.forEach(c => {

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\PriceList;
 use App\CustomerPriceList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PriceListController extends Controller
 {
@@ -14,7 +16,14 @@ class PriceListController extends Controller
      */
     public function index()
     {
-        return response()->json(CustomerPriceList::all());
+        if (Cache::has('pricelists')){
+            $prices = Cache::get('pricelists');
+        }
+        else{
+            $prices =  DB::table('customer_price_lists')->get();
+            Cache::put('pricelists',$prices,3600);
+        }
+        return response()->json($prices);
     }
 
       public function importPrices()

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Account;
 use App\Ledger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 
 class AccountController extends Controller
@@ -16,7 +18,14 @@ class AccountController extends Controller
      */
     public function index()
     {
-        return response()->json(Account::get()->chunk(100));
+        if (Cache::has('accounts')){
+            $accounts = Cache::get('accounts');
+        }
+        else{
+            $accounts =  DB::table('accounts')->get();
+            Cache::put('accounts',$accounts,3600);
+        }
+        return response()->json($accounts);
     }
 
     /**

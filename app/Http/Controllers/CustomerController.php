@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Account;
 use App\Customer;
 use App\CustomerType;
 use App\SageCustomer;
@@ -9,6 +10,8 @@ use App\IclassTbl;
 
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -19,7 +22,16 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        return response()->json(Customer::get()->chunk(50));
+
+       if (Cache::has('customerss')){
+        $customers = Cache::get('customerss');
+       }
+       else{
+           $customers =  DB::table('customers')->get();
+           Cache::put('customerss',$customers,3600);
+       }
+        return response()->json($customers);
+
     }
 
     /**

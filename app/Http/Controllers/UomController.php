@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Uom;
 use App\SageUom;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class UomController extends Controller
 {
@@ -14,7 +16,14 @@ class UomController extends Controller
      */
     public function index()
     {
-        return response()->json(Uom::all());
+        if (Cache::has('uoms')){
+            $uoms = Cache::get('uoms');
+        }
+        else{
+            $uoms =  DB::table('uoms')->get();
+            Cache::put('uoms',$uoms,3600);
+        }
+        return response()->json($uoms);
     }
       public function importUom()
     {
@@ -43,7 +52,7 @@ class UomController extends Controller
         foreach ($uoms as $uom){
             $inserted[] = Uom::create([
                 'id_units' => $uom->idUnits,
-                'code' => $uom->cUnitCode,              
+                'code' => $uom->cUnitCode,
                 'description' => $uom->cUnitDescription
             ]);
 
