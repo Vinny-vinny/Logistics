@@ -475,7 +475,7 @@
 
             },
             getCustomers(){
-                this.$store.state.all_my_customers.forEach(c => {
+                this.all_customers.forEach(c => {
                     this.customers.push({
                         'value': c.id,
                         'text': c.name
