@@ -19,7 +19,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        return response()->json(Customer::all());
+        return response()->json(Customer::get()->chunk(50));
     }
 
     /**
@@ -40,10 +40,10 @@ class CustomerController extends Controller
 
        $external = IclassTbl::where('Description','not like','%staff%')->get()->map(function($e){
         return $e->IdCliClass;
-       });        
+       });
 
         $internal_customers = SageCustomer::select("DCLink","Account","Name","Contact_Person","EMail",
-            "Physical1","Physical2","Telephone","Telephone2","Fax1","Fax2","Tax_Number","Post1","Post2","iARPriceListNameID")->whereIn('iClassID',$internal)->get()->map(function($in_t){              
+            "Physical1","Physical2","Telephone","Telephone2","Fax1","Fax2","Tax_Number","Post1","Post2","iARPriceListNameID")->whereIn('iClassID',$internal)->get()->map(function($in_t){
                return [
                     'DCLink'=>$in_t->DCLink,
                     'Account'=> $in_t->Account,
@@ -61,11 +61,11 @@ class CustomerController extends Controller
                     'Post1'=> $in_t->Post1,
                     'Post2'=> $in_t->Post2,
                     'iARPriceListNameID'=> $in_t->iARPriceListNameID
-                ];            
+                ];
             });
 
         $external_customers = SageCustomer::select("DCLink","Account","Name","Contact_Person","EMail",
-            "Physical1","Physical2","Telephone","Telephone2","Fax1","Fax2","Tax_Number","Post1","Post2","iARPriceListNameID")->whereIn('iClassID',$external)->get()->map(function($ex_t){              
+            "Physical1","Physical2","Telephone","Telephone2","Fax1","Fax2","Tax_Number","Post1","Post2","iARPriceListNameID")->whereIn('iClassID',$external)->get()->map(function($ex_t){
                return [
                     'DCLink'=>$ex_t->DCLink,
                     'Account'=> $ex_t->Account,
@@ -82,8 +82,8 @@ class CustomerController extends Controller
                     'Tax_Number'=> $ex_t->Tax_Number,
                     'Post1'=> $ex_t->Post1,
                     'Post2'=> $ex_t->Post2,
-                    'iARPriceListNameID'=> $ex_t->iARPriceListNameID 
-                ];            
+                    'iARPriceListNameID'=> $ex_t->iARPriceListNameID
+                ];
             });
 
        $customers = array_merge($internal_customers->toArray(),$external_customers->toArray());
@@ -109,7 +109,7 @@ class CustomerController extends Controller
     }
     function storeCustomers($customers){
         $faker = Faker::create();
-        foreach ($customers as $customer){        
+        foreach ($customers as $customer){
             $inserted[] = Customer::create([
                 'dc_link' => $customer['DCLink'],
                 'account' => $customer['Account'] ? $customer['Account'] : $faker->word,

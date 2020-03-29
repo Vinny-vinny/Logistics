@@ -68,6 +68,7 @@
             this.listen();
             this.getRequisitions();
             this.getAllAccounts();
+            this.getAllCustomers();
 
 
         },
@@ -78,11 +79,17 @@
         },
         methods:{
             getAllAccounts(){
-                console.log(this.get_users)
                 axios.get('accounts')
                     .then(res => {
                       console.log(res.data)
                         this.$store.dispatch('my_accounts',res.data);
+                    })
+            },
+            getAllCustomers(){
+                axios.get('customers')
+                    .then(res => {
+                        //console.log(res.data)
+                        this.$store.dispatch('my_customers',res.data.customers);
                     })
             },
             reverseRequisition(rq){
@@ -98,7 +105,6 @@
                     .then(res => {
                         this.tableData = res.data.requisitions;
                         this.projects = res.data.projects;
-                        this.$store.dispatch('my_customers',res.data.customers);
                         this.$store.dispatch('my_vehicles',res.data.machines);
                         this.$store.dispatch('my_parts',res.data.parts);
                         this.$store.dispatch('my_uoms',res.data.uoms);
@@ -106,7 +112,7 @@
                         this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.$store.dispatch('my_charges',res.data.charges);
                         this.$store.dispatch('my_projects',res.data.projects);
-                       // this.$store.dispatch('my_accounts',res.data.accounts);
+                       //this.$store.dispatch('my_accounts',res.data.accounts);
 
                     })
                     .catch(error => Exception.handle(error))
