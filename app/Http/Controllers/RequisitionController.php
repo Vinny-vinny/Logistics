@@ -30,7 +30,7 @@ class RequisitionController extends Controller
         return response()->json([
             'requisitions' => RequisitionResource::collection(Requisition::get()),
             'machines' =>  Machine::get()->chunk(100),
-            'customers' => Customer::get()->chunk(100),
+            'customers' => Customer::get()->chunk(50),
             'parts' => Part::get()->chunk(100),
             'uoms' => Uom::get()->chunk(100),
             'pricelists' => CustomerPriceList::get()->chunk(100),
