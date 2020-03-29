@@ -267,6 +267,10 @@
             this.getAccounts();
             this.getCustomers();
             this.$store.dispatch('loadUsers');
+
+            setTimeout(()=>{
+                console.log(this.get_users);
+            },3000)
             },
 
         watch:{
