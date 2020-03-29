@@ -67,6 +67,10 @@
         created() {
              this.getFuels();
              this.listen();
+             this.getCustomers();
+             this.getMachines();
+             this.getAccounts();
+             this.getParts();
         },
         methods: {
             reverseFuel(fuel){
@@ -76,20 +80,40 @@
                         this.add_fuel=false;
                         })
             },
+            getCustomers(){
+              axios.get('customers')
+              .then(res => {
+                  this.$store.dispatch('my_customers',res.data);
+              })
+            },
+            getMachines(){
+                axios.get('machines')
+                    .then(res => {
+                        this.$store.dispatch('my_vehicles',res.data);
+                    })
+            },
+            getAccounts(){
+                axios.get('accounts')
+                    .then(res => {
+                        this.$store.dispatch('my_accounts',res.data);
+                    })
+            },
+            getParts(){
+                axios.get('parts')
+                    .then(res => {
+                       this.$store.dispatch('my_parts',res.data);
+                    })
+            },
             getFuels() {
                 axios.get('fuel')
                     .then(res => {
                         this.tableData = res.data.fuels;
                         this.$store.dispatch('my_fuels',res.data.fuels);
-                        this.$store.dispatch('my_customers',res.data.customers);
                         this.$store.dispatch('my_customer_types',res.data.customer_types);
                         this.$store.dispatch('my_jobcards',res.data.jobcards);
                         this.$store.dispatch('my_charges',res.data.charges);
-                        this.$store.dispatch('my_parts',res.data.parts);
                         this.$store.dispatch('my_users',res.data.users);
-                        this.$store.dispatch('my_vehicles',res.data.vehicles);
                         this.$store.dispatch('my_projects',res.data.projects);
-                        this.$store.dispatch('my_accounts',res.data.accounts);
                         this.initDatable();
                     })
                     .catch(error => Exception.handle(error))
