@@ -255,6 +255,7 @@
                 show_customer:false,
                 subprojects:[],
                 parts:{},
+                all_accounts:{}
 
             }
         },
@@ -267,11 +268,6 @@
                 this.creditAccount();
                 this.getAccounts();
                 this.getCustomers();
-            },1000)
-            this.$store.dispatch('loadUsers');
-
-            setTimeout(()=>{
-                console.log(this.$store.state.all_my_accounts);
             },1000)
             },
 
@@ -475,6 +471,7 @@
                 this.users = this.$store.state.all_my_users;
                 this.parts = this.$store.state.all_my_parts;
                 this.vehicles = this.$store.state.all_my_vehicles;
+                this.all_accounts = this.$store.state.all_my_accounts;
 
             },
             getCustomers(){
@@ -486,7 +483,7 @@
                 })
             },
         getAccounts(){
-           let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
+           let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
             accounts.forEach(a => {
                 this.accounts.push({
                     'value': a.account_link,
