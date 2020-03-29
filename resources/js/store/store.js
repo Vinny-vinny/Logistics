@@ -237,7 +237,7 @@ export default new Vuex.Store({
         axios.get('accounts')
             .then(res => {
                 commit('getAllUsers',res.data)
-            })
+            }).catch((e) => console.log(e))
         },
         updateServiceType({commit},service){
         commit('updateServiceType',service);
