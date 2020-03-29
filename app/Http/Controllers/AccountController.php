@@ -16,7 +16,7 @@ class AccountController extends Controller
      */
     public function index()
     {
-        return response()->json(Account::all());
+        return response()->json(Account::get()->chunk(200));
     }
 
     /**
