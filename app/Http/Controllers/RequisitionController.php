@@ -28,7 +28,7 @@ class RequisitionController extends Controller
     public function index()
     {
         return response()->json([
-            'requisitions' => RequisitionResource::collection(DB::table('requisitions')->get()),
+            'requisitions' => RequisitionResource::collection(Requisition::get()),
             'machines' =>  DB::table('machines')->get(),
             'charges' => DB::table('wheretocharges')->get(),
             'projects' => DB::table('asset_categories')->get()
