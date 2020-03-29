@@ -238,7 +238,9 @@
                 show_issue:false,
                 show_inv:false,
                 account:'',
-                charges:{}
+                charges:{},
+                all_accounts:{},
+                all_projects:{}
 
             }
         },
@@ -354,10 +356,12 @@
             this.parts = this.$store.state.all_my_parts;
             this.drivers  = this.$store.state.all_my_users;
             this.vehicles = this.$store.state.all_my_vehicles;
+            this.all_accounts =  this.$store.state.all_my_accounts;
+            this.all_projects = this.$store.state.all_my_projects;
 
             },
             getProjects(){
-                this.$store.state.all_my_projects.forEach(p => {
+                this.all_projects.forEach(p => {
                     this.projects.push({
                         'value': p.project_link,
                         'text': p.name
@@ -365,7 +369,7 @@
                 })
             },
             getAccounts(){
-                  let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
+                  let accounts =this.all_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
                   accounts.forEach(a => {
                       this.accounts.push({
                           'value': a.account_link,
@@ -374,7 +378,7 @@
                   })
             },
             getAccountsDebit(){
-                let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
                 accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
