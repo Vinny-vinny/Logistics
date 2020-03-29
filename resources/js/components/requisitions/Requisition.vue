@@ -267,8 +267,10 @@
                 this.getGroups();
                 this.creditAccount();
                 this.getAccounts();
-                this.getCustomers();
             },3000)
+            setTimeout(()=>{
+             this.getCustomers();
+            },4000)
             },
 
         watch:{
