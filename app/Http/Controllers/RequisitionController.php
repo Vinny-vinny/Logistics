@@ -29,14 +29,14 @@ class RequisitionController extends Controller
     {
         return response()->json([
             'requisitions' => RequisitionResource::collection(Requisition::get()),
-            'machines' =>  Machine::get()->chunk(100),
+            'machines' =>  Machine::get()->chunk(50),
             'customers' => Customer::get()->chunk(50),
-            'parts' => Part::get()->chunk(100),
-            'uoms' => Uom::get()->chunk(100),
-            'pricelists' => CustomerPriceList::get()->chunk(100),
-            'accounts' => Account::get()->chunk(100),
-            'charges' => Wheretocharge::get()->chunk(100),
-            'projects' => AssetCategory::get()->chunk(100)
+            'parts' => Part::get()->chunk(50),
+            'uoms' => Uom::get()->chunk(50),
+            'pricelists' => CustomerPriceList::get()->chunk(50),
+            'accounts' => Account::get()->chunk(50),
+            'charges' => Wheretocharge::get()->chunk(50),
+            'projects' => AssetCategory::get()->chunk(50)
         ]);
     }
 
