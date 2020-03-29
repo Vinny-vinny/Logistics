@@ -268,7 +268,7 @@
                 this.creditAccount();
                 this.getAccounts();
                 this.getCustomers();
-            },1000)
+            },3000)
             },
 
         watch:{
