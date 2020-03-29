@@ -9,7 +9,7 @@
                 </div>
                 <div class="box-body">
                     <form @submit.prevent="saveRequisition()">
-                        {{get_users}}
+
                         <div class="row">
                             <div class="col-md-6">
                             <div class="form-group">
