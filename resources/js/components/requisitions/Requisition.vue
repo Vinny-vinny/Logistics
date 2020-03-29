@@ -269,8 +269,8 @@
             this.$store.dispatch('loadUsers');
 
             setTimeout(()=>{
-                console.log(this.get_users);
-            },3000)
+                console.log(this.$store.state.all_my_accounts);
+            },1000)
             },
 
         watch:{
