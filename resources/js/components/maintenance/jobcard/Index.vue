@@ -60,6 +60,9 @@
             this.listen();
             this.getJobs();
             this.getReqs();
+            this.getCustomers();
+            this.getParts();
+            this.getMachines();
         },
         methods:{
                  reverseJob(rq){
@@ -67,6 +70,24 @@
                     .then(() =>{
                         this.show_reversal = true;
                         this.add_jobcard=false;
+                    })
+            },
+            getCustomers(){
+              axios.get('customers')
+              .then(res => {
+                  this.$store.dispatch('my_customers',res.data);
+              })
+            },
+            getParts(){
+                axios.get('parts')
+                    .then(res => {
+                        this.$store.dispatch('my_parts',res.data);
+                    })
+            },
+            getMachines(){
+                axios.get('machines')
+                    .then(res => {
+                        this.$store.dispatch('my_vehicles',res.data);
                     })
             },
             getJobs(){
@@ -90,14 +111,8 @@
             getReqs(){
                 axios.get('requisitions')
                     .then(res =>{
-                        this.$store.dispatch('my_customers',res.data.customers);
-                        this.$store.dispatch('my_parts',res.data.parts);
-                        this.$store.dispatch('my_vehicles',res.data.machines);
-                        this.$store.dispatch('my_reqs',res.data.requisitions);
-                        this.initDatable()
-                    })
-                    .catch(error => Exception.handle(error))
-                this.initDatable();
+                     this.$store.dispatch('my_reqs',res.data.requisitions)
+            }).catch(error => Exception.handle(error))
             },
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)

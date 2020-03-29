@@ -12,6 +12,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Cache;
 
 class MachineController extends Controller
 {
@@ -22,7 +23,14 @@ class MachineController extends Controller
      */
     public function index()
     {
-        return response()->json(MachineResource::collection(Machine::all()));
+        if (Cache::has('machines')){
+            $machines = Cache::get('machines');
+        }
+        else{
+            $machines =  MachineResource::collection(Machine::all());
+            Cache::put('machines',$machines,3600);
+        }
+        return response()->json($machines);
     }
     /**
      * Store a newly created resource in storage.
