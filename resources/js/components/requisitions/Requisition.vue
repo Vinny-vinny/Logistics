@@ -259,13 +259,15 @@
             }
         },
         created(){
-            this.getAllDetails();
-            this.listen();
-            this.getProjects();
-            this.getGroups();
-            this.creditAccount();
-            this.getAccounts();
-            this.getCustomers();
+            setTimeout(()=>{
+                this.getAllDetails();
+                this.listen();
+                this.getProjects();
+                this.getGroups();
+                this.creditAccount();
+                this.getAccounts();
+                this.getCustomers();
+            },1000)
             this.$store.dispatch('loadUsers');
 
             setTimeout(()=>{
