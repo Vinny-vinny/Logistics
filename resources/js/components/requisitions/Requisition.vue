@@ -260,13 +260,15 @@
             }
         },
         created(){
+            setTimeout(()=>{
                 this.getAllDetails();
                 this.listen();
                 this.getProjects();
                 this.getGroups();
                 this.creditAccount();
                 this.getAccounts();
-              this.getCustomers();
+                this.getCustomers();
+            },3000)
             },
         watch:{
             'form.type'(){
@@ -281,7 +283,6 @@
 
             },
             qty(){
-
             if (isNaN(parseFloat(this.qty)) && !isFinite(this.qty) && this.qty < 0) {
               //console.log('qqtyy....')
               this.qty = 1;
