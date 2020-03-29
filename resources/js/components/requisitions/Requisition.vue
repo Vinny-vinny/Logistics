@@ -260,19 +260,14 @@
             }
         },
         created(){
-            setTimeout(()=>{
                 this.getAllDetails();
                 this.listen();
                 this.getProjects();
                 this.getGroups();
                 this.creditAccount();
                 this.getAccounts();
-            },3000)
-            setTimeout(()=>{
-             this.getCustomers();
-            },4000)
+              this.getCustomers();
             },
-
         watch:{
             'form.type'(){
              if (this.form.type =='External') {
