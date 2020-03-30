@@ -66,8 +66,8 @@ router.beforeEach((to, from, next) => {
     next();
 });
 window.eventBus = new Vue();
-window.axios = require('axios')
-axios.defaults.baseURL ='http://lewa.local.com/api/';
+window.axios = require('axios');
+axios.defaults.baseURL ='http://localhost:8000/api/';
 
 /**
  * The following block of code may be used to automatically register your
@@ -77,7 +77,7 @@ axios.defaults.baseURL ='http://lewa.local.com/api/';
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
 window.base_url = axios.defaults.baseURL;
-window.site_url = 'http://lewa.local.com/';
+window.site_url = 'http://localhost:8000/';
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);

@@ -26,11 +26,11 @@
                     </tr>
                     <tr>
                         <td>GL Code</td>
-                        <td>{{job.costcode}}</td>
+                        <td>{{job.cost_code}}</td>
                     </tr>
                     <tr>
                         <td>Cost Code</td>
-                        <td>{{job.costcode}}</td>
+                        <td>{{job.cost_code}}</td>
                     </tr>
                     <tr>
                         <td>Cost Center</td>
@@ -366,6 +366,7 @@
             }
         },
         created() {
+
           this.getJob();
           this.getRequisitions();
         },
@@ -385,6 +386,7 @@
               axios.get('job-card')
               .then(res => {
                   this.job = res.data.jobcards.find(j => j.id == this.$route.params['id']);
+                  console.log(this.job)
                   this.cost_at = this.job.current_readings;
                   this.track_by = this.job.track_name;
                   axios.get('customers')

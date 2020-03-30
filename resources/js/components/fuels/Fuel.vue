@@ -311,10 +311,10 @@
         },
         methods: {
         InvoiceFuel(){
-            this.invoice_text = true;
+         this.invoice_text = true;
          axios.post(`invoice-fuel`,this.form)
          .then(res => {
-           eventBus.$emit('listFuels', res.data)
+           eventBus.$emit('cancel')
          })
         },
         IssueFuel(){
