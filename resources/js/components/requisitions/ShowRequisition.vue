@@ -51,10 +51,8 @@
                             <td>{{item.qty}}</td>
                             <td></td>
                         </tr>
-
                     </table>
                     <br>
-
                     <p>Section Head - Requsting Dept: &nbsp;&nbsp;&nbsp; .............................................................</p>
                     <p>HOD - Administration / Stores: &nbsp;&nbsp;&nbsp; .............................................................</p>
 

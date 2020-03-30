@@ -17,6 +17,7 @@ class CreateStkCategoriesTable extends Migration
             $table->bigIncrements('id');
              $table->string('name');
              $table->string('description');
+             $table->integer('account_link');
             $table->timestamps();
         });
     }

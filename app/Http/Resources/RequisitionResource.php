@@ -39,6 +39,7 @@ class RequisitionResource extends JsonResource
             'subproject_id' => $this->subproject_id,
             'reversal_ref' => $this->reversal_ref,
             'inventory_items_reversal' => json_decode($this->inventory_items_reversal),
+            'credit_account_id' => $this->credit_account_id
         ];
     }
 }

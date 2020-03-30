@@ -60,9 +60,16 @@
             this.getPricelists();
             this.getUoms();
             this.getParts();
+            this.getGroups();
         },
 
         methods:{
+            getGroups(){
+                axios.get('stk-groups')
+                    .then(res => {
+                        this.$store.dispatch('my_stk_groups',res.data);
+                    })
+            },
             getAllAccounts(){
                 axios.get('accounts')
                     .then(res => {

@@ -109,7 +109,7 @@
                         <li><router-link to="/jobcard-category" class="fa fa-circle-o"> Jobcard Categories</router-link></li>
                           <li style="display:none"><router-link to="/fuel-category" class="fa fa-circle-o"> Fuel Categories</router-link></li>
                         <li><router-link to="/checklist-tool" class="fa fa-circle-o"> Checklist Tools</router-link></li>
-                        <li><router-link to="/where-to-charge" class="fa fa-circle-o"> Where To Charge</router-link></li>
+                        <li style="display:none"><router-link to="/where-to-charge" class="fa fa-circle-o"> Where To Charge</router-link></li>
                         <li><router-link to="/charges" class="fa fa-circle-o"> Labour / Standing Charges</router-link></li>
                     </ul>
                 </li>

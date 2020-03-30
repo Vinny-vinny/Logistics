@@ -17,7 +17,8 @@ class StkCategorySeeder extends Seeder
         foreach ($categories as $category){
             \App\StkCategory::create([
                'name' => $category->StGroup,
-               'description' => $category->Description
+               'description' => $category->Description,
+               'account_link' => $category->StockAccLink
             ]);
         }
     }

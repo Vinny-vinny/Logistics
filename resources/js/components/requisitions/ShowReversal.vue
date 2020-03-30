@@ -201,7 +201,8 @@
                 subprojects:[],
                 accountsd:[],
                 all_charges:{},
-                all_accounts:{}
+                all_accounts:{},
+                all_stk_groups:{}
             }
         },
         created(){
@@ -227,15 +228,12 @@
 
             },
             qty(){
-
             if (isNaN(parseFloat(this.qty)) && !isFinite(this.qty) && this.qty < 0) {
               //console.log('qqtyy....')
               this.qty = 1;
             }
-
             },
             getExpenses(){
-
             let customer;
             let item_array = [];
             let uoms;
@@ -383,6 +381,7 @@
                 this.vehicles = this.$store.state.all_my_vehicles;
                 this.all_charges = this.$store.state.all_my_charges;
                 this.all_accounts = this.$store.state.all_my_accounts;
+                this.all_stk_groups = this.$store.state.all_stk_groups;
 
             },
            subProject(){
@@ -396,11 +395,11 @@
              })
             },
             creditAccount(){
-                if (this.all_charges .length) {
-                 let account = this.all_charges .find(req => req.type =='Requisition');
-                 this.account = account.account;
-                 this.form.credit_account_id  = account.account_id;
-                }
+                // if (this.all_charges .length) {
+                //  let account = this.all_charges .find(req => req.type =='Requisition');
+                //  this.account = account.account;
+                //  this.form.credit_account_id  = account.account_id;
+               // }
 
             },
             resetAccount(){
@@ -428,8 +427,8 @@
             })
         }  ,
             getAccountsDebit(){
-                let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
-                accounts.forEach(a => {
+            //let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                this.all_accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
                         'text': a.account
@@ -487,16 +486,13 @@
                     'text': p.item_group +'-'+p.description
                 })
             })
-
+          this.form.credit_account_id = this.all_stk_groups.find(g => g.name == this.form.group_name).account_link;
             },
             getGroups(){
-                axios.get('stk-groups')
-                .then(res => {
-                    res.data.forEach(stk => {
-                        this.stk_groups.push({
-                            'value': stk.name,
-                            'text': stk.name +'-'+stk.description
-                        })
+                this.all_stk_groups.forEach(stk => {
+                    this.stk_groups.push({
+                        'value': stk.name,
+                        'text': stk.name +'-'+stk.description
                     })
                 })
             },

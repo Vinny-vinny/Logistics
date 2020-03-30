@@ -78,7 +78,7 @@
                             >
                             </model-select>
                                </div>
-
+{{form.credit_account_id}}
                          <div class="form-group">
                             <label>Debit Account</label>
                              <model-select :options="accountsd"
@@ -265,7 +265,8 @@
                 accountsd:[],
                 all_charges:{},
                 all_accounts:{},
-                all_projects:{}
+                all_projects:{},
+                all_stk_group:{}
             }
         },
         created(){
@@ -450,6 +451,7 @@
                 this.all_charges = this.$store.state.all_my_charges;
                 this.all_accounts = this.$store.state.all_my_accounts;
                 this.all_projects = this.$store.state.all_my_projects;
+                this.all_stk_groups = this.$store.state.all_my_stk_groups;
             },
 
             subProject(){
@@ -471,13 +473,13 @@
          })
           },
             creditAccount(){
-                  if (this.all_charges.length) {
-                 let account = this.all_charges.find(req => req.type =='Requisition');
+                 //  if (this.all_charges.length) {
+                 // let account = this.all_charges.find(req => req.type =='Requisition');
                // console.log(account)
                  //this.form.account = this.$store.state.all_my_accounts.;
 
-                 this.form.credit_account_id  = account.account_id;
-                }
+                //  this.form.credit_account_id  = account.account_id;
+                // }
 
             },
             resetAccount(){
@@ -513,8 +515,8 @@
 
         },
             getAccountsDebit(){
-                let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
-                accounts.forEach(a => {
+                //let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                this.all_accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
                         'text': a.account
@@ -574,13 +576,10 @@
 
             },
             getGroups(){
-                axios.get('stk-groups')
-                .then(res => {
-                    res.data.forEach(stk => {
-                        this.stk_groups.push({
-                            'value': stk.name,
-                            'text': stk.name +'-'+stk.description
-                        })
+                this.all_stk_groups.forEach(stk => {
+                    this.stk_groups.push({
+                        'value': stk.name,
+                        'text': stk.name +'-'+stk.description
                     })
                 })
             },
@@ -683,6 +682,7 @@
             },
             listen(){
                  this.form = this.$store.state.requisitions;
+                 console.log(this.form)
                 this.subProject();
                 this.selectedGroup();
                 },

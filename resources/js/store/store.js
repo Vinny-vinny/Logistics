@@ -59,7 +59,8 @@ export default new Vuex.Store({
         all_my_tracks:{},
         all_my_categories:{},
         all_my_mechanics:{},
-        get_users:{}
+        get_users:{},
+        all_my_stk_groups:{}
     },
 
     mutations:{
@@ -227,6 +228,9 @@ export default new Vuex.Store({
         },
         my_mechanics(state,data){
          state.all_my_mechanics = data;
+        },
+        my_stk_groups(state,data){
+         state.all_my_stk_groups = data;
         }
     },
     actions:{
@@ -397,6 +401,9 @@ export default new Vuex.Store({
         },
         my_mechanics({commit},data){
         commit('my_mechanics',data);
+        },
+        my_stk_groups({commit},data){
+        commit('my_stk_groups',data);
         }
 
     }

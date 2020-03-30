@@ -111,14 +111,11 @@
                                   <div>
                                <div class="form-group">
                                    <label>Credit Account</label>
-                                   <div class="form-group">
-                                       <label>Debit Account</label>
-                                       <model-select :options="accountsd"
+                                                   <model-select :options="accountsd"
                                                      v-model="form.credit_account_id"
                                                      :is-disabled="true"
                                                      required>
                                        </model-select>
-                                   </div>
 
 
                                </div>
@@ -240,7 +237,8 @@
                 account:'',
                 charges:{},
                 all_accounts:{},
-                all_projects:{}
+                all_projects:{},
+                stk_groups:{}
 
             }
         },
@@ -249,6 +247,7 @@
                 this.getAllDetails();
                 this.getProjects();
                 this.getAccounts();
+                this.getStkGroups();
                 this.listen();
                 this.assetType();
                 this.getParts();
@@ -312,6 +311,12 @@
             }
         },
         methods: {
+            getStkGroups(){
+                axios.get('stk-groups')
+                    .then(res => {
+                       this.form.credit_account_id = res.data.find(g => g.name ==='IG002').account_link;
+                    })
+            },
         InvoiceFuel(){
          this.invoice_text = true;
          axios.post(`invoice-fuel`,this.form)
@@ -327,11 +332,11 @@
         })
         },
             creditAccount(){
-                if (this.charges.length) {
-                 let account = this.charges.find(req => req.type =='Fueling');
-                 this.account = account.account;
-                 this.form.credit_account_id  = account.account_id;
-                }
+                // if (this.charges.length) {
+                //  let account = this.charges.find(req => req.type =='Fueling');
+                //  this.account = account.account;
+                //  this.form.credit_account_id  = account.account_id;
+               // }
             },
             resetCustomerType(){
             this.form.customer_type_id = '';
@@ -380,8 +385,8 @@
                   })
             },
             getAccountsDebit(){
-                let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
-                accounts.forEach(a => {
+               /// let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                this.all_accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
                         'text': a.account

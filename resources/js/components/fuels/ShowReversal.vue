@@ -354,7 +354,7 @@
              let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
              subp.forEach(p => {
                 this.subprojects.push({
-                    'value': p.id,
+                    'value': p.project_link,
                     'text': p.code
                 })
              })
@@ -364,7 +364,7 @@
               .then(res => {
                 res.data.forEach(p => {
                     this.projects.push({
-                        'value': p.id,
+                        'value': p.project_link,
                         'text': p.name
                     })
                 })
@@ -380,7 +380,7 @@
             getJobcards(){
               axios.get('job-card')
               .then(res => {
-                  this.jobcards = res.data
+                  this.jobcards = res.data.jobcards
               })
             },
             getCustomerTypes(){

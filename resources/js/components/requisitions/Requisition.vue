@@ -83,8 +83,7 @@
                                    <label>Credit Account</label>
                                    <model-select :options="accountsd"
                                                  :is-disabled="true"
-                                                 v-model="form.credit_account_id"
-                                   >
+                                                 v-model="form.credit_account_id">
                                    </model-select>
                                </div>
 
@@ -98,11 +97,8 @@
                         </div>
                        </div>
                    </fieldset>
-
-
                         </div>
                         </div>
-
 
                         <div class="form-group" v-if="form.type==='Internal'">
                                  <fieldset class="the-fieldset">
@@ -260,7 +256,8 @@
                 show_customer:false,
                 subprojects:[],
                 parts:{},
-                all_accounts:{}
+                all_accounts:{},
+                all_stk_groups:{}
 
             }
         },
@@ -437,7 +434,7 @@
           this.issue_text = true;
           axios.get(`issue-reqs/${req_id}`)
           .then(res => {
-           eventBus.$emit('listReqs',res.data)
+           eventBus.$emit('cancel')
           })
           },
            subProject(){
@@ -451,11 +448,11 @@
              })
             },
             creditAccount(){
-                if (this.$store.state.all_my_charges.length) {
-                 let account = this.$store.state.all_my_charges.find(req => req.type =='Requisition');
-                 this.account = account.account;
-                 this.form.credit_account_id  = account.account_id;
-                }
+                // if (this.$store.state.all_my_charges.length) {
+                //  let account = this.$store.state.all_my_charges.find(req => req.type =='Requisition');
+                //  this.account = account.account;
+                //  this.form.credit_account_id  = account.account_id;
+                // }
 
             },
             resetAccount(){
@@ -472,6 +469,8 @@
                 this.parts = this.$store.state.all_my_parts;
                 this.vehicles = this.$store.state.all_my_vehicles;
                 this.all_accounts = this.$store.state.all_my_accounts;
+                this.all_stk_groups = this.$store.state.all_my_stk_groups;
+
             },
             getCustomers(){
                 this.all_customers.forEach(c => {
@@ -492,8 +491,8 @@
 
         },
             getAccountsD(){
-                let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
-                accounts.forEach(a => {
+              //let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                this.all_accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
                         'text': a.account
@@ -552,17 +551,15 @@
                 })
             })
 
+            this.form.credit_account_id = this.all_stk_groups.find(g => g.name == this.form.group_name).account_link;
             },
             getGroups(){
-                axios.get('stk-groups')
-                .then(res => {
-                    res.data.forEach(stk => {
+                this.all_stk_groups.forEach(stk => {
                         this.stk_groups.push({
                             'value': stk.name,
                             'text': stk.name +'-'+stk.description
                         })
                     })
-                })
             },
             convertDate(str) {
                 var date = new Date(str),
@@ -617,7 +614,7 @@
                 if (this.form.customer_id =='') {
                     return this.$toastr.e('Please Select customer first.')
                 }
-                this.form.credit_account_id ='';
+               // this.form.credit_account_id ='';
                 this.form.where_to_charge ='';
                 }
                 else if(this.form.type =='Internal'){
