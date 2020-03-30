@@ -199,7 +199,9 @@
                 show_issue:true,
                 show_customer:false,
                 subprojects:[],
-                accountsd:[]
+                accountsd:[],
+                all_charges:{},
+                all_accounts:{}
             }
         },
         created(){
@@ -379,6 +381,8 @@
                 this.users = this.$store.state.all_my_users;
                 this.parts = this.$store.state.all_my_parts;
                 this.vehicles = this.$store.state.all_my_vehicles;
+                this.all_charges = this.$store.state.all_my_charges;
+                this.all_accounts = this.$store.state.all_my_accounts;
 
             },
            subProject(){
@@ -392,8 +396,8 @@
              })
             },
             creditAccount(){
-                if (this.$store.state.all_my_charges.length) {
-                 let account = this.$store.state.all_my_charges.find(req => req.type =='Requisition');
+                if (this.all_charges .length) {
+                 let account = this.all_charges .find(req => req.type =='Requisition');
                  this.account = account.account;
                  this.form.credit_account_id  = account.account_id;
                 }
@@ -415,7 +419,7 @@
 
             },
         getAccounts(){
-            let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.credit_account_id);
+            let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.credit_account_id);
             accounts.forEach(a => {
                 this.accounts.push({
                     'value': a.id,
@@ -424,7 +428,7 @@
             })
         }  ,
             getAccountsDebit(){
-                let accounts = this.$store.state.all_my_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
                 accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
@@ -583,7 +587,6 @@
                 eventBus.$emit('cancel')
             },
             listen(){
-
                 this.form = this.$store.state.requisitions;
                 this.selectedGroup();
                 this.subProject();

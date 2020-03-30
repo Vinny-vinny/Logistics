@@ -53,6 +53,9 @@
         created(){
             this.listen();
             this.getJobs();
+            this.getCustomers();
+            this.getParts();
+            this.getMachines();
         },
         methods:{
                  reverseJob(rq){
@@ -62,6 +65,24 @@
                         this.add_jobcard=false;
                     })
             },
+            getCustomers(){
+                axios.get('customers')
+                    .then(res => {
+                        this.$store.dispatch('my_customers',res.data);
+                    })
+            },
+            getParts(){
+                axios.get('parts')
+                    .then(res => {
+                        this.$store.dispatch('my_parts',res.data);
+                    })
+            },
+            getMachines(){
+                axios.get('machines')
+                    .then(res => {
+                        this.$store.dispatch('my_vehicles',res.data);
+                    })
+            },
             getJobs(){
                 axios.get('job-card')
                     .then(res =>{
@@ -69,15 +90,12 @@
                         this.$store.dispatch('my_job_types',res.data.job_types);
                         this.$store.dispatch('my_job_categories',res.data.jobcard_categories);
                         this.$store.dispatch('my_customer_types',res.data.customer_types);
-                        this.$store.dispatch('my_customers',res.data.customers);
                         this.$store.dispatch('my_service_types',res.data.service_types);
                         this.$store.dispatch('my_tracks',res.data.tracks);
                         this.$store.dispatch('my_users',res.data.users);
                         this.$store.dispatch('my_categories',res.data.categories);
                         this.$store.dispatch('my_mechanics',res.data.mechanics);
                         this.$store.dispatch('my_projects',res.data.asset_categories);
-                        this.$store.dispatch('my_parts',res.data.parts);
-                        this.$store.dispatch('my_vehicles',res.data.vehicles);
                         this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.initDatable()
                     })

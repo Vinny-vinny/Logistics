@@ -428,7 +428,6 @@
                         if (req.type =='Internal'){
                             this.requisition_type = 'Internal';
                             this.requisitions_internal = req.inventory_items_internal;
-
                             axios.get('parts')
                             .then(res => {
                                 let total =0;

@@ -351,6 +351,9 @@
                 transactions:{},
                 stk_items:[],
                 show_rqs:false,
+                all_mechanics:{},
+                all_projects:{},
+                all_categories:{},
                 inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
 
             }
@@ -489,6 +492,9 @@
                 this.tracks = this.$store.state.all_my_tracks;
                 this.users = this.$store.state.all_my_users;
                 this.job_types = this.$store.state.all_my_job_types;
+                this.all_mechanics = this.$store.state.all_my_mechanics;
+                this.all_projects = this.$store.state.all_my_projects;
+                this.all_categories = this.$store.state.all_my_categories;
             },
             getJobDetails(){
               this.show_rqs = false;
@@ -572,7 +578,7 @@
                 }
             },
             getMechanics() {
-                        this.$store.state.all_my_mechanics.forEach(m => {
+                this.all_mechanics.forEach(m => {
                             this.mechanics.push({
                                 'value': m.id,
                                 'text': m.name
@@ -580,7 +586,7 @@
                         })
             },
             getProjects() {
-                    this.$store.state.all_my_projects.forEach(p => {
+                this.all_projects.forEach(p => {
                     this.projects.push({
                         'value': p.project_link,
                         'text': p.name
@@ -623,7 +629,7 @@
                 this.inventory_items_external.splice(i, 1);
             },
             getCategories() {
-                        this.$store.state.all_my_categories.forEach(c => {
+                this.all_categories.forEach(c => {
                             this.categories.push({
                                 'value': c.id,
                                 'text': c.name
