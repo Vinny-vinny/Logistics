@@ -245,14 +245,16 @@
             }
         },
         created() {
-            this.getAllDetails();
-            this.getProjects();
-            this.getAccounts();
-            this.listen();
-            this.assetType();
-            this.getParts();
-            this.creditAccount();
-            this.getAccountsDebit();
+            setTimeout(()=>{
+                this.getAllDetails();
+                this.getProjects();
+                this.getAccounts();
+                this.listen();
+                this.assetType();
+                this.getParts();
+                this.creditAccount();
+                this.getAccountsDebit();
+            },3000)
 
             },
        watch:{

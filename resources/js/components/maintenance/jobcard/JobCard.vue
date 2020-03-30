@@ -469,13 +469,15 @@
             this.initDate();
         },
         created() {
-            this.getAllDetails();
-            this.getCategories();
-            this.getMechanics();
-            this.getProjects();
-            this.getParts();
-            this.filteredRqs();
-            this.listen();
+            setTimeout(()=>{
+                this.getAllDetails();
+                this.getCategories();
+                this.getMechanics();
+                this.getProjects();
+                this.getParts();
+                this.filteredRqs();
+                this.listen();
+            },3000)
 
             },
         filters: {
