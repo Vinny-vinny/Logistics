@@ -81,7 +81,11 @@
                                   <div>
                                <div class="form-group">
                                    <label>Credit Account</label>
-                                   <input type="text" class="form-control" :value="account" disabled>
+                                   <model-select :options="accountsd"
+                                                 :is-disabled="true"
+                                                 v-model="form.credit_account_id"
+                                   >
+                                   </model-select>
                                </div>
 
                          <div class="form-group">
@@ -244,6 +248,7 @@
                 items:[],
                 initial_unit_cost:'',
                 accounts:[],
+                accountsd:[],
                 uoms:[],
                 customers:[],
                 pricelists:{},
@@ -267,6 +272,7 @@
                 this.getGroups();
                 this.creditAccount();
                 this.getAccounts();
+                this.getAccountsD();
                 this.getCustomers();
             },3000)
             },
@@ -485,6 +491,16 @@
             })
 
         },
+            getAccountsD(){
+                let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
+                accounts.forEach(a => {
+                    this.accountsd.push({
+                        'value': a.account_link,
+                        'text': a.account
+                    })
+                })
+
+            },
 
             costing(cost){
             return cost;
