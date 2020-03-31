@@ -48,14 +48,15 @@
                 tableData: [],
                 importing:false,
                 add_customer:false,
-                editing: false
+                editing: false,
+
             }
         },
         created(){
             this.getCustomers();
             this.listen();
         },
-        
+
         methods:{
             getCustomers(){
                 axios.get('customers')

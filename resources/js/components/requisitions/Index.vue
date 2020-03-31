@@ -11,7 +11,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
                       <button class="btn btn-success pull-right" @click="show_req_form =true">Print Requisition Form</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_requisition=true">Add Requisition</button>
+                    <button class="btn btn-primary pull-right mr" @click="addReq()">{{show_add_txt ? 'Please wait..' : 'Add Requisition'}}</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
@@ -60,9 +60,12 @@
                 show_reversal:false,
                 show_req_form:false,
                 projects:{},
-                users:{}
+                users:{},
+                customers:{},
+                show_add_txt:false
             }
         },
+
         created(){
             this.$store.dispatch('loadUsers');
             this.listen();
@@ -75,11 +78,18 @@
             this.getGroups();
         },
         computed:{
-            get_users(){
-            return this.$store.state.get_users;
+            get_customers(){
+            return  this.$store.state.all_my_customers;
             }
         },
         methods:{
+            addReq(){
+                this.show_add_txt = true;
+              if (this.get_customers !==undefined && this.get_customers.length > 1){
+                  this.show_add_txt = false;
+                  this.add_requisition=true
+              }
+            },
             getGroups(){
                 axios.get('stk-groups')
                     .then(res => {
@@ -99,6 +109,7 @@
             getAllCustomers(){
                 axios.get('customers')
                     .then(res => {
+                        this.customers = res.data;
                         this.$store.dispatch('my_customers',res.data);
                         console.log('-------customers--')
                         console.log(res.data)
