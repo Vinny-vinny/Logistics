@@ -91,12 +91,18 @@
                     .then(res => {
                       //console.log(res.data)
                         this.$store.dispatch('my_accounts',res.data);
+                        console.log('-------accounts--')
+                        console.log(res.data)
+                        console.log('---end accounts----')
                     })
             },
             getAllCustomers(){
                 axios.get('customers')
                     .then(res => {
                         this.$store.dispatch('my_customers',res.data);
+                        console.log('-------customers--')
+                        console.log(res.data)
+                        console.log('---end customer----')
                     })
             },
             getPricelists(){

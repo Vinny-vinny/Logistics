@@ -30,7 +30,7 @@ class CustomerController extends Controller
 //           $customers =  DB::table('customers')->get();
 //           Cache::put('customerss',$customers,3600);
 //       }
-        $customers = Customer::get()->chunk(100);
+        $customers = collect(Customer::get()->chunk(100));
         $customers->toArray();
         return response()->json($customers);
 
