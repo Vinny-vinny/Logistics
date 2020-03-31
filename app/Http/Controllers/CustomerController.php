@@ -23,13 +23,15 @@ class CustomerController extends Controller
     public function index()
     {
 
-       if (Cache::has('customerss')){
-        $customers = Cache::get('customerss');
-       }
-       else{
-           $customers =  DB::table('customers')->get();
-           Cache::put('customerss',$customers,3600);
-       }
+//       if (Cache::has('customerss')){
+//        $customers = Cache::get('customerss');
+//       }
+//       else{
+//           $customers =  DB::table('customers')->get();
+//           Cache::put('customerss',$customers,3600);
+//       }
+        $customers = Customer::get()->chunk(100);
+        $customers->toArray();
         return response()->json($customers);
 
     }
