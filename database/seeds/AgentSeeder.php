@@ -16,7 +16,7 @@ class AgentSeeder extends Seeder
 
        foreach ($agents as $agent){
            \App\User::create([
-              'name' => 'cAgentName',
+              'name' => $agent->cAgentName,
                'email' => $faker->email,
                'title' => $agent->cDisplayName,
                'join_date'=> \Carbon\Carbon::now(),

@@ -82,6 +82,8 @@
         },
         created(){
            //this.$store.dispatch('loadUsers');
+            this.$store.dispatch('compute_prices');
+            console.log(this.cPrices);
             this.listen();
             this.getRequisitions();
             this.getAllAccounts();
@@ -90,8 +92,12 @@
             this.getUoms();
             this.getParts();
             this.getGroups();
+
         },
         computed:{
+            cPrices(){
+            return   this.$store.state.p_lists;
+            },
             cust(){
               return this.check_customers;
             },
@@ -103,6 +109,9 @@
             },
             part(){
                 return this.check_parts;
+            },
+            donePrices(){
+                return this.$store.getters.donePrices;
             }
         },
         methods:{

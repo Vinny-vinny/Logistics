@@ -61,7 +61,8 @@ export default new Vuex.Store({
         all_my_mechanics:{},
         get_users:{},
         all_my_stk_groups:{},
-        all_my_expenses:{}
+        all_my_expenses:{},
+        p_lists:{}
     },
 
     mutations:{
@@ -235,6 +236,9 @@ export default new Vuex.Store({
         },
         my_expenses(state,data){
          state.all_my_expenses = data;
+        },
+        compute_prices(state,data){
+         state.p_lists = data;
         }
     },
     actions:{
@@ -411,6 +415,12 @@ export default new Vuex.Store({
         },
         my_expenses({commit},data){
         commit('my_expenses',data);
+        },
+        compute_prices({commit},data){
+        axios.get('price-list')
+            .then(res => {
+             commit('compute_prices',res.data);
+            }).catch(e => console.log(e))
         }
 
     }
