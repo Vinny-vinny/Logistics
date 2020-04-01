@@ -66,9 +66,11 @@
                 projects:{},
                 users:{},
                 customers:{},
-                show_add_txt:false,
-                walla:false,
-                check_customers:false
+                check_customers:false,
+                check_accounts:false,
+                check_prices:false,
+                check_parts:false,
+                show_add_txt:false
             }
         },
         watch:{
@@ -91,17 +93,22 @@
         },
         computed:{
             cust(){
-              return this.walla;
+              return this.check_customers;
             },
-            get_customers(){
-            return  this.$store.state.all_my_customers;
+            account(){
+                return this.check_accounts;
             },
-
+            price(){
+                return this.check_prices;
+            },
+            part(){
+                return this.check_parts;
+            }
         },
         methods:{
             addReq(){
                 this.show_add_txt = true;
-                if (this.cust){
+                if (this.cust && this.account && this.price && this.part){
                     this.show_add_txt = false;
                     this.add_requisition=true
                 }
@@ -113,29 +120,26 @@
                     })
             },
             getAllAccounts(){
+                this.check_accounts =false;
                 axios.get('accounts')
                     .then(res => {
-                        this.walla =true;
-                      //console.log(res.data)
+                        this.check_accounts =true;
                         this.$store.dispatch('my_accounts',res.data);
-                        console.log('-------accounts--')
-                        console.log(res.data)
-                        console.log('---end accounts----')
                     })
             },
             getAllCustomers(){
+                this.check_customers =false;
                 axios.get('customers')
                     .then(res => {
-                        this.customers = res.data;
+                        this.check_customers =true;
                         this.$store.dispatch('my_customers',res.data);
-                        console.log('-------customers--')
-                        console.log(res.data)
-                        console.log('---end customer----')
                     })
             },
             getPricelists(){
+                this.check_prices =false;
                 axios.get('price-list')
                     .then(res => {
+                        this.check_prices =true;
                         this.$store.dispatch('my_pricelists',res.data);
                     })
             },
@@ -146,8 +150,10 @@
                     })
             },
             getParts(){
+                this.check_parts = false;
                 axios.get('parts')
                     .then(res => {
+                     this.check_parts = true;
                      this.$store.dispatch('my_parts',res.data);
                     })
             },

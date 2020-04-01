@@ -473,7 +473,7 @@
 
             },
             getCustomers(){
-             console.log(this.all_customers);
+           //  console.log(this.all_customers);
                 this.all_customers.forEach(c => {
                     this.customers.push({
                         'value': c.id,
