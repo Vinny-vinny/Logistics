@@ -465,11 +465,7 @@
                 }
             }
         },
-        mounted() {
-            this.initDate();
-        },
         created() {
-            setTimeout(()=>{
                 this.getAllDetails();
                 this.getCategories();
                 this.getMechanics();
@@ -477,9 +473,7 @@
                 this.getParts();
                 this.filteredRqs();
                 this.listen();
-            },3000)
-
-            },
+                },
         filters: {
             moment: function (date) {
                 return moment(date);
