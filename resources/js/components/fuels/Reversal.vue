@@ -234,12 +234,9 @@
                 accountsd:[],
                 show_issue:false,
                 show_inv:false,
-
-
             }
         },
         created() {
-            setTimeout(()=>{
                 this.getAllDetails();
                 this.getProjects();
                 this.getAccounts();
@@ -248,9 +245,6 @@
                 this.getParts();
                 this.creditAccount();
                 this.getAccountsDebit();
-            },3000)
-
-
         },
         watch:{
             'form.fuel_category_id'(){

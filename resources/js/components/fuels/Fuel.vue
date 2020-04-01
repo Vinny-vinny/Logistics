@@ -116,8 +116,6 @@
                                                      :is-disabled="true"
                                                      required>
                                        </model-select>
-
-
                                </div>
 
                          <div class="form-group">
@@ -243,7 +241,6 @@
             }
         },
         created() {
-            setTimeout(()=>{
                 this.getAllDetails();
                 this.getProjects();
                 this.getAccounts();
@@ -253,9 +250,7 @@
                 this.getParts();
                 this.creditAccount();
                 this.getAccountsDebit();
-            },3000)
-
-            },
+                },
        watch:{
         'form.fuel_category_id'(){
             if (this.form.fuel_category_id=='stock_issue') {
@@ -365,7 +360,6 @@
             this.vehicles = this.$store.state.all_my_vehicles;
             this.all_accounts =  this.$store.state.all_my_accounts;
             this.all_projects = this.$store.state.all_my_projects;
-
             },
             getProjects(){
                 this.all_projects.forEach(p => {

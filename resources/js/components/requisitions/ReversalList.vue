@@ -69,42 +69,43 @@
         },
         computed:{
             cust(){
-                return this.check_customers;
+             return this.check_customers;
             },
             account(){
-                return this.check_accounts;
+            return this.check_accounts;
             },
             price(){
-                return this.check_prices;
+             return this.check_prices;
             },
             part(){
-                return this.check_parts;
+             return this.check_parts;
             }
         },
-
         methods:{
             getGroups(){
                 axios.get('stk-groups')
                     .then(res => {
-                        this.$store.dispatch('my_stk_groups',res.data);
+                     this.$store.dispatch('my_stk_groups',res.data);
                     })
             },
             getAllAccounts(){
                 axios.get('accounts')
                     .then(res => {
-                        //console.log(res.data)
+                         this.check_accounts = true;
                         this.$store.dispatch('my_accounts',res.data);
                     })
             },
             getAllCustomers(){
                 axios.get('customers')
                     .then(res => {
+                        this.check_customers = true;
                         this.$store.dispatch('my_customers',res.data);
                     })
             },
             getPricelists(){
                 axios.get('price-list')
                     .then(res => {
+                        this.check_prices = true;
                         this.$store.dispatch('my_pricelists',res.data);
                     })
             },
@@ -117,6 +118,7 @@
             getParts(){
                 axios.get('parts')
                     .then(res => {
+                        this.check_parts = true;
                         this.$store.dispatch('my_parts',res.data);
                     })
             },

@@ -60,7 +60,8 @@ export default new Vuex.Store({
         all_my_categories:{},
         all_my_mechanics:{},
         get_users:{},
-        all_my_stk_groups:{}
+        all_my_stk_groups:{},
+        all_my_expenses:{}
     },
 
     mutations:{
@@ -231,6 +232,9 @@ export default new Vuex.Store({
         },
         my_stk_groups(state,data){
          state.all_my_stk_groups = data;
+        },
+        my_expenses(state,data){
+         state.all_my_expenses = data;
         }
     },
     actions:{
@@ -404,6 +408,9 @@ export default new Vuex.Store({
         },
         my_stk_groups({commit},data){
         commit('my_stk_groups',data);
+        },
+        my_expenses({commit},data){
+        commit('my_expenses',data);
         }
 
     }

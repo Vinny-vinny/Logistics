@@ -381,7 +381,7 @@
                 this.vehicles = this.$store.state.all_my_vehicles;
                 this.all_charges = this.$store.state.all_my_charges;
                 this.all_accounts = this.$store.state.all_my_accounts;
-                this.all_stk_groups = this.$store.state.all_stk_groups;
+                this.all_stk_groups = this.$store.state.all_my_stk_groups;
 
             },
            subProject(){
@@ -486,7 +486,9 @@
                     'text': p.item_group +'-'+p.description
                 })
             })
-          this.form.credit_account_id = this.all_stk_groups.find(g => g.name == this.form.group_name).account_link;
+                if (this.form.credit_account_id){
+                this.form.credit_account_id = this.all_stk_groups.find(g => g.name == this.form.group_name).account_link;
+                }
             },
             getGroups(){
                 this.all_stk_groups.forEach(stk => {

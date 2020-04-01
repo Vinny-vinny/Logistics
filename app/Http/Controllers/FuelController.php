@@ -32,13 +32,14 @@ class FuelController extends Controller
     public function index()
     {
         return response()->json([
-            'fuels'=>FuelResource::collection(Fuel::take(200)->orderBy('created_at','DESC')->get()),
+            'fuels'=>FuelResource::collection(Fuel::take(2000)->orderBy('created_at','DESC')->get()),
             'customer_types' => DB::table('customer_types')->get(),
             'fuel_types' => DB::table('fuel_types')->get(),
             'jobcards' => JobcardResource::collection(Jobcard::take(200)->orderBy('created_at','DESC')->get()),
             'projects' => DB::table('asset_categories')->get(),
             'charges' => DB::table('wheretocharges')->get(),
-            'users' => DB::table('users')->get()
+            'users' => DB::table('users')->get(),
+            'expenses' => DB::table('expenses')->get()
 
         ]);
     }

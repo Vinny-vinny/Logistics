@@ -12,7 +12,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Fueling</h3>
                     <button class="btn btn-primary pull-right" @click="add_fuel_other=true" style="display:none">Add Other Fuel</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_fuel=true">Add Fuel</button>
+                    <button class="btn btn-primary pull-right mr" @click="addFuel()">{{show_add_text ? 'Please wait...':'Add Fuel'}}</button>
 
                 </div>
                 <div class="box-body">
@@ -61,7 +61,11 @@
                 add_fuel_other: false,
                 editing: false,
                 show_reversal:false,
-                show_print:false
+                show_print:false,
+                show_add_text:false,
+                check_customers:false,
+                check_accounts:false,
+                check_parts:false
             }
         },
         created() {
@@ -72,7 +76,24 @@
              this.getAccounts();
              this.getParts();
         },
+        computed:{
+          cust(){
+             return this.check_customers;
+          }  ,
+            account(){
+             return this.check_accounts;
+            },
+            part(){
+              return this.check_parts;
+            },
+        },
         methods: {
+            addFuel(){
+             this.show_add_text = true;
+             if (this.cust && this.account && this.part){
+                 this.add_fuel =  true;
+             }
+            },
             reverseFuel(fuel){
              this.$store.dispatch('updateFuel',fuel)
                     .then(() =>{
@@ -83,6 +104,7 @@
             getCustomers(){
               axios.get('customers')
               .then(res => {
+                  this.check_customers = true;
                   this.$store.dispatch('my_customers',res.data);
               })
             },
@@ -95,12 +117,14 @@
             getAccounts(){
                 axios.get('accounts')
                     .then(res => {
+                        this.check_accounts = true;
                         this.$store.dispatch('my_accounts',res.data);
                     })
             },
             getParts(){
                 axios.get('parts')
                     .then(res => {
+                        this.check_parts = true;
                        this.$store.dispatch('my_parts',res.data);
                     })
             },
@@ -148,6 +172,7 @@
                     this.tableData.unshift(fuel);
                     this.add_fuel = false;
                     this.add_fuel_other = false;
+                    this.show_add_text = false;
                     this.initDatable();
                 });
                 eventBus.$on('cancel', () => {
@@ -156,6 +181,7 @@
                     this.editing = false;
                     this.show_reversal = false;
                     this.show_print = false;
+                    this.show_add_text = false;
                     this.getFuels();
                     this.initDatable();
                 });
@@ -164,6 +190,7 @@
                     this.add_fuel_other = false;
                     this.editing = false;
                     this.show_reversal = false;
+                    this.show_add_text = false;
                     for (let i = 0; i < this.tableData.length; i++) {
                         if (this.tableData[i].id == fuel.id) {
                             this.tableData.splice(i, 1);

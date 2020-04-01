@@ -206,6 +206,7 @@
                 eventBus.$on('listReqs',(rq) =>{
                     this.tableData.unshift(rq);
                     this.add_requisition =false;
+                    this.show_add_txt = false;
                     this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
@@ -213,6 +214,7 @@
                     this.editing = false;
                     this.reversing = false;
                     this.show_reversal = false;
+                    this.show_add_txt = false;
                     this.getRequisitions();
                     this.initDatable();
                 });
@@ -224,6 +226,7 @@
                     this.add_requisition = false;
                     this.editing = false;
                     this.show_reversal = false;
+                    this.show_add_txt = false;
                     for (let i=0;i<this.tableData.length;i++){
                         if (this.tableData[i].id == rq.id){
                             this.tableData.splice(i,1);

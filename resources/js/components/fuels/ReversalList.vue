@@ -50,7 +50,10 @@
                 add_fuel: false,
                 add_fuel_other: false,
                 editing: false,
-                show_reversal:false
+                show_reversal:false,
+                check_customers:false,
+                check_accounts:false,
+                check_parts:false
             }
         },
         created() {
@@ -63,6 +66,17 @@
         mounted() {
             this.listen();
         },
+        computed:{
+            cust(){
+                return this.check_customers;
+            }  ,
+            account(){
+                return this.check_accounts;
+            },
+            part(){
+                return this.check_parts;
+            },
+        },
         methods: {
             reverseFuel(fuel){
              this.$store.dispatch('updateFuel',fuel)
@@ -74,6 +88,7 @@
             getCustomers(){
                 axios.get('customers')
                     .then(res => {
+                        this.check_customers = true;
                         this.$store.dispatch('my_customers',res.data);
                     })
             },
@@ -86,12 +101,14 @@
             getAccounts(){
                 axios.get('accounts')
                     .then(res => {
+                        this.check_accounts = true;
                         this.$store.dispatch('my_accounts',res.data);
                     })
             },
             getParts(){
                 axios.get('parts')
                     .then(res => {
+                        this.check_parts = true;
                         this.$store.dispatch('my_parts',res.data);
                     })
             },
@@ -106,13 +123,17 @@
                         this.$store.dispatch('my_charges',res.data.charges);
                         this.$store.dispatch('my_users',res.data.users);
                         this.$store.dispatch('my_projects',res.data.projects);
+                        this.$store.dispatch('my_expenses',res.data.expenses);
                     })
                     .catch(error => Exception.handle(error))
             },
             editFuel(fuel) {
                 this.$store.dispatch('updateFuel', fuel)
                     .then(() => {
-                       this.show_reversal = true;
+                        if (this.cust && this.part && this.account){
+                            console.log('walla')
+                            this.show_reversal = true;
+                        }
                     })
             },
             deleteFuel(id) {
