@@ -262,7 +262,6 @@
             }
         },
         created(){
-            setTimeout(()=>{
                 this.getAllDetails();
                 this.listen();
                 this.getProjects();
@@ -271,7 +270,6 @@
                 this.getAccounts();
                 this.getAccountsD();
                 this.getCustomers();
-            },3000)
             },
         watch:{
             'form.type'(){

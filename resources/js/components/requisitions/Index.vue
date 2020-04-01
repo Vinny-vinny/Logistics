@@ -179,11 +179,13 @@
                 this.initDatable();
             },
             editRequisition(rq){
-                //return alert('walla');
                 this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
-                        this.editing=true;
-                        this.add_requisition=true;
+                        if (this.cust && this.account && this.price && this.part){
+                            this.show_add_txt = false;
+                            this.add_requisition=true
+                            this.editing=true;
+                        }
                     })
             },
             deleteRequisition(id){
