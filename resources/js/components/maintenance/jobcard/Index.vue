@@ -135,8 +135,10 @@
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)
                     .then(() =>{
-                            this.editing=true;
-                            this.add_jobcard=true;
+                            if (this.cust && this.part){
+                                this.editing=true;
+                                this.add_jobcard=true;
+                            }
                     })
 
             },
