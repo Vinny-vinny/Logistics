@@ -160,9 +160,12 @@
             reverseRequisition(rq){
             this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
-                        this.reversing=true;
-                        this.show_reversal = true;
-                        this.add_requisition=false;
+                        if (this.cust && this.account && this.price && this.part){
+                            this.reversing=true;
+                            this.show_reversal = true;
+                            this.add_requisition=false;
+                        }
+
                     })
             },
             getRequisitions(){

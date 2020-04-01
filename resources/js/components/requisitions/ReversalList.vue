@@ -49,7 +49,12 @@
                 add_requisition: false,
                 editing: false,
                 show_form:false,
-                show_reversal:false
+                show_reversal:false,
+                check_customers:false,
+                check_accounts:false,
+                check_prices:false,
+                check_parts:false,
+                show_add_txt:false
             }
         },
         created(){
@@ -61,6 +66,20 @@
             this.getUoms();
             this.getParts();
             this.getGroups();
+        },
+        computed:{
+            cust(){
+                return this.check_customers;
+            },
+            account(){
+                return this.check_accounts;
+            },
+            price(){
+                return this.check_prices;
+            },
+            part(){
+                return this.check_parts;
+            }
         },
 
         methods:{
@@ -115,8 +134,11 @@
             editRequisition(rq){
                 this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
-                        this.editing=true;
-                        this.add_requisition=true;
+                        if (this.cust && this.account && this.price && this.part){
+                            this.editing=true;
+                            this.add_requisition=true;
+                        }
+
                     })
             },
             listen(){
