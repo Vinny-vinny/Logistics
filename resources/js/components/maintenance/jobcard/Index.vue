@@ -67,13 +67,15 @@
             this.getParts();
             this.getMachines();
         },
-        methods:{
+        computed:{
             cust(){
-              return this.check_customers;
+                return this.check_customers;
             },
             part(){
-              return this.check_parts;
+                return this.check_parts;
             },
+        },
+        methods:{
                  reverseJob(rq){
             this.$store.dispatch('updateJobcard',rq)
                     .then(() =>{
