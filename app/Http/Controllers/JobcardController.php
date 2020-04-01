@@ -49,7 +49,8 @@ class JobcardController extends Controller
           'categories' => DB::table('categories')->get(),
           'service_types' => DB::table('service_types')->get(),
           'tracks' => DB::table('track_bies')->get(),
-          'users' => DB::table('users')->get()
+          'users' => DB::table('users')->get(),
+          'requisitions' => DB::table('requisitions')->take(1000)->orderBy('created_at','DESC')->get(),
 
       ]);
     }

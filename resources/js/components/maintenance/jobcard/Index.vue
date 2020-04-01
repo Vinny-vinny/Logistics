@@ -121,6 +121,7 @@
                         this.$store.dispatch('my_categories',res.data.categories);
                         this.$store.dispatch('my_mechanics',res.data.mechanics);
                         this.$store.dispatch('my_projects',res.data.asset_categories);
+                        this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.initDatable()
                     })
                     .catch(error => Exception.handle(error))
