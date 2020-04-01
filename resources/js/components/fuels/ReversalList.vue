@@ -131,8 +131,8 @@
                 this.$store.dispatch('updateFuel', fuel)
                     .then(() => {
                         if (this.cust && this.part && this.account){
-                            console.log('walla')
-                            this.show_reversal = true;
+                            //console.log('walla')
+                              this.show_reversal = true;
                         }
                     })
             },
