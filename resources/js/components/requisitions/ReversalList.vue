@@ -129,6 +129,7 @@
                         this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.$store.dispatch('my_charges',res.data.charges);
                         this.$store.dispatch('my_projects',res.data.projects);
+                        this.initDatable();
                     })
                     .catch(error => Exception.handle(error))
                 this.initDatable();
@@ -147,7 +148,6 @@
                 eventBus.$on('listReqs',(rq) =>{
                     this.tableData.unshift(rq);
                     this.add_requisition =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_requisition = false;

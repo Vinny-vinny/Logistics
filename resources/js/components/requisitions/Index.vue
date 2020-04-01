@@ -173,13 +173,14 @@
                     .then(res => {
                         this.tableData = res.data.requisitions;
                         this.projects = res.data.projects;
+                        this.initDatable();
                         this.$store.dispatch('my_vehicles',res.data.machines);
                         this.$store.dispatch('my_reqs',res.data.requisitions);
                         this.$store.dispatch('my_charges',res.data.charges);
                         this.$store.dispatch('my_projects',res.data.projects);
                     })
                     .catch(error => Exception.handle(error))
-                this.initDatable();
+
             },
             editRequisition(rq){
                 this.$store.dispatch('updateRequisition',rq)

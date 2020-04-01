@@ -114,6 +114,7 @@
                 axios.get('job-card')
                     .then(res =>{
                         this.tableData = res.data.jobcards;
+                        this.initDatable();
                         this.$store.dispatch('my_job_types',res.data.job_types);
                         this.$store.dispatch('my_job_categories',res.data.jobcard_categories);
                         this.$store.dispatch('my_customer_types',res.data.customer_types);
@@ -124,7 +125,7 @@
                         this.$store.dispatch('my_mechanics',res.data.mechanics);
                         this.$store.dispatch('my_projects',res.data.asset_categories);
                         this.$store.dispatch('my_reqs',res.data.requisitions);
-                        this.initDatable()
+
                     })
                     .catch(error => Exception.handle(error))
                 this.initDatable();

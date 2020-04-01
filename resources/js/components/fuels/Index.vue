@@ -132,13 +132,14 @@
                 axios.get('fuel')
                     .then(res => {
                         this.tableData = res.data.fuels;
+                        this.initDatable();
                         this.$store.dispatch('my_fuels',res.data.fuels);
                         this.$store.dispatch('my_customer_types',res.data.customer_types);
                         this.$store.dispatch('my_jobcards',res.data.jobcards);
                         this.$store.dispatch('my_charges',res.data.charges);
                         this.$store.dispatch('my_users',res.data.users);
                         this.$store.dispatch('my_projects',res.data.projects);
-                        this.initDatable();
+
                     })
                     .catch(error => Exception.handle(error))
             },

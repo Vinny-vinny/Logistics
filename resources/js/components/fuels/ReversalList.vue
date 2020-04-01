@@ -117,6 +117,7 @@
                 axios.get('fuel')
                     .then(res =>{
                         this.tableData = res.data.fuels.filter(f => f.reversal_ref !=='' && f.reversal_ref !==null)
+                        this.initDatable();
                         this.$store.dispatch('my_fuels',res.data.fuels);
                         this.$store.dispatch('my_customer_types',res.data.customer_types);
                         this.$store.dispatch('my_jobcards',res.data.jobcards);
