@@ -8,10 +8,14 @@
         <section class="content" v-if="!add_requisition && !show_form && !show_reversal && !show_req_form">
             <!-- Default box -->
             <div class="box">
+
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
                       <button class="btn btn-success pull-right" @click="show_req_form =true">Print Requisition Form</button>
-                    <button class="btn btn-primary pull-right mr" @click="addReq()">{{show_add_txt ? 'Please wait..' : 'Add Requisition'}}</button>
+                    <template>
+                        <button class="btn btn-primary pull-right mr" @click="addReq()">{{show_add_txt ? 'Please wait..' : 'Add Requisition'}}</button>
+                    </template>
+
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
@@ -62,12 +66,20 @@
                 projects:{},
                 users:{},
                 customers:{},
-                show_add_txt:false
+                show_add_txt:false,
+                walla:false,
+                check_customers:false
             }
         },
-
+        watch:{
+            mycustomers(){
+                if (this.customers.length){
+                 this.add_requisition = true;
+                }
+            }
+        },
         created(){
-            this.$store.dispatch('loadUsers');
+           //this.$store.dispatch('loadUsers');
             this.listen();
             this.getRequisitions();
             this.getAllAccounts();
@@ -78,17 +90,21 @@
             this.getGroups();
         },
         computed:{
+            cust(){
+              return this.walla;
+            },
             get_customers(){
             return  this.$store.state.all_my_customers;
-            }
+            },
+
         },
         methods:{
             addReq(){
                 this.show_add_txt = true;
-              if (this.get_customers !==undefined && this.get_customers.length > 1){
-                  this.show_add_txt = false;
-                  this.add_requisition=true
-              }
+                if (this.cust){
+                    this.show_add_txt = false;
+                    this.add_requisition=true
+                }
             },
             getGroups(){
                 axios.get('stk-groups')
@@ -99,6 +115,7 @@
             getAllAccounts(){
                 axios.get('accounts')
                     .then(res => {
+                        this.walla =true;
                       //console.log(res.data)
                         this.$store.dispatch('my_accounts',res.data);
                         console.log('-------accounts--')
