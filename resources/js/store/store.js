@@ -400,7 +400,10 @@ export default new Vuex.Store({
         commit('my_fuels',data);
         },
         my_projects({commit},data){
-        commit('my_projects',data);
+        axios.get('asset-category')
+            .then(res => {
+                commit('my_projects',res.data);
+            })
         },
         my_accounts({commit},data){
         axios.get('accounts')

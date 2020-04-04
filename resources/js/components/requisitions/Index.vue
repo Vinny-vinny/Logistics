@@ -90,6 +90,7 @@
         methods:{
             getAllDetails(){
                 this.$store.dispatch('my_reqs');
+                this.initDatable();
                 this.$store.dispatch('my_parts');
                 this.$store.dispatch('my_customers');
                 this.$store.dispatch('my_accounts');
@@ -97,15 +98,12 @@
                 this.$store.dispatch('my_uoms');
                 this.$store.dispatch('my_vehicles');
                 this.$store.dispatch('my_stk_groups');
-                this.$store.dispatch('my_users').then(() => {
-                    this.initDatable();
-                });
-
+                this.$store.dispatch('my_users');
+                this.$store.dispatch('my_projects');
             },
             addReq(){
                  this.show_add_txt = true;
                 if (this.pricelists.length > 1 && this.parts.length > 1){
-                    console.log('walla')
                     this.show_add_txt = false;
                     this.add_requisition=true
                 }

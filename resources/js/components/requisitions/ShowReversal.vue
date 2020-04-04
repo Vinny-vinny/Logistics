@@ -178,11 +178,9 @@
                 },
                 edit_requisition: this.edit,
                 projects:[],
-                parts:{},
                 qty:'',
                 part:'',
                 unit_price:'',
-                users:{},
                 username:User.name(),
                 stk_groups:[],
                 items:[],
@@ -191,26 +189,18 @@
                 accounts:[],
                 uoms:[],
                 customers:[],
-                pricelists:{},
-                all_customers:{},
-                units:{},
                 filtered_uoms:{},
                 account:'',
                 show_issue:true,
                 show_customer:false,
                 subprojects:[],
-                accountsd:[],
-                all_charges:{},
-                all_accounts:{},
-                all_stk_groups:{}
+                accountsd:[]
             }
         },
         created(){
-            this.getAllDetails();
             this.listen();
             this.getProjects();
             this.getGroups();
-            this.creditAccount();
             this.getAccounts();
             this.getAccountsDebit();
             this.getCustomers();
@@ -368,22 +358,34 @@
           },
             getExternal(){
              return [this.part,this.qty,this.unit_price,this.form.inventory_items_external,this.form.group_name,this.form.customer_id].join();
+            },
+            all_customers(){
+                return this.$store.state.all_my_customers;
+            },
+            pricelists(){
+                return this.$store.state.all_my_pricelists;
+            },
+            units(){
+                return this.$store.state.all_my_uoms;
+            },
+            users(){
+                return this.$store.state.all_my_users;
+            },
+            parts(){
+                return this.$store.state.all_my_parts;
+            },
+            vehicles(){
+                return this.$store.state.all_my_vehicles;
+            },
+            all_accounts(){
+                return this.$store.state.all_my_accounts;
+            },
+            all_stk_groups(){
+                return this.$store.state.all_my_stk_groups;
             }
         },
 
         methods:{
-            getAllDetails(){
-                this.all_customers = this.$store.state.all_my_customers;
-                this.pricelists = this.$store.state.all_my_pricelists;
-                this.units = this.$store.state.all_my_uoms;
-                this.users = this.$store.state.all_my_users;
-                this.parts = this.$store.state.all_my_parts;
-                this.vehicles = this.$store.state.all_my_vehicles;
-                this.all_charges = this.$store.state.all_my_charges;
-                this.all_accounts = this.$store.state.all_my_accounts;
-                this.all_stk_groups = this.$store.state.all_my_stk_groups;
-
-            },
            subProject(){
              this.subprojects =[];
              let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.project_id);
@@ -393,14 +395,6 @@
                     'text': p.description
                 })
              })
-            },
-            creditAccount(){
-                // if (this.all_charges .length) {
-                //  let account = this.all_charges .find(req => req.type =='Requisition');
-                //  this.account = account.account;
-                //  this.form.credit_account_id  = account.account_id;
-               // }
-
             },
             resetAccount(){
             this.form.where_to_charge = '';
@@ -554,7 +548,6 @@
                 if (this.form.where_to_charge =='') {
                     return this.$toastr.e('Please select debit account.');
                 }
-                this.creditAccount();
                 this.form.customer_id ='';
                 }
                 if (this.form.requested_on =='') {

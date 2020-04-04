@@ -258,7 +258,6 @@
                 this.listen();
                 this.getProjects();
                 this.getGroups();
-                this.creditAccount();
                 this.getAccounts();
                 this.getAccountsD();
                 this.getCustomers();
@@ -461,14 +460,6 @@
                 })
              })
             },
-            creditAccount(){
-                // if (this.$store.state.all_my_charges.length) {
-                //  let account = this.$store.state.all_my_charges.find(req => req.type =='Requisition');
-                //  this.account = account.account;
-                //  this.form.credit_account_id  = account.account_id;
-                // }
-
-            },
             resetAccount(){
             this.form.where_to_charge = '';
             },
@@ -627,7 +618,6 @@
                 if (this.form.where_to_charge =='') {
                     return this.$toastr.e('Please select debit account.');
                 }
-                this.creditAccount();
                 this.form.customer_id ='';
                 }
                 if (this.form.requested_on =='') {

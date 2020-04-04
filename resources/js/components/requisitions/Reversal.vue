@@ -252,8 +252,6 @@
                 accounts:[],
                 uoms:[],
                 customers:[],
-                pricelists:{},
-                all_customers:{},
                 units:{},
                 filtered_uoms:{},
                 show_issue:true,
@@ -263,18 +261,12 @@
                 requisition:{},
                 subprojects:[],
                 accountsd:[],
-                all_charges:{},
-                all_accounts:{},
-                all_projects:{},
-                all_stk_group:{}
             }
         },
         created(){
-            this.getAllDetails();
             this.listen();
             this.getProjects();
             this.getGroups();
-            this.creditAccount();
             this.getAccounts();
             this.getCustomers();
             this.getAccountsDebit();
@@ -295,7 +287,6 @@
 
             },
             qty(){
-
             if (isNaN(parseFloat(this.qty)) && !isFinite(this.qty) && this.qty < 0) {
               //console.log('qqtyy....')
               this.qty = 1;
@@ -437,23 +428,37 @@
           },
             getExternal(){
              return [this.part,this.qty,this.unit_price,this.form.inventory_items_external,this.form.group_name,this.form.customer_id].join();
+            },
+            all_projects(){
+            return this.$store.state.all_my_projects;
+            },
+            all_customers(){
+                return this.$store.state.all_my_customers;
+            },
+            pricelists(){
+                return this.$store.state.all_my_pricelists;
+            },
+            units(){
+                return this.$store.state.all_my_uoms;
+            },
+            users(){
+                return this.$store.state.all_my_users;
+            },
+            parts(){
+                return this.$store.state.all_my_parts;
+            },
+            vehicles(){
+                return this.$store.state.all_my_vehicles;
+            },
+            all_accounts(){
+                return this.$store.state.all_my_accounts;
+            },
+            all_stk_groups(){
+                return this.$store.state.all_my_stk_groups;
             }
         },
 
         methods:{
-            getAllDetails(){
-                this.all_customers = this.$store.state.all_my_customers;
-                this.pricelists = this.$store.state.all_my_pricelists;
-                this.units = this.$store.state.all_my_uoms;
-                this.users = this.$store.state.all_my_users;
-                this.parts = this.$store.state.all_my_parts;
-                this.vehicles = this.$store.state.all_my_vehicles;
-                this.all_charges = this.$store.state.all_my_charges;
-                this.all_accounts = this.$store.state.all_my_accounts;
-                this.all_projects = this.$store.state.all_my_projects;
-                this.all_stk_groups = this.$store.state.all_my_stk_groups;
-            },
-
             subProject(){
                 this.subprojects =[];
                 let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.project_id);
@@ -472,27 +477,11 @@
              //console.log(res.data.inventory_items_internal)
          })
           },
-            creditAccount(){
-                 //  if (this.all_charges.length) {
-                 // let account = this.all_charges.find(req => req.type =='Requisition');
-               // console.log(account)
-                 //this.form.account = this.$store.state.all_my_accounts.;
-
-                //  this.form.credit_account_id  = account.account_id;
-                // }
-
-            },
             resetAccount(){
             this.form.where_to_charge = '';
             },
             resetCustomer(){
             this.form.customer_id = '';
-            },
-            getPriceLists(){
-            axios.get('price-list')
-            .then(res => {
-                this.pricelists = res.data;
-            })
             },
             getCustomers(){
                 this.all_customers.forEach(c => {
@@ -682,7 +671,6 @@
             },
             listen(){
                  this.form = this.$store.state.requisitions;
-                 console.log(this.form)
                 this.subProject();
                 this.selectedGroup();
                 },
