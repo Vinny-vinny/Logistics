@@ -90,7 +90,6 @@
         methods:{
             getAllDetails(){
                 this.$store.dispatch('my_reqs');
-                this.initDatable();
                 this.$store.dispatch('my_parts');
                 this.$store.dispatch('my_customers');
                 this.$store.dispatch('my_accounts');
@@ -100,6 +99,7 @@
                 this.$store.dispatch('my_stk_groups');
                 this.$store.dispatch('my_users');
                 this.$store.dispatch('my_projects');
+                this.initDatable();
             },
             addReq(){
                  this.show_add_txt = true;
