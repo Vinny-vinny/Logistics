@@ -101,7 +101,7 @@
             },
             addReq(){
                 this.show_add_txt = true;
-              console.log(this.this.parts)
+              console.log(this.parts)
                 if (this.parts.length > 1){
                     console.log('walla')
                     this.show_add_txt = false;
