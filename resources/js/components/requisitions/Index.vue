@@ -104,7 +104,7 @@
                 setTimeout(()=>{
                    this.add_requisition=true;
                     this.show_add_txt = false;
-                },1000)
+                },3000)
                 //  this.show_add_txt = true;
                 // if (this.pricelists.length > 1 && this.parts.length > 1){
                 //     this.show_add_txt = false;
