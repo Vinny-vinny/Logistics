@@ -42,6 +42,7 @@
 </template>
 <script>
     import Requisition from "./ShowReversal";
+    import {mapGetters} from "vuex";
     export default {
         data(){
             return {
@@ -61,21 +62,19 @@
             this.listen();
             },
         computed:{
+            ...mapGetters({
+                pricelists:'all_pricelists',
+                parts:'all_parts',
+                reqs:'all_reqs'
+            }),
             tableData(){
-                if (this.$store.state.all_my_reqs.length > 1){
-                 return  this.$store.state.all_my_reqs.filter(req => req.reversal_ref !=='' && req.reversal_ref !==null);
+                if (this.reqs.length > 1){
+                 return  this.reqs.filter(req => req.reversal_ref !=='' && req.reversal_ref !==null);
                 }
-            },
-            pricelists(){
-                return this.$store.state.all_my_pricelists;
-            },
-            parts(){
-                return this.$store.state.all_my_parts;
-            },
+            }
         },
         methods:{
             getAllDetails(){
-                this.$store.dispatch('my_reqs');
                 this.$store.dispatch('my_parts');
                 this.$store.dispatch('my_customers');
                 this.$store.dispatch('my_accounts');
@@ -85,7 +84,10 @@
                 this.$store.dispatch('my_stk_groups');
                 this.$store.dispatch('my_users');
                 this.$store.dispatch('my_projects');
+                this.$store.dispatch('my_reqs').then(() => {
                 this.initDatable();
+                })
+
                 },
 
             editRequisition(rq){

@@ -238,6 +238,39 @@ export default new Vuex.Store({
          state.all_my_expenses = data;
         },
     },
+    getters:{
+      all_parts(state){
+      return state.all_my_parts;
+      },
+      all_pricelists(state){
+      return state.all_my_pricelists;
+      },
+        all_reqs(state){
+        return state.all_my_reqs;
+        },
+        all_users(state){
+        return state.all_my_users;
+        },
+        all_customers(state){
+        return state.all_my_customers;
+        },
+        all_accounts(state){
+        return state.all_my_accounts;
+        },
+        all_units(state){
+        return state.all_my_uoms;
+        },
+        all_vehicles(state){
+        return state.all_my_vehicles;
+        },
+        all_stk_groups(state){
+        return state.all_my_stk_groups;
+        },
+        all_projects(state){
+        return state.all_my_projects;
+        }
+
+    },
     actions:{
     pathTo({commit},to){
      commit('pathTo',to);

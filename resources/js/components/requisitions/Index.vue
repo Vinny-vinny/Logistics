@@ -54,6 +54,7 @@
     import RequisitionForm from "./RequisitionForm";
     import Reversal from "./Reversal";
     import ReqForm from "./ReqForm";
+    import {mapGetters} from "vuex";
     export default {
         data(){
             return {
@@ -77,19 +78,14 @@
             this.listen();
             },
         computed:{
-            tableData(){
-            return  this.$store.state.all_my_reqs;
-            },
-            pricelists(){
-              return this.$store.state.all_my_pricelists;
-            },
-            parts(){
-                return this.$store.state.all_my_parts;
-            },
+            ...mapGetters({
+                parts:'all_parts',
+                pricelists:'all_pricelists',
+                tableData:'all_reqs',
+            })
         },
         methods:{
             getAllDetails(){
-                this.$store.dispatch('my_reqs');
                 this.$store.dispatch('my_parts');
                 this.$store.dispatch('my_customers');
                 this.$store.dispatch('my_accounts');
@@ -99,12 +95,13 @@
                 this.$store.dispatch('my_stk_groups');
                 this.$store.dispatch('my_users');
                 this.$store.dispatch('my_projects');
-                this.initDatable();
+                this.$store.dispatch('my_reqs').then(() =>{
+                    this.initDatable();
+                });
             },
             addReq(){
                  this.show_add_txt = true;
-                if (this.$store.state.all_my_pricelists.length > 1 && this.$store.state.all_my_parts.length > 1){
-                    //console.log('cool....')
+                if (this.pricelists.length > 1 && this.parts.length > 1){
                     this.show_add_txt = false;
                     this.add_requisition=true
                 }

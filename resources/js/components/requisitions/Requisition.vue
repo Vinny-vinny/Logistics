@@ -211,6 +211,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
      import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props:['edit'],
         data(){
@@ -408,6 +409,16 @@
             }
         },
         computed:{
+         ...mapGetters({
+             all_customers:'all_customers',
+             pricelists:'all_pricelists',
+             units: 'all_units',
+             users: 'all_users',
+             parts: 'all_parts',
+             vehicles: 'all_vehicles',
+             all_accounts: 'all_accounts',
+             all_stk_groups: 'all_stk_groups',
+         }),
         internalType(){
         return this.form.type =='Internal';
         },
@@ -417,31 +428,7 @@
             getExternal(){
              return [this.part,this.qty,this.unit_price,this.form.inventory_items_external,this.form.group_name,this.form.customer_id].join();
             },
-            all_customers(){
-            return this.$store.state.all_my_customers;
             },
-            pricelists(){
-            return this.$store.state.all_my_pricelists;
-            },
-            units(){
-             return this.$store.state.all_my_uoms;
-            },
-            users(){
-            return this.$store.state.all_my_users;
-            },
-            parts(){
-            return this.$store.state.all_my_parts;
-            },
-            vehicles(){
-            return this.$store.state.all_my_vehicles;
-            },
-            all_accounts(){
-            return this.$store.state.all_my_accounts;
-            },
-            all_stk_groups(){
-            return this.$store.state.all_my_stk_groups;
-            }
-        },
         methods:{
          issueStock(req_id){
           this.issue_text = true;
