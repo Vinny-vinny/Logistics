@@ -105,6 +105,7 @@
             addReq(){
                  this.show_add_txt = true;
                 if (this.pricelists.length > 1 && this.parts.length > 1){
+                    console.log('walla')
                     this.show_add_txt = false;
                     this.add_requisition=true
                 }
