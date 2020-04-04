@@ -89,6 +89,7 @@
         },
         methods:{
             getAllDetails(){
+                this.$store.dispatch('my_reqs');
                 this.$store.dispatch('my_parts');
                 this.$store.dispatch('my_customers');
                 this.$store.dispatch('my_accounts');
@@ -96,8 +97,7 @@
                 this.$store.dispatch('my_uoms');
                 this.$store.dispatch('my_vehicles');
                 this.$store.dispatch('my_stk_groups');
-                this.$store.dispatch('my_users');
-                this.$store.dispatch('my_reqs').then(() => {
+                this.$store.dispatch('my_users').then(() => {
                     this.initDatable();
                 });
 
