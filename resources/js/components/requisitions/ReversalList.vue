@@ -92,6 +92,7 @@
                 this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
                         if (this.pricelists.length > 1 && this.parts.length > 1){
+
                             this.editing=true;
                             this.add_requisition=true;
                         }
