@@ -57,7 +57,6 @@
     export default {
         data(){
             return {
-                tableData: [],
                 add_requisition: false,
                 editing: false,
                 show_form:false,
@@ -73,103 +72,47 @@
                 show_add_txt:false
             }
         },
-        watch:{
-            mycustomers(){
-                if (this.customers.length){
-                 this.add_requisition = true;
-                }
-            }
-        },
         created(){
-           //this.$store.dispatch('loadUsers');
-            this.$store.dispatch('compute_prices');
-            console.log(this.cPrices);
+            this.getAllDetails();
             this.listen();
-            this.getRequisitions();
-            this.getAllAccounts();
-            this.getAllCustomers();
-            this.getPricelists();
-            this.getUoms();
-            this.getParts();
-            this.getGroups();
-
-        },
+            },
         computed:{
-            cPrices(){
-            return   this.$store.state.p_lists;
+            tableData(){
+            return  this.$store.state.all_my_reqs;
             },
-            cust(){
-              return this.check_customers;
+            pricelists(){
+              return this.$store.state.all_my_pricelists;
             },
-            account(){
-                return this.check_accounts;
+            parts(){
+                return this.$store.state.all_my_parts;
             },
-            price(){
-                return this.check_prices;
-            },
-            part(){
-                return this.check_parts;
-            },
-            donePrices(){
-                return this.$store.getters.donePrices;
-            }
         },
         methods:{
+            getAllDetails(){
+
+                this.$store.dispatch('my_reqs').then(() => {
+                    this.initDatable();
+                });
+                this.$store.dispatch('my_parts');
+                this.$store.dispatch('my_customers');
+                this.$store.dispatch('my_accounts');
+                this.$store.dispatch('my_pricelists');
+                this.$store.dispatch('my_uoms');
+                this.$store.dispatch('my_vehicles');
+                this.$store.dispatch('my_stk_groups');
+                this.$store.dispatch('my_users');
+            },
             addReq(){
-                this.show_add_txt = true;
-                if (this.cust && this.account && this.price && this.part){
+                 this.show_add_txt = true;
+                if (this.pricelists.length > 1 && this.parts.length > 1){
                     this.show_add_txt = false;
                     this.add_requisition=true
                 }
             },
-            getGroups(){
-                axios.get('stk-groups')
-                    .then(res => {
-                        this.$store.dispatch('my_stk_groups',res.data);
-                    })
-            },
-            getAllAccounts(){
-                this.check_accounts =false;
-                axios.get('accounts')
-                    .then(res => {
-                        this.check_accounts =true;
-                        this.$store.dispatch('my_accounts',res.data);
-                    })
-            },
-            getAllCustomers(){
-                this.check_customers =false;
-                axios.get('customers')
-                    .then(res => {
-                        this.check_customers =true;
-                        this.$store.dispatch('my_customers',res.data);
-                    })
-            },
-            getPricelists(){
-                this.check_prices =false;
-                axios.get('price-list')
-                    .then(res => {
-                        this.check_prices =true;
-                        this.$store.dispatch('my_pricelists',res.data);
-                    })
-            },
-            getUoms(){
-                axios.get('uom')
-                    .then(res => {
-                        this.$store.dispatch('my_uoms',res.data);
-                    })
-            },
-            getParts(){
-                this.check_parts = false;
-                axios.get('parts')
-                    .then(res => {
-                     this.check_parts = true;
-                     this.$store.dispatch('my_parts',res.data);
-                    })
-            },
             reverseRequisition(rq){
             this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
-                        if (this.cust && this.account && this.price && this.part){
+                        if (this.pricelists.length > 1 && this.parts.length > 1){
                             this.reversing=true;
                             this.show_reversal = true;
                             this.add_requisition=false;
@@ -177,24 +120,10 @@
 
                     })
             },
-            getRequisitions(){
-                axios.get('requisitions')
-                    .then(res => {
-                        this.tableData = res.data.requisitions;
-                        this.projects = res.data.projects;
-                        this.initDatable();
-                        this.$store.dispatch('my_vehicles',res.data.machines);
-                        this.$store.dispatch('my_reqs',res.data.requisitions);
-                        this.$store.dispatch('my_charges',res.data.charges);
-                        this.$store.dispatch('my_projects',res.data.projects);
-                    })
-                    .catch(error => Exception.handle(error))
-
-            },
             editRequisition(rq){
                 this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
-                        if (this.cust && this.account && this.price && this.part){
+                        if (this.pricelists.length > 1 && this.parts.length > 1){
                             this.show_add_txt = false;
                             this.add_requisition=true
                             this.editing=true;
@@ -225,7 +154,7 @@
                     this.reversing = false;
                     this.show_reversal = false;
                     this.show_add_txt = false;
-                    this.getRequisitions();
+                    //this.getRequisitions();
                     this.initDatable();
                 });
                 eventBus.$on('close_req_form',(req) => {
@@ -247,8 +176,7 @@
                 });
                 eventBus.$on('hide_form',() =>{
                 this.show_form = false;
-                this.getRequisitions();
-
+              //  this.getRequisitions();
                 })
             },
             initDatable(){

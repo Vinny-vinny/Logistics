@@ -237,20 +237,11 @@ export default new Vuex.Store({
         my_expenses(state,data){
          state.all_my_expenses = data;
         },
-        compute_prices(state,data){
-         state.p_lists = data;
-        }
     },
     actions:{
     pathTo({commit},to){
      commit('pathTo',to);
     },
-        loadUsers({commit}){
-        axios.get('accounts')
-            .then(res => {
-                commit('getAllUsers',res.data)
-            }).catch((e) => console.log(e))
-        },
         updateServiceType({commit},service){
         commit('updateServiceType',service);
         },
@@ -353,23 +344,42 @@ export default new Vuex.Store({
         updateCharges({commit},charge){
         commit('updateCharges',charge);
         },
-        my_parts({commit},data){
-        commit('my_parts',data);
+        my_parts({commit}){
+        axios.get('parts')
+            .then(res => {
+                commit('my_parts',res.data);
+            })
         },
         my_customers({commit},data){
-        commit('my_customers',data);
+        axios.get('customers')
+            .then(res => {
+             commit('my_customers',res.data);
+            })
         },
-        my_vehicles({commit},data){
-         commit('my_vehicles',data);
+        my_vehicles({commit}){
+            axios.get('machines')
+                .then(res => {
+                    commit('my_vehicles',res.data);
+                })
         },
-        my_uoms({commit},data){
-         commit('my_uoms',data);
+        my_uoms({commit}){
+        axios.get('uom')
+            .then(res => {
+                commit('my_uoms',res.data);
+            })
         },
-        my_pricelists({commit},data){
-        commit('my_pricelists',data);
+        my_pricelists({commit}){
+        axios.get('price-list')
+            .then(res => {
+              commit('my_pricelists',res.data);
+            }).catch(e => console.log(e))
         },
-        my_reqs({commit},data){
-        commit('my_reqs',data);
+        my_reqs({commit}){
+        axios.get('requisitions')
+            .then(res => {
+                commit('my_reqs',res.data);
+            })
+            .catch(error => Exception.handle(error))
         },
         my_job_types({commit},data){
         commit('my_job_types',data);
@@ -393,7 +403,10 @@ export default new Vuex.Store({
         commit('my_projects',data);
         },
         my_accounts({commit},data){
-        commit('my_accounts',data);
+        axios.get('accounts')
+            .then(res => {
+                commit('my_accounts',res.data);
+            })
         },
         my_job_categories({commit},data){
         commit('my_job_categories',data);
@@ -411,17 +424,14 @@ export default new Vuex.Store({
         commit('my_mechanics',data);
         },
         my_stk_groups({commit},data){
-        commit('my_stk_groups',data);
+        axios.get('stk-groups')
+            .then(res => {
+                commit('my_stk_groups',res.data);
+            })
         },
         my_expenses({commit},data){
         commit('my_expenses',data);
         },
-        compute_prices({commit},data){
-        axios.get('price-list')
-            .then(res => {
-             commit('compute_prices',res.data);
-            }).catch(e => console.log(e))
-        }
 
     }
 })

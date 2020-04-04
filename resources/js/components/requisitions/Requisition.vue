@@ -238,7 +238,6 @@
                 qty:'',
                 part:'',
                 unit_price:'',
-                users:{},
                 username:User.name(),
                 stk_groups:[],
                 items:[],
@@ -247,22 +246,15 @@
                 accountsd:[],
                 uoms:[],
                 customers:[],
-                pricelists:{},
-                all_customers:{},
-                units:{},
                 filtered_uoms:{},
                 account:'',
                 show_issue:true,
                 show_customer:false,
                 subprojects:[],
-                parts:{},
-                all_accounts:{},
-                all_stk_groups:{}
 
             }
         },
         created(){
-                this.getAllDetails();
                 this.listen();
                 this.getProjects();
                 this.getGroups();
@@ -425,6 +417,30 @@
           },
             getExternal(){
              return [this.part,this.qty,this.unit_price,this.form.inventory_items_external,this.form.group_name,this.form.customer_id].join();
+            },
+            all_customers(){
+            return this.$store.state.all_my_customers;
+            },
+            pricelists(){
+            return this.$store.state.all_my_pricelists;
+            },
+            units(){
+             return this.$store.state.all_my_uoms;
+            },
+            users(){
+            return this.$store.state.all_my_users;
+            },
+            parts(){
+            return this.$store.state.all_my_parts;
+            },
+            vehicles(){
+            return this.$store.state.all_my_vehicles;
+            },
+            all_accounts(){
+            return this.$store.state.all_my_accounts;
+            },
+            all_stk_groups(){
+            return this.$store.state.all_my_stk_groups;
             }
         },
         methods:{
@@ -458,17 +474,6 @@
             },
             resetCustomer(){
             this.form.customer_id = '';
-            },
-                getAllDetails(){
-                this.all_customers = this.$store.state.all_my_customers;
-                this.pricelists = this.$store.state.all_my_pricelists;
-                this.units = this.$store.state.all_my_uoms;
-                this.users = this.$store.state.all_my_users;
-                this.parts = this.$store.state.all_my_parts;
-                this.vehicles = this.$store.state.all_my_vehicles;
-                this.all_accounts = this.$store.state.all_my_accounts;
-                this.all_stk_groups = this.$store.state.all_my_stk_groups;
-
             },
             getCustomers(){
            //  console.log(this.all_customers);
@@ -655,12 +660,7 @@
             listen(){
                 if (this.edit){
                     this.form = this.$store.state.requisitions;
-                    this.all_customers = this.$store.state.all_my_customers;
-                    this.vehicles = this.$store.state.all_my_vehicles;
-                    this.parts = this.$store.state.all_my_parts;
-                    this.units = this.$store.state.all_my_uoms;
-                    this.pricelists = this.$store.state.all_my_pricelists;
-                    this.subProject();
+                   this.subProject();
                     this.selectedGroup();
                 }
             },
