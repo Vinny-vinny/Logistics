@@ -103,8 +103,8 @@
             },
             addReq(){
                  this.show_add_txt = true;
-                if (this.pricelists.length > 1 && this.parts.length > 1){
-                    console.log('cool....')
+                if (this.$store.state.all_my_pricelists.length > 1 && this.$store.state.all_my_parts.length > 1){
+                    //console.log('cool....')
                     this.show_add_txt = false;
                     this.add_requisition=true
                 }
