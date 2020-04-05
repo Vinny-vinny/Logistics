@@ -39,20 +39,7 @@ class JobcardController extends Controller
      */
     public function index()
     {
-      return response()->json([
-          'jobcards' =>JobcardResource::collection(Jobcard::take(200)->orderBy('created_at','DESC')->get()),
-          'customer_types' => DB::table('customer_types')->get(),
-          'mechanics' => DB::table('mechanics')->get(),
-          'jobcard_categories' => DB::table('jobcard_categories')->get(),
-          'asset_categories' => DB::table('asset_categories')->get(),
-          'job_types' => DB::table('job_types')->get(),
-          'categories' => DB::table('categories')->get(),
-          'service_types' => DB::table('service_types')->get(),
-          'tracks' => DB::table('track_bies')->get(),
-          'users' => DB::table('users')->get(),
-          'requisitions' => DB::table('requisitions')->take(1000)->orderBy('created_at','DESC')->get(),
-
-      ]);
+      return response()->json(JobcardResource::collection(Jobcard::orderBy('created_at','DESC')->get()));
     }
 
     /**

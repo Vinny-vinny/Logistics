@@ -268,6 +268,33 @@ export default new Vuex.Store({
         },
         all_projects(state){
         return state.all_my_projects;
+        },
+        all_jobs(state){
+            return state.all_my_jobcards;
+        },
+        all_categories(state){
+            return state.all_my_categories;
+        },
+        all_mechanics(state){
+            return state.all_my_mechanics;
+        },
+        all_tracks(state){
+            return state.all_my_tracks;
+        },
+        all_customer_types(state){
+            return state.all_my_customer_types;
+        },
+        all_service_types(state){
+            return state.all_my_service_types;
+        },
+        all_job_categories(state){
+            return state.all_my_job_categories;
+        },
+        all_job_types(state){
+          return state.all_my_job_types;
+        },
+        all_fuels(state){
+            return state.all_my_fuels;
         }
 
     },
@@ -414,25 +441,41 @@ export default new Vuex.Store({
             })
             .catch(error => Exception.handle(error))
         },
-        my_job_types({commit},data){
-        commit('my_job_types',data);
+        my_job_types({commit}){
+        axios.get('job-types')
+            .then(res => {
+                commit('my_job_types',res.data);
+            })
+            .catch(error => Exception.handle(error))
         },
-        my_jobcards({commit},data){
-        commit('my_jobcards',data);
+        my_jobcards({commit}){
+        axios.get('job-card')
+            .then(res => {
+                commit('my_jobcards',res.data);
+            })
         },
         my_charges({commit},data){
         commit('my_charges',data);
         },
-        my_users({commit},data){
-        commit('my_users',data);
+        my_users({commit}){
+        axios.get('users')
+            .then(res => {
+             commit('my_users',res.data);
+            })
         },
-        my_customer_types({commit},data){
-        commit('my_customer_types',data)
+        my_customer_types({commit}){
+        axios.get('customer-types')
+            .then(res => {
+                commit('my_customer_types',res.data);
+            })
         },
-        my_fuels({commit},data){
-        commit('my_fuels',data);
+        my_fuels({commit}){
+        axios.get('fuel')
+            .then(res => {
+             commit('my_fuels',res.data);
+            })
         },
-        my_projects({commit},data){
+        my_projects({commit}){
         axios.get('asset-category')
             .then(res => {
                 commit('my_projects',res.data);
@@ -444,20 +487,40 @@ export default new Vuex.Store({
                 commit('my_accounts',res.data);
             })
         },
-        my_job_categories({commit},data){
-        commit('my_job_categories',data);
+        my_job_categories({commit}){
+        axios.get('jobcard-category')
+            .then(res => {
+                commit('my_job_categories',res.data);
+            })
+            .catch(error => Exception.handle(error))
         },
-        my_service_types({commit},data){
-        commit('my_service_types',data);
+        my_service_types({commit}){
+        axios.get('service-types')
+            .then(res => {
+                commit('my_service_types',res.data);
+            })
+            .catch(error => Exception.handle(error))
         },
-        my_tracks({commit},data){
-        commit('my_tracks',data);
+        my_tracks({commit}){
+        axios.get('track-by')
+            .then(res => {
+                commit('my_tracks',res.data);
+            })
+            .catch(error => Exception.handle(error))
         },
-        my_categories({commit},data){
-        commit('my_categories',data);
+        my_categories({commit}){
+        axios.get('categories')
+            .then(res => {
+                commit('my_categories',res.data);
+            })
+            .catch(error => Exception.handle(error))
         },
-        my_mechanics({commit},data){
-        commit('my_mechanics',data);
+        my_mechanics({commit}){
+        axios.get('mechanics')
+            .then(res => {
+                commit('my_mechanics',res.data);
+            })
+            .catch(error => Exception.handle(error))
         },
         my_stk_groups({commit},data){
         axios.get('stk-groups')

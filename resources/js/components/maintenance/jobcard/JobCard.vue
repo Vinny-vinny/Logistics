@@ -312,6 +312,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
      import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props: ['edit'],
         data() {
@@ -345,10 +346,7 @@
                 checklist: '',
                 invoice_text:false,
                 edit_jobcard: this.edit,
-                machines: {},
-                tracks: {},
                 service_types: {},
-                services: {},
                 balances: {},
                 internal: false,
                 external: false,
@@ -356,34 +354,27 @@
                 show_track_by: false,
                 make: '',
                 driver: '',
-                users: {},
                 previous_readings: 0,
                 actual_readings: 0,
                 service_after: 0,
                 next_computed_readings: 0,
                 show_next_readings: true,
-                parts: {},
                 categories: [],
                 status: 1,
                 projects: [],
-                job_categories: {},
                 mechanics: [],
-                job_types: {},
                 customer_type: '',
-                customers: {},
                 filtered_customers: [],
                 show_customers: false,
                 part_qty: '',
                 part_id: '',
                 exp_qty: '',
                 exp_id: '',
-                requisitions: {},
                 show_inventory: false,
                 filtered_items_internal: [],
                 filtered_items_external: [],
                 disable_rq: false,
                 filtered_rq: '',
-                customer_types: {},
                 rqs:[],
                 subprojects:[],
                 transactions:{},
@@ -466,7 +457,6 @@
             }
         },
         created() {
-                this.getAllDetails();
                 this.getCategories();
                 this.getMechanics();
                 this.getProjects();
@@ -479,8 +469,22 @@
                 return moment(date);
             }
         },
-
         computed: {
+           ...mapGetters({
+               customers:'all_customers',
+               requisitions:'all_reqs',
+               parts:'all_parts',
+               machines:'all_vehicles',
+               job_categories:'all_job_categories',
+               all_categories:'all_categories',
+               customer_types:'all_customer_types',
+               services:'all_service_types',
+               tracks:'all_tracks',
+               users:'all_users',
+               job_types:'all_job_types',
+               all_projects:'all_projects',
+               all_mechanics:'all_mechanics'
+           }),
             labours(){
             return [this.form.hours_spent,this.form.job_type_id].join();
             },
@@ -508,7 +512,6 @@
              this.invoice_text = true;
             axios.post(`invoice-job-card`,this.form)
             .then(res => {
-                console.log(res.data)
               eventBus.$emit('cancel')
             })
             },
@@ -571,18 +574,6 @@
 
 
             },
-            getAllDetails(){
-                this.customers = this.$store.state.all_my_customers;
-                this.requisitions = this.$store.state.all_my_reqs;
-                this.parts = this.$store.state.all_my_parts;
-                this.machines = this.$store.state.all_my_vehicles;
-                this.job_categories = this.$store.state.all_my_job_categories;
-                this.customer_types = this.$store.state.all_my_customer_types;
-                this.services = this.$store.state.all_my_service_types;
-                this.tracks = this.$store.state.all_my_tracks;
-                this.users = this.$store.state.all_my_users;
-                this.job_types = this.$store.state.all_my_job_types;
-            },
             getParts() {
                         this.parts.forEach(p => {
                             this.stk_items.push({
@@ -605,7 +596,7 @@
                 }
             },
             getCategories() {
-                this.$store.state.all_my_categories.forEach(c => {
+                this.all_categories.forEach(c => {
                     this.categories.push({
                         'value': c.id,
                         'text': c.name
@@ -613,7 +604,7 @@
                 })
             },
             getMechanics() {
-                this.$store.state.all_my_mechanics.forEach(m => {
+                this.all_mechanics.forEach(m => {
                     this.mechanics.push({
                         'value': m.id,
                         'text': m.name
@@ -621,7 +612,7 @@
                 })
             },
             getProjects() {
-                this.$store.state.all_my_projects.forEach(p => {
+               this.all_projects.forEach(p => {
                     this.projects.push({
                         'value': p.project_link,
                         'text': p.name

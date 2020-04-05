@@ -175,6 +175,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
     import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props: ['edit', 'other_fuel', 'add_fuel','reverse'],
         data() {
@@ -205,25 +206,17 @@
                 },
                 edit_fuel: this.edit,
                 other_fuel_asset: this.other_fuel,
-                customers: {},
-                vehicles: {},
-                drivers: {},
                 expenses: {},
                 company: false,
                 other: false,
-                fuel_types: {},
                 fuel_type: '',
                 total: 0,
                 show_fuel_type: false,
                 show_rate: false,
-                parts: {},
                 total_expenses:0,
                 pa:{},
                 filtered_customers:[],
-                customer_types:{},
-                jobcards:{},
                 show_customer:false,
-                fuels:{},
                 jobs:{},
                 username:User.name(),
                 projects:[],
@@ -233,13 +226,11 @@
                 accountsd:[],
                 show_issue:false,
                 show_inv:false,
-                account:'',
-                all_accounts:{}
+                account:''
 
             }
         },
         created() {
-            this.getAllDetails();
             this.listen();
             this.assetType();
             this.getParts();
@@ -280,6 +271,18 @@
             });
         },
         computed: {
+            ...mapGetters({
+                fuels:'all_fuels',
+                customers:'all_customers',
+                customer_types:'all_customer_types',
+                jobcards:'all_jobs',
+                parts:'all_parts',
+                drivers:'all_users',
+                all_accounts:'all_accounts',
+                all_projects:'all_projects',
+                vehicles:'all_vehicles',
+                all_stk_groups:'all_stk_groups',
+            }),
              checkCatgory(){
            return this.form.fuel_category_id =='stock_issue';
             },
@@ -304,7 +307,6 @@
         },
         methods: {
             getAccountsDebit(){
-                /// let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
                 this.all_accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
@@ -312,20 +314,7 @@
                     })
                 })
             },
-            getAllDetails(){
-                this.fuels = this.$store.state.all_my_fuels;
-                this.customers = this.$store.state.all_my_customers;
-                this.customer_types = this.$store.state.all_my_customer_types;
-                this.jobcards = this.$store.state.all_my_jobcards;
-                this.parts = this.$store.state.all_my_parts;
-                this.drivers  = this.$store.state.all_my_users;
-                this.vehicles = this.$store.state.all_my_vehicles;
-                this.all_accounts =  this.$store.state.all_my_accounts;
-                this.all_projects = this.$store.state.all_my_projects;
-                this.expenses = this.$store.state.all_my_expenses;
-            },
-
-          getAccounts(){
+           getAccounts(){
             let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
             accounts.forEach(a => {
                 this.accounts.push({
@@ -378,15 +367,7 @@
 
             },
             genExpenses(){
-                let total = 0;
-                if (this.form.expense_id !=='') {
-                    for (let i =0; i< this.expenses.length; i++){
-                        if (this.expenses[i]['id'] === this.form.expense_id){
-                            total += parseFloat(this.expenses[i]['cost']);
-                        }
-                    }
-                }
-                return total;
+                 return 0;
             },
             getParts() {
               this.stks = this.parts.filter(p => p.code == 'LA0012' || p.code == 'LA0018');

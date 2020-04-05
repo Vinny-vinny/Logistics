@@ -57,14 +57,6 @@
                                     <label>Fuel Rate</label>
                                     <input type="text" class="form-control" v-model="form.rate">
                                 </div>
-                                <div class="form-group" style="display:none">
-                                    <label>Other Charges</label>
-                                    <select name="expense_id" class="form-control" v-model="form.expense_id" @change="genExpenses()">
-                                        <option :value="expense.id" v-for="expense in expenses" :key="expense.id">
-                                            {{expense.name}}
-                                        </option>
-                                    </select>
-                                </div>
                                 <div class="form-group" v-if="jobs.length">
                                     <label>Jobcard</label>
                                     <select v-model="form.job_card_id" class="form-control">
@@ -173,6 +165,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
     import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props: ['edit', 'other_fuel', 'add_fuel'],
         data() {
@@ -205,9 +198,6 @@
                 issue_text:false,
                 invoice_text:false,
                 other_fuel_asset: this.other_fuel,
-                customers: {},
-                vehicles: {},
-                drivers: {},
                 expenses: {},
                 company: false,
                 other: false,
@@ -215,14 +205,10 @@
                 total: 0,
                 show_fuel_type: false,
                 show_rate: false,
-                parts: {},
                 total_expenses:0,
                 pa:{},
                 filtered_customers:[],
-                customer_types:{},
-                jobcards:{},
                 show_customer:false,
-                fuels:{},
                 jobs:{},
                 username:User.name(),
                 projects:[],
@@ -233,22 +219,17 @@
                 show_issue:false,
                 show_inv:false,
                 account:'',
-                charges:{},
-                all_accounts:{},
-                all_projects:{},
                 stk_groups:{}
 
             }
         },
         created() {
-                this.getAllDetails();
                 this.getProjects();
                 this.getAccounts();
                 this.getStkGroups();
                 this.listen();
                 this.assetType();
                 this.getParts();
-                this.creditAccount();
                 this.getAccountsDebit();
                 },
        watch:{
@@ -283,6 +264,18 @@
             });
         },
         computed: {
+            ...mapGetters({
+                fuels:'all_fuels',
+                customers:'all_customers',
+                customer_types:'all_customer_types',
+                jobcards:'all_jobs',
+                parts:'all_parts',
+                drivers:'all_users',
+                all_accounts:'all_accounts',
+                all_projects:'all_projects',
+                vehicles:'all_vehicles',
+                all_stk_groups:'all_stk_groups',
+            }),
              checkCatgory(){
            return this.form.fuel_category_id =='stock_issue';
             },
@@ -307,10 +300,7 @@
         },
         methods: {
             getStkGroups(){
-                axios.get('stk-groups')
-                    .then(res => {
-                       this.form.credit_account_id = res.data.find(g => g.name ==='IG002').account_link;
-                    })
+            this.form.credit_account_id = this.all_stk_groups.find(g => g.name ==='IG002').account_link;
             },
         InvoiceFuel(){
          this.invoice_text = true;
@@ -320,19 +310,12 @@
          })
         },
         IssueFuel(){
-            this.issue_text = true;
+        this.issue_text = true;
         axios.post(`issue-fuel`,this.form)
         .then(res => {
         eventBus.$emit('listFuels', res.data)
         })
         },
-            creditAccount(){
-                // if (this.charges.length) {
-                //  let account = this.charges.find(req => req.type =='Fueling');
-                //  this.account = account.account;
-                //  this.form.credit_account_id  = account.account_id;
-               // }
-            },
             resetCustomerType(){
             this.form.customer_type_id = '';
             },
@@ -340,7 +323,7 @@
             this.form.customer_id = '';
             },
             subProject(){
-                this.subprojects =[];
+             this.subprojects =[];
              let subp = this.vehicles.filter(vehicle => vehicle.asset_category_id == this.form.asset_category_id);
              subp.forEach(p => {
                 this.subprojects.push({
@@ -348,18 +331,6 @@
                     'text': p.description
                 })
              })
-            },
-            getAllDetails(){
-            this.fuels = this.$store.state.all_my_fuels;
-            this.customers = this.$store.state.all_my_customers;
-            this.customer_types = this.$store.state.all_my_customer_types;
-            this.jobcards = this.$store.state.all_my_jobcards;
-            this.charges = this.$store.state.all_my_charges;
-            this.parts = this.$store.state.all_my_parts;
-            this.drivers  = this.$store.state.all_my_users;
-            this.vehicles = this.$store.state.all_my_vehicles;
-            this.all_accounts =  this.$store.state.all_my_accounts;
-            this.all_projects = this.$store.state.all_my_projects;
             },
             getProjects(){
                 this.all_projects.forEach(p => {
@@ -370,17 +341,16 @@
                 })
             },
             getAccounts(){
-                  let accounts =this.all_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
-                  accounts.forEach(a => {
-                      this.accounts.push({
-                          'value': a.account_link,
-                          'text': a.account
-                      })
-                  })
+          let accounts =this.all_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
+          accounts.forEach(a => {
+              this.accounts.push({
+                  'value': a.account_link,
+                  'text': a.account
+              })
+          })
             },
             getAccountsDebit(){
-               /// let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
-                this.all_accounts.forEach(a => {
+                    this.all_accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
                         'text': a.account
@@ -389,11 +359,9 @@
             },
 
             fuelRate(){
-            setTimeout(()=>{
                 let item =this.stks.find(s => s.id == this.form.fuel_type_id);
                 this.form.rate = item.cost;
                 this.fuel_type = item.description;
-            },100)
 
             },
             customerTypes(){
@@ -443,7 +411,6 @@
                     }
                     this.form.customer_type_id = '';
                     this.form.customer_id = '';
-                    this.creditAccount();
                 }
                   else if (this.form.fuel_category_id =='invoice') {
                     if (this.form.customer_id =='') {

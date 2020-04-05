@@ -9,7 +9,7 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Job Card</h3>
-                    <button class="btn btn-success pull-right" @click="show_form=true">Print Job Card Form</button>
+                    <button class="btn btn-success pull-right" @click="printJob()">Print Job Card Form</button>
                     <button class="btn btn-primary pull-right mr" @click="addJob()">{{show_add_text ? 'Please wait...' :'Add Job Card'}}</button>
                 </div>
                 <div class="box-body">
@@ -46,10 +46,10 @@
     import JobCard from "./JobCard";
     import JobForm from "./JobForm";
     import Reversal from "./Reversal";
+    import {mapGetters} from "vuex";
     export default {
         data(){
             return {
-                tableData: [],
                 add_jobcard: false,
                 editing: false,
                 show_form:false,
@@ -60,86 +60,61 @@
             }
         },
         created(){
+            this.getAllDetails();
             this.listen();
-            this.getJobs();
-            this.getReqs();
-            this.getCustomers();
-            this.getParts();
-            this.getMachines();
         },
         computed:{
-            cust(){
-                return this.check_customers;
-            },
-            part(){
-                return this.check_parts;
-            },
+           ...mapGetters({
+               tableData:'all_jobs',
+               parts:'all_parts',
+               machines:'all_vehicles'
+
+           })
         },
         methods:{
-                 reverseJob(rq){
+            printJob(){
+                if (this.machines.length > 1){
+                  this.show_form=true
+                }
+            },
+           getAllDetails(){
+               this.$store.dispatch('my_parts');
+               this.$store.dispatch('my_customers');
+               this.$store.dispatch('my_vehicles');
+               this.$store.dispatch('my_users');
+               this.$store.dispatch('my_job_types');
+               this.$store.dispatch('my_job_categories');
+               this.$store.dispatch('my_customer_types');
+               this.$store.dispatch('my_service_types');
+               this.$store.dispatch('my_tracks');
+               this.$store.dispatch('my_projects');
+               this.$store.dispatch('my_categories');
+               this.$store.dispatch('my_mechanics');
+               this.$store.dispatch('my_reqs');
+               this.$store.dispatch('my_jobcards').then(() =>{
+                   this.initDatable();
+               });
+           } ,
+            reverseJob(rq){
             this.$store.dispatch('updateJobcard',rq)
                     .then(() =>{
-                        this.show_reversal = true;
-                        this.add_jobcard=false;
+                        if (this.parts.length > 1) {
+                            this.show_reversal = true;
+                            this.add_jobcard = false;
+                        }
                     })
             },
             addJob(){
                 this.show_add_text=false;
-                if (this.cust && this.part){
+                if (this.parts.length > 1){
                     this.add_jobcard=true;
                     this.show_add_text=true;
                 }
             },
-            getCustomers(){
-              axios.get('customers')
-              .then(res => {
-                  this.check_customers = true;
-                  this.$store.dispatch('my_customers',res.data);
-              })
-            },
-            getParts(){
-                axios.get('parts')
-                    .then(res => {
-                        this.check_parts = true;
-                        this.$store.dispatch('my_parts',res.data);
-                    })
-            },
-            getMachines(){
-                axios.get('machines')
-                    .then(res => {
-                        this.$store.dispatch('my_vehicles',res.data);
-                    })
-            },
-            getJobs(){
-                axios.get('job-card')
-                    .then(res =>{
-                        this.tableData = res.data.jobcards;
-                        this.initDatable();
-                        this.$store.dispatch('my_job_types',res.data.job_types);
-                        this.$store.dispatch('my_job_categories',res.data.jobcard_categories);
-                        this.$store.dispatch('my_customer_types',res.data.customer_types);
-                        this.$store.dispatch('my_service_types',res.data.service_types);
-                        this.$store.dispatch('my_tracks',res.data.tracks);
-                        this.$store.dispatch('my_users',res.data.users);
-                        this.$store.dispatch('my_categories',res.data.categories);
-                        this.$store.dispatch('my_mechanics',res.data.mechanics);
-                        this.$store.dispatch('my_projects',res.data.asset_categories);
-                        this.$store.dispatch('my_reqs',res.data.requisitions);
-
-                    })
-                    .catch(error => Exception.handle(error))
-                this.initDatable();
-            },
-            getReqs(){
-                axios.get('requisitions')
-                    .then(res =>{
-                     this.$store.dispatch('my_reqs',res.data.requisitions)
-            }).catch(error => Exception.handle(error))
-            },
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)
                     .then(() =>{
-                            if (this.cust && this.part){
+                        if (this.parts.length > 1){
                                 this.editing=true;
                                 this.add_jobcard=true;
                             }
@@ -163,7 +138,6 @@
                     this.add_jobcard =false;
                     this.show_add_text=false;
                     this.initDatable();
-                    this.getJobs();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_jobcard = false;
@@ -171,7 +145,6 @@
                     this.show_reversal = false;
                     this.show_add_text=false;
                     this.initDatable();
-                    this.getJobs();
                 });
                 eventBus.$on('updateJobcard',(job)=>{
                     this.add_jobcard = false;
@@ -188,12 +161,10 @@
                 });
                 eventBus.$on('close_form',() => {
                     this.show_form = false;
-                    this.getJobs();
                     this.initDatable();
                 });
                 eventBus.$on('cancel_job',() =>{
                     this.show_form = false;
-                    this.getJobs();
                     this.initDatable();
                 });
             },

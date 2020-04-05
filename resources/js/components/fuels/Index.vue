@@ -53,10 +53,10 @@
     import Fuel from "./Fuel";
     import Reversal from "./Reversal";
     import ShowFuel from "./ShowFuel";
+    import {mapGetters} from "vuex";
     export default {
         data() {
             return {
-                tableData: [],
                 add_fuel: false,
                 add_fuel_other: false,
                 editing: false,
@@ -69,79 +69,44 @@
             }
         },
         created() {
-             this.getFuels();
+             this.getAllDetails();
              this.listen();
-             this.getCustomers();
-             this.getMachines();
-             this.getAccounts();
-             this.getParts();
-        },
+            },
         computed:{
-          cust(){
-             return this.check_customers;
-          }  ,
-            account(){
-             return this.check_accounts;
-            },
-            part(){
-              return this.check_parts;
-            },
+        ...mapGetters({
+            tableData:'all_fuels',
+            parts:'all_parts'
+        })
         },
         methods: {
+            getAllDetails(){
+                 this.$store.dispatch('my_parts');
+                 this.$store.dispatch('my_customers');
+                 this.$store.dispatch('my_vehicles');
+                 this.$store.dispatch('my_accounts');
+                 this.$store.dispatch('my_users');
+                 this.$store.dispatch('my_customer_types');
+                 this.$store.dispatch('my_jobcards');
+                 this.$store.dispatch('my_projects');
+                 this.$store.dispatch('my_stk_groups');
+                this.$store.dispatch('my_fuels').then(() =>{
+                    this.initDatable();
+                });
+            } ,
             addFuel(){
              this.show_add_text = true;
-             if (this.cust && this.account && this.part){
+             if (this.parts.length !==undefined){
                  this.add_fuel =  true;
              }
             },
             reverseFuel(fuel){
              this.$store.dispatch('updateFuel',fuel)
                     .then(() =>{
-                        this.show_reversal = true;
-                        this.add_fuel=false;
+                        if (this.parts.length !==undefined) {
+                            this.show_reversal = true;
+                            this.add_fuel = false;
+                        }
                         })
-            },
-            getCustomers(){
-              axios.get('customers')
-              .then(res => {
-                  this.check_customers = true;
-                  this.$store.dispatch('my_customers',res.data);
-              })
-            },
-            getMachines(){
-                axios.get('machines')
-                    .then(res => {
-                        this.$store.dispatch('my_vehicles',res.data);
-                    })
-            },
-            getAccounts(){
-                axios.get('accounts')
-                    .then(res => {
-                        this.check_accounts = true;
-                        this.$store.dispatch('my_accounts',res.data);
-                    })
-            },
-            getParts(){
-                axios.get('parts')
-                    .then(res => {
-                        this.check_parts = true;
-                       this.$store.dispatch('my_parts',res.data);
-                    })
-            },
-            getFuels() {
-                axios.get('fuel')
-                    .then(res => {
-                        this.tableData = res.data.fuels;
-                        this.initDatable();
-                        this.$store.dispatch('my_fuels',res.data.fuels);
-                        this.$store.dispatch('my_customer_types',res.data.customer_types);
-                        this.$store.dispatch('my_jobcards',res.data.jobcards);
-                        this.$store.dispatch('my_charges',res.data.charges);
-                        this.$store.dispatch('my_users',res.data.users);
-                        this.$store.dispatch('my_projects',res.data.projects);
-
-                    })
-                    .catch(error => Exception.handle(error))
             },
             showPrint(fuel){
              this.$store.dispatch('updateCustomer',this.$store.state.all_my_customers.find(c => c.id === fuel.customer_id));
@@ -153,8 +118,10 @@
             editFuel(fuel) {
                 this.$store.dispatch('updateFuel', fuel)
                     .then(() => {
-                        this.editing = true;
-                        fuel.vehicle_id !== null ? this.add_fuel = true : this.add_fuel_other = true;
+                        if (this.parts.length !==undefined) {
+                            this.editing = true;
+                            fuel.vehicle_id !== null ? this.add_fuel = true : this.add_fuel_other = true;
+                        }
                     })
             },
             deleteFuel(id) {
@@ -183,7 +150,6 @@
                     this.show_reversal = false;
                     this.show_print = false;
                     this.show_add_text = false;
-                    this.getFuels();
                     this.initDatable();
                 });
                 eventBus.$on('updateFuel', (fuel) => {

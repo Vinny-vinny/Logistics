@@ -173,6 +173,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
     import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props: ['edit', 'other_fuel', 'add_fuel','reverse'],
         data() {
@@ -229,7 +230,6 @@
                 projects:[],
                 subprojects:[],
                 stks:{},
-                fuel_categories:{},
                 accounts:[],
                 accountsd:[],
                 show_issue:false,
@@ -243,7 +243,6 @@
                 this.listen();
                 this.assetType();
                 this.getParts();
-                this.creditAccount();
                 this.getAccountsDebit();
         },
         watch:{
@@ -282,6 +281,18 @@
             });
         },
         computed: {
+            ...mapGetters({
+                fuels:'all_fuels',
+                customers:'all_customers',
+                customer_types:'all_customer_types',
+                jobcards:'all_jobs',
+                parts:'all_parts',
+                drivers:'all_users',
+                all_accounts:'all_accounts',
+                all_projects:'all_projects',
+                vehicles:'all_vehicles',
+                all_stk_groups:'all_stk_groups',
+            }),
             checkCatgory(){
                 return this.form.fuel_category_id =='stock_issue';
             },
@@ -308,19 +319,7 @@
             getParts() {
                 this.stks = this.parts.filter(p => p.code == 'LA0012' || p.code == 'LA0018');
             },
-            creditAccount(){
-                // axios.get('where-to-charge')
-                // .then(res => {
-                //     if (res.data.length) {
-                //      let account = res.data.find(req => req.type =='Fueling');
-                //      this.form.account = account.account;
-                //      this.form.credit_account_id  = account.account_id;
-                //     }
-                //
-                // })
-            },
             getAccountsDebit(){
-                /// let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.where_to_charge)
                 this.all_accounts.forEach(a => {
                     this.accountsd.push({
                         'value': a.account_link,
@@ -330,18 +329,12 @@
             },
             getAccounts(){
                 let accounts = this.all_accounts.filter(acc => acc.account_link !==this.form.credit_account_id)
-                this.all_accounts.forEach(a => {
+                accounts.forEach(a => {
                     this.accounts.push({
                         'value': a.account_link,
                         'text': a.account
                     })
                 })
-            }  ,
-            getFuelCategories(){
-                axios.get('fuel-category')
-                    .then(res => {
-                        this.fuel_categories = res.data;
-                    })
             },
             resetCustomerType(){
                 this.form.customer_type_id = '';
@@ -368,13 +361,10 @@
                 })
             },
             fuelRate(){
-                setTimeout(()=>{
                     let item =this.stks.find(s => s.id == this.form.fuel_type_id);
                     this.form.rate = item.cost;
                     this.fuel_type = item.description;
-                },100)
-
-            },
+                    },
             customerTypes(){
                 this.filtered_customers = [];
                 this.show_customer = true;
@@ -409,19 +399,6 @@
 
             assetType() {
                 this.other_fuel_asset ? this.other = true : this.company = true;
-            },
-            getAllDetails(){
-                this.fuels = this.$store.state.all_my_fuels;
-                this.customers = this.$store.state.all_my_customers;
-                this.customer_types = this.$store.state.all_my_customer_types;
-                this.jobcards = this.$store.state.all_my_jobcards;
-                this.charges = this.$store.state.all_my_charges;
-                this.parts = this.$store.state.all_my_parts;
-                this.drivers  = this.$store.state.all_my_users;
-                this.vehicles = this.$store.state.all_my_vehicles;
-                this.all_accounts =  this.$store.state.all_my_accounts;
-                this.all_projects = this.$store.state.all_my_projects;
-
             },
 
             convertDate(str) {

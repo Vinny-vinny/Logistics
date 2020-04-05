@@ -54,6 +54,7 @@
 </template>
 <script>
     import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         data(){
             return{
@@ -67,7 +68,6 @@
                     inventory_items_internal: [{part: '', uom:'',quantity: '',unit_cost:'',total_cost:'',total_cost_inclusive:'',qty_available:''}],
                     inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}]
                 },
-                machines:{},
                 projects:[],
                 subprojects:[],
                 show_customer:false,
@@ -75,7 +75,6 @@
             }
         },
         created() {
-            this.getMachines();
             this.getProjects();
             this.getCustomers();
 
@@ -90,18 +89,21 @@
                 }
             }
         },
+        computed:{
+          ...mapGetters({
+            all_customers:'all_customers',
+            machines:'all_machines',
+            all_projects:'all_projects'
+          })
+        },
         methods:{
             getCustomers(){
-                axios.get('customers')
-                    .then(res => {
-                        this.all_customers = res.data;
-                        res.data.forEach(c => {
-                            this.customers.push({
-                                'value': c.id,
-                                'text': c.name
-                            })
-                        })
-                    })
+                this.all_customers.forEach(c => {
+                this.customers.push({
+                    'value': c.id,
+                    'text': c.name
+                })
+            })
             },
             subProject(){
                 this.subprojects = [];
@@ -115,21 +117,12 @@
             },
 
             getProjects() {
-                axios.get('asset-category')
-                    .then(res => {
-                        res.data.forEach(p => {
-                            this.projects.push({
-                                'value': p.project_link,
-                                'text': p.name
-                            })
-                        })
-                    })
-            },
-            getMachines(){
-                axios.get('machines')
-                    .then(res => {
-                        this.machines = res.data
-                    })
+            this.all_projects.forEach(p => {
+                this.projects.push({
+                    'value': p.project_link,
+                    'text': p.name
+                })
+            })
             },
             generateReq(){
                 if (this.form.type ==='External'){
@@ -141,9 +134,6 @@
                     .then(res => {
                         this.$store.dispatch('reqFormData',res.data);
                         eventBus.$emit('close_req_form');
-                        // console.log(res.data)
-                       // this.$router.push({path:`/jobcard-form/${res.data.id}`});
-                        //eventBus.$emit('close_form');
                     })
                     .catch(err => console.log(err))
             },

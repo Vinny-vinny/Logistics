@@ -42,11 +42,11 @@
 </template>
 <script>
     import ShowReversal from "./ShowReversal";
+    import {mapGetters} from "vuex";
 
     export default {
         data() {
             return {
-                tableData: [],
                 add_fuel: false,
                 add_fuel_other: false,
                 editing: false,
@@ -57,96 +57,42 @@
             }
         },
         created() {
-            this.getFuels();
-            this.getCustomers();
-            this.getMachines();
-            this.getAccounts();
-            this.getParts();
-        },
+            this.getAllDetails();
+           },
         mounted() {
             this.listen();
         },
         computed:{
-            cust(){
-                return this.check_customers;
-            }  ,
-            account(){
-                return this.check_accounts;
-            },
-            part(){
-                return this.check_parts;
-            },
+            ...mapGetters({
+                all_fuels:'all_fuels',
+                parts:'all_parts'
+            }),
+            tableData(){
+             return this.all_fuels.filter(f => f.reversal_ref !=='' && f.reversal_ref !==null);
+            }
         },
         methods: {
-            reverseFuel(fuel){
-             this.$store.dispatch('updateFuel',fuel)
-                    .then(() =>{
-                        this.show_reversal = true;
-                        this.add_fuel=false;
-                        })
-            },
-            getCustomers(){
-                axios.get('customers')
-                    .then(res => {
-                        this.check_customers = true;
-                        this.$store.dispatch('my_customers',res.data);
-                    })
-            },
-            getMachines(){
-                axios.get('machines')
-                    .then(res => {
-                        this.$store.dispatch('my_vehicles',res.data);
-                    })
-            },
-            getAccounts(){
-                axios.get('accounts')
-                    .then(res => {
-                        this.check_accounts = true;
-                        this.$store.dispatch('my_accounts',res.data);
-                    })
-            },
-            getParts(){
-                axios.get('parts')
-                    .then(res => {
-                        this.check_parts = true;
-                        this.$store.dispatch('my_parts',res.data);
-                    })
-            },
-
-            getFuels() {
-                axios.get('fuel')
-                    .then(res =>{
-                        this.tableData = res.data.fuels.filter(f => f.reversal_ref !=='' && f.reversal_ref !==null)
-                        this.initDatable();
-                        this.$store.dispatch('my_fuels',res.data.fuels);
-                        this.$store.dispatch('my_customer_types',res.data.customer_types);
-                        this.$store.dispatch('my_jobcards',res.data.jobcards);
-                        this.$store.dispatch('my_charges',res.data.charges);
-                        this.$store.dispatch('my_users',res.data.users);
-                        this.$store.dispatch('my_projects',res.data.projects);
-                        this.$store.dispatch('my_expenses',res.data.expenses);
-                    })
-                    .catch(error => Exception.handle(error))
+            getAllDetails(){
+                this.$store.dispatch('my_parts');
+                this.$store.dispatch('my_customers');
+                this.$store.dispatch('my_vehicles');
+                this.$store.dispatch('my_accounts');
+                this.$store.dispatch('my_users');
+                this.$store.dispatch('my_customer_types');
+                this.$store.dispatch('my_jobcards');
+                this.$store.dispatch('my_projects');
+                this.$store.dispatch('my_stk_groups');
+                this.$store.dispatch('my_fuels').then(() =>{
+                    this.initDatable();
+                });
             },
             editFuel(fuel) {
                 this.$store.dispatch('updateFuel', fuel)
                     .then(() => {
-                        if (this.cust && this.part && this.account){
-                            //console.log('walla')
-                              this.show_reversal = true;
+                        if (this.parts !==undefined){
+                        this.show_reversal = true;
                         }
                     })
-            },
-            deleteFuel(id) {
-                axios.delete(`fuel/${id}`)
-                    .then(res => {
-                        for (let i = 0; i < this.tableData.length; i++) {
-                            if (this.tableData[i].id == res.data) {
-                                this.tableData.splice(i, 1);
-                            }
-                        }
-                    })
-                    .catch(error => Exception.handle(error))
             },
             listen() {
                 eventBus.$on('listFuels', (fuel) => {
@@ -160,7 +106,6 @@
                     this.add_fuel_other = false;
                     this.editing = false;
                     this.show_reversal = false;
-                    this.getFuels();
                     this.initDatable();
                 });
                 eventBus.$on('updateFuel', (fuel) => {

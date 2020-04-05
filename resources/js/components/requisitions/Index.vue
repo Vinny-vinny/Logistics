@@ -11,7 +11,7 @@
 
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                      <button class="btn btn-success pull-right" @click="show_req_form =true">Print Requisition Form</button>
+                      <button class="btn btn-success pull-right" @click="printForm()">Print Requisition Form</button>
                     <template>
                         <button class="btn btn-primary pull-right mr" @click="addReq()">{{show_add_txt ? 'Please wait..' : 'Add Requisition'}}</button>
                     </template>
@@ -82,9 +82,15 @@
                 parts:'all_parts',
                 pricelists:'all_pricelists',
                 tableData:'all_reqs',
+                machines:'all_vehicles'
             })
         },
         methods:{
+            printForm(){
+              if (this.machines.length !==undefined){
+               this.show_req_form =true
+              }
+            },
             getAllDetails(){
                 this.$store.dispatch('my_parts');
                 this.$store.dispatch('my_customers');

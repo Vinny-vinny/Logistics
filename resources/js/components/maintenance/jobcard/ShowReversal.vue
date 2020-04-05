@@ -255,6 +255,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
      import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props: ['reverse'],
         data() {
@@ -290,10 +291,6 @@
                 checklist: '',
                 inventory_items_reversal:[],
                 edit_jobcard: this.edit,
-                machines: {},
-                tracks: {},
-                service_types: {},
-                services: {},
                 balances: {},
                 internal: false,
                 external: false,
@@ -301,60 +298,45 @@
                 show_track_by: false,
                 make: '',
                 driver: '',
-                users: {},
                 previous_readings: 0,
                 actual_readings: 0,
                 service_after: 0,
                 next_computed_readings: 0,
                 show_next_readings: true,
-                parts: {},
                 categories: [],
                 status: 1,
                 projects: [],
-                job_categories: {},
                 mechanics: [],
-                job_types: {},
                 customer_type: '',
-                customers: {},
                 filtered_customers: [],
                 show_customers: false,
                 part_qty: '',
                 part_id: '',
                 exp_qty: '',
                 exp_id: '',
-                requisitions: {},
                 show_inventory: false,
                 filtered_items_internal: [],
                 filtered_items_external: [],
                 disable_rq: false,
                 filtered_rq: '',
-                customer_types: {},
                 rqs:[],
                 subprojects:[],
                 transactions:{},
                 stk_items:[],
                 show_rqs:false,
-                items:[],
-                all_mechanics:{},
-                all_projects:{},
-                all_categories:{}
-
-
+                items:[]
             }
         },
         watch: {
             labours(){
             if (this.form.hours_spent > 0 && this.form.job_type_id) {
-                       axios.get('job-types')
-                        .then(res => {
-                            let total =0;
-                            this.job_types = res.data;
-                            if (this.form.job_type_id) {
-                              let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
-                             total += this.form.hours_spent * cost;
-                            }
-                           this.form.labour_cost =  total.toFixed(2);
-                        })
+            let total =0;
+            if (this.form.job_type_id) {
+              let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
+             total += this.form.hours_spent * cost;
+            }
+           this.form.labour_cost =  total.toFixed(2);
+
             }
             },
             getCost() {
@@ -406,27 +388,19 @@
                     let time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
 
                     if (this.form.job_type_id !== '') {
-                     axios.get('job-types')
-                        .then(res => {
-                            let total =0;
-                            this.job_types = res.data;
-                            if (this.form.job_type_id) {
-                              let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
-                             total += time_in_minutes / 60 * cost;
-                            }
-                           // this.form.labour_cost =  total;
-                        })
+                    let total =0;
+                    if (this.form.job_type_id) {
+                      let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
+                     total += time_in_minutes / 60 * cost;
+                    }
+                    this.form.labour_cost =  total;
 
                     }
 
                 }
             }
         },
-        mounted() {
-            this.initDate();
-        },
         created() {
-            this.getAllDetails();
             this.getCategories();
             this.getMechanics();
             this.getProjects();
@@ -441,6 +415,21 @@
         },
 
         computed: {
+            ...mapGetters({
+                customers:'all_customers',
+                requisitions:'all_reqs',
+                parts:'all_parts',
+                machines:'all_vehicles',
+                job_categories:'all_job_categories',
+                all_categories:'all_categories',
+                customer_types:'all_customer_types',
+                service_types:'all_service_types',
+                tracks:'all_tracks',
+                users:'all_users',
+                job_types:'all_job_types',
+                all_projects:'all_projects',
+                all_mechanics:'all_mechanics'
+            }),
             labours(){
             return [this.form.hours_spent,this.form.job_type_id].join();
             },
@@ -464,22 +453,6 @@
 
         },
         methods: {
-            getAllDetails(){
-                this.customers = this.$store.state.all_my_customers;
-                this.requisitions = this.$store.state.all_my_reqs;
-                this.parts = this.$store.state.all_my_parts;
-                this.machines = this.$store.state.all_my_vehicles;
-                this.job_categories = this.$store.state.all_my_job_categories;
-                this.customer_types = this.$store.state.all_my_customer_types;
-                this.services = this.$store.state.all_my_service_types;
-                this.tracks = this.$store.state.all_my_tracks;
-                this.users = this.$store.state.all_my_users;
-                this.job_types = this.$store.state.all_my_job_types;
-                this.all_mechanics = this.$store.state.all_my_mechanics;
-                this.all_projects = this.$store.state.all_my_projects;
-                this.all_categories = this.$store.state.all_my_categories;
-            },
-
               selectedGroup(){
                 let items=[];
                  items = this.parts.filter(item => item.item_group == this.form.group_name);
@@ -494,7 +467,6 @@
 
                     }
                 }
-
 
             items.forEach(p => {
                 this.items.push({
@@ -565,25 +537,7 @@
                 }
 
             },
-            getDetails() {
-                // this.show_inventory = true;
-                // this.filtered_items_internal = [];
-                // this.filtered_items_external = [];
-                //    if (this.rqs[0]['type'] =='Internal') {
-                //     console.log('internal')
-                //    this.filtered_rq ='Internal';
-                //    this.filtered_items_internal = this.rqs[0]['inventory_items_internal'];
-                // }
-                // else if (this.rqs[0]['type'] =='External') {
-                //     console.log('external')
-                //    this.filtered_rq ='External';
-                //    this.filtered_items_external = this.rqs[0]['inventory_items_external'];
-                //    console.log(  this.filtered_items_external)
-                // }
-
-              },
-
-            customerType() {
+         customerType() {
                 this.filtered_customers = [];
                 this.show_customers = true;
                 if (this.form.customer_type_id) {
@@ -656,7 +610,7 @@
                 })
             },
               nextReadings() {
-                this.services.forEach(service => {
+                this.service_types.forEach(service => {
                     if (service.id === this.form.service_type_id) {
                         this.service_after = service.service_after;
                     }
@@ -747,7 +701,7 @@
                     this.previous_readings = this.$store.state.job_card.previous_readings;
                     this.make = this.$store.state.job_card.make;
                     this.driver = this.$store.state.job_card.driver;
-                    this.service_types = this.form.service_types;
+                   // this.service_types = this.form.service_types;
 
                     this.status = this.$store.state.job_card.status;
                     this.show_customers = true;

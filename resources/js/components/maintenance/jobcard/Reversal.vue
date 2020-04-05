@@ -272,6 +272,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
      import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props: ['reverse'],
         data() {
@@ -442,7 +443,6 @@
             this.initDate();
         },
         created() {
-            this.getAllDetails();
             this.getCategories();
             this.getMechanics();
             this.getProjects();
@@ -458,6 +458,21 @@
         },
 
         computed: {
+            ...mapGetters({
+                customers:'all_customers',
+                requisitions:'all_reqs',
+                parts:'all_parts',
+                machines:'all_vehicles',
+                job_categories:'all_job_categories',
+                all_categories:'all_categories',
+                customer_types:'all_customer_types',
+                services:'all_service_types',
+                tracks:'all_tracks',
+                users:'all_users',
+                job_types:'all_job_types',
+                all_projects:'all_projects',
+                all_mechanics:'all_mechanics'
+            }),
             labours(){
             return [this.form.hours_spent,this.form.job_type_id].join();
             },
@@ -481,21 +496,6 @@
 
         },
         methods: {
-            getAllDetails(){
-                this.customers = this.$store.state.all_my_customers;
-                this.requisitions = this.$store.state.all_my_reqs;
-                this.parts = this.$store.state.all_my_parts;
-                this.machines = this.$store.state.all_my_vehicles;
-                this.job_categories = this.$store.state.all_my_job_categories;
-                this.customer_types = this.$store.state.all_my_customer_types;
-                this.services = this.$store.state.all_my_service_types;
-                this.tracks = this.$store.state.all_my_tracks;
-                this.users = this.$store.state.all_my_users;
-                this.job_types = this.$store.state.all_my_job_types;
-                this.all_mechanics = this.$store.state.all_my_mechanics;
-                this.all_projects = this.$store.state.all_my_projects;
-                this.all_categories = this.$store.state.all_my_categories;
-            },
             getJobDetails(){
               this.show_rqs = false;
              if(this.form.customer_id){

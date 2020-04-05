@@ -43,6 +43,7 @@
 </template>
 <script>
     import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from "vuex";
     export default {
         props:['printJob'],
         data(){
@@ -63,6 +64,12 @@
         this.getMachines();
         this.getProjects();
             },
+        computed:{
+          ...mapGetters({
+              all_projects:'all_projects',
+              machines:'all_vehicles'
+          }),
+        },
         methods:{
             subProject(){
                 this.subprojects = [];
@@ -76,22 +83,14 @@
             },
 
             getProjects() {
-                axios.get('asset-category')
-                    .then(res => {
-                        res.data.forEach(p => {
-                            this.projects.push({
-                                'value': p.project_link,
-                                'text': p.name
-                            })
-                        })
-                    })
-            },
-            getMachines(){
-                axios.get('machines')
-                    .then(res => {
-                        this.machines = res.data
-                    })
-            },
+             this.all_projects.forEach(p => {
+            this.projects.push({
+                'value': p.project_link,
+                'text': p.name
+            })
+        })
+       },
+
             generateJob(){
                 axios.post('generate-job',this.form)
                     .then(res => {

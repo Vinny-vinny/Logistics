@@ -240,11 +240,9 @@
                 inventory_items_reversal:[],
                 show_text:false,
                 projects:[],
-                parts:{},
                 qty:'',
                 part:'',
                 unit_price:'',
-                users:{},
                 username:User.name(),
                 stk_groups:[],
                 items:[],
@@ -253,7 +251,6 @@
                 accounts:[],
                 uoms:[],
                 customers:[],
-                units:{},
                 filtered_uoms:{},
                 show_issue:true,
                 show_customer:false,
@@ -452,14 +449,6 @@
                     })
                 })
             },
-          getRequistion(){
-         axios.get(`requisitions/${this.form.id}`)
-         .then(res => {
-             this.external_reqs = res.data.inventory_items_external;
-             this.internal_reqs = res.data.inventory_items_internal;
-             //console.log(res.data.inventory_items_internal)
-         })
-          },
             resetAccount(){
             this.form.where_to_charge = '';
             },

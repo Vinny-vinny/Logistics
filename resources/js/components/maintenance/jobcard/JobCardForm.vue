@@ -111,7 +111,7 @@
             jobInfo(){
                 axios.get('job-card')
                     .then(res =>{
-                        let job_details = res.data.jobcards.find(job => job.id == this.$route.params['id']);
+                        let job_details = res.data.find(job => job.id == this.$route.params['id']);
                         this.job_card = job_details.card_no;
                         this.project = job_details.project;
                         this.jobcard_type = job_details.service_type;
