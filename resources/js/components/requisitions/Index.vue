@@ -11,9 +11,9 @@
 
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                      <button class="btn btn-success pull-right" @click="printForm()">Print Requisition Form</button>
+                      <button class="btn btn-success pull-right" @click="printForm()" v-if="pricelists.length > 1">Print Requisition Form</button>
                     <template>
-                        <button class="btn btn-primary pull-right mr" @click="addReq()">{{show_add_txt ? 'Please wait..' : 'Add Requisition'}}</button>
+                        <button class="btn btn-primary pull-right mr" @click="addReq()" v-if="pricelists.length > 1">{{show_add_txt ? 'Please wait..' : 'Add Requisition'}}</button>
                     </template>
 
                 </div>
@@ -37,10 +37,13 @@
                             <td>{{rq.person_requested}}</td>
                             <td>{{rq.project}}</td>
                             <td>
-                               <button class="btn btn-success btn-sm fz" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
+                           <span v-if="pricelists.length > 1">
+                              <button class="btn btn-success btn-sm fz" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
                                <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm fz"><i class="fa fa-eye"></i></router-link>
                                 <button class="btn btn-danger btn-sm fz" @click="reverseRequisition(rq)" v-if="!rq.reversal_ref && rq.type=='Internal' && rq.used==1"><i class="fa fa-undo" aria-hidden="true"></i></button>
-<!--                            <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->                            </td>
+                               <!--                            <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->   
+                           </span>
+                           </td>
                         </tr>
                         </tbody>
                     </table>
