@@ -69,44 +69,45 @@
 </template>
 
 <script>
+    import {mapGetters} from "vuex";
+
     export default {
         data(){
             return {
-            requisition:{},
-                items:[]
+            items:[],
+            requisition:{}
             }
         },
         created() {
         this.getRequisitions();
             },
+        computed:{
+          ...mapGetters({
+              requisitions:'all_reqs',
+              parts:'all_parts'
+          })
+        },
         methods:{
             getRequisitions(){
-                let items;
-                axios.get('requisitions')
-                .then(res => {
-                    this.requisition = res.data.requisitions.find(req => req.id == this.$route.params['id']);
+                    let items;
+                    this.requisition = this.requisitions.find(req => req.id == this.$route.params['id']);
                    if (this.requisition.type ==='Internal'){
                        items = this.requisition.inventory_items_internal;
                    }
                    else{
                        items = this.requisition.inventory_items_external;
                    }
-                axios.get('parts')
-                    .then(res => {
+
                         for (let j=0;j<items.length;j++){
-                            for (let i =0; i<res.data.length;i++){
-                                if (res.data[i]['id'] ==items[j]['part']){
+                            for (let i =0; i<this.parts.length;i++){
+                                if (this.parts[i]['id'] ==items[j]['part']){
                                     this.items.push({
-                                        description:res.data[i]['description'],
+                                        description:this.parts[i]['description'],
                                         qty:items[j]['quantity']
                                 })
                                 }
                             }
                         }
-                    })
-
-                })
-
             },
             print(){
                 window.print();
