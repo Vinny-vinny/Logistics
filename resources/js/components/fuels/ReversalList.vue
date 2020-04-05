@@ -29,7 +29,7 @@
                             <td>{{fuel.fuel_type}}</td>
                             <td>{{fuel.reversal_rate}}</td>
                             <td>
-                                <button class="btn btn-info btn-sm" @click="editFuel(fuel)"><i
+                                <button class="btn btn-info btn-sm" @click="editFuel(fuel)" v-if="parts.length"><i
                                     class="fa fa-eye"></i></button>
                             </td>
                         </tr>
@@ -89,9 +89,7 @@
             editFuel(fuel) {
                 this.$store.dispatch('updateFuel', fuel)
                     .then(() => {
-                        if (this.parts !==undefined){
-                        this.show_reversal = true;
-                        }
+                      this.show_reversal = true;
                     })
             },
             listen() {

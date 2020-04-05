@@ -11,9 +11,9 @@
 
                 <div class="box-header with-border">
                     <h3 class="box-title">Requisitions</h3>
-                      <button class="btn btn-success pull-right" @click="printForm()" v-if="pricelists.length > 1">Print Requisition Form</button>
+                      <button class="btn btn-success pull-right" @click="show_req_form =true" v-if="machines.length > 1">Print Requisition Form</button>
                     <template>
-                        <button class="btn btn-primary pull-right mr" @click="addReq()" v-if="pricelists.length > 1">{{show_add_txt ? 'Please wait..' : 'Add Requisition'}}</button>
+                        <button class="btn btn-primary pull-right mr" @click="add_requisition=true" v-if="pricelists.length > 1">Add Requisition</button>
                     </template>
 
                 </div>
@@ -41,7 +41,7 @@
                               <button class="btn btn-success btn-sm fz" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
                                <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm fz"><i class="fa fa-eye"></i></router-link>
                                 <button class="btn btn-danger btn-sm fz" @click="reverseRequisition(rq)" v-if="!rq.reversal_ref && rq.type=='Internal' && rq.used==1"><i class="fa fa-undo" aria-hidden="true"></i></button>
-                               <!--                            <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->   
+                               <!--                            <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->
                            </span>
                            </td>
                         </tr>
@@ -89,11 +89,6 @@
             })
         },
         methods:{
-            printForm(){
-              if (this.machines.length !==undefined){
-               this.show_req_form =true
-              }
-            },
             getAllDetails(){
                 this.$store.dispatch('my_parts');
                 this.$store.dispatch('my_customers');
@@ -107,15 +102,6 @@
                 this.$store.dispatch('my_reqs').then(() =>{
                     this.initDatable();
                 });
-            },
-            addReq(){
-                this.show_add_txt = true;
-              console.log(this.parts)
-                if (this.parts.length > 1){
-                    console.log('walla')
-                    this.show_add_txt = false;
-                    this.add_requisition=true
-                }
             },
             reverseRequisition(rq){
             this.$store.dispatch('updateRequisition',rq)

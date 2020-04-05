@@ -12,7 +12,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Fueling</h3>
                     <button class="btn btn-primary pull-right" @click="add_fuel_other=true" style="display:none">Add Other Fuel</button>
-                    <button class="btn btn-primary pull-right mr" @click="addFuel()">{{show_add_text ? 'Please wait...':'Add Fuel'}}</button>
+                    <button class="btn btn-primary pull-right mr" @click="add_fuel=true" v-if="parts.length > 1">Add Fuel</button>
 
                 </div>
                 <div class="box-body">
@@ -35,11 +35,13 @@
                             <td>{{fuel.fuel_type}}</td>
                             <td>{{fuel.rate}}</td>
                             <td>
-                                <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
-                                    class="fa fa-edit"></i></button>
+                               <span v-if="parts.length > 1">
+                                  <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
+                                      class="fa fa-edit"></i></button>
                                 <button class="btn btn-info btn-sm" @click="showPrint(fuel)"><i class="fa fa-eye"></i></button>
-<!--                                <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>-->
+                                   <!--                                <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>-->
                                 <button v-if="!fuel.reversal_ref && fuel.fuel_category_id=='stock_issue' && fuel.status !=0" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                               </span>
                             </td>
                         </tr>
                         </tbody>
@@ -69,8 +71,8 @@
             }
         },
         created() {
-             this.getAllDetails();
-             this.listen();
+         this.getAllDetails();
+         this.listen();
             },
         mounted() {
            this.initDatable();
@@ -94,19 +96,11 @@
                  this.$store.dispatch('my_stk_groups');
                 this.$store.dispatch('my_fuels')
             } ,
-            addFuel(){
-             this.show_add_text = true;
-             if (this.parts.length !==undefined){
-                 this.add_fuel =  true;
-             }
-            },
             reverseFuel(fuel){
              this.$store.dispatch('updateFuel',fuel)
                     .then(() =>{
-                        if (this.parts.length !==undefined) {
-                            this.show_reversal = true;
-                            this.add_fuel = false;
-                        }
+                    this.show_reversal = true;
+                    this.add_fuel = false;
                         })
             },
             showPrint(fuel){
@@ -119,10 +113,9 @@
             editFuel(fuel) {
                 this.$store.dispatch('updateFuel', fuel)
                     .then(() => {
-                        if (this.parts.length !==undefined) {
-                            this.editing = true;
-                            fuel.vehicle_id !== null ? this.add_fuel = true : this.add_fuel_other = true;
-                        }
+                     this.editing = true;
+                    fuel.vehicle_id !== null ? this.add_fuel = true : this.add_fuel_other = true;
+
                     })
             },
             deleteFuel(id) {

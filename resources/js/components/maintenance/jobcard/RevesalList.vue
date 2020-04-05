@@ -28,7 +28,7 @@
                             <td>{{job.driver}}</td>
                             <td>{{job.project}}</td>
                               <td>
-                                <button class="btn btn-info btn-sm" @click="editJobcard(job)"><i class="fa fa-eye"></i></button>
+                                <button class="btn btn-info btn-sm" @click="editJobcard(job)" v-if="parts.length > 1"><i class="fa fa-eye"></i></button>
                                 </td>
                         </tr>
                         </tbody>
@@ -88,11 +88,10 @@
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)
                     .then(() =>{
-                        if (this.jobs.length > 1) {
                             this.editing = true;
                             this.add_jobcard = false;
                             this.show_reversal = true;
-                        }
+
 
                     })
 

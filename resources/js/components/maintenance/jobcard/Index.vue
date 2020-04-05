@@ -9,8 +9,8 @@
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">Job Card</h3>
-                    <button class="btn btn-success pull-right" @click="printJob()">Print Job Card Form</button>
-                    <button class="btn btn-primary pull-right mr" @click="addJob()">{{show_add_text ? 'Please wait...' :'Add Job Card'}}</button>
+                    <button class="btn btn-success pull-right" @click="show_form=true" v-if="parts.length">Print Job Card Form</button>
+                    <button class="btn btn-primary pull-right mr" @click="add_jobcard=true" v-if="parts.length > 1">Add Job Card</button>
                 </div>
                 <div class="box-body">
                     <table class="table table-striped dt">
@@ -30,9 +30,11 @@
                             <td>{{job.driver}}</td>
                             <td>{{job.project}}</td>
                               <td>
+                             <span v-if="parts.length">
                                 <button class="btn btn-success btn-sm" @click="editJobcard(job)"><i class="fa fa-edit"></i></button>
                                 <router-link :to="{path:'/job-card/'+job.id}" class="btn btn-info btn-sm"><i class=" fa fa-eye"></i></router-link>
                                  <button v-if="!job.reversal_ref && job.invoiced==1" class="btn btn-danger btn-sm" @click="reverseJob(job)"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                             </span>
                                  </td>
                         </tr>
                         </tbody>
@@ -72,11 +74,6 @@
            })
         },
         methods:{
-            printJob(){
-                if (this.machines.length > 1){
-                  this.show_form=true
-                }
-            },
            getAllDetails(){
                this.$store.dispatch('my_parts');
                this.$store.dispatch('my_customers');
@@ -103,13 +100,6 @@
                             this.add_jobcard = false;
                         }
                     })
-            },
-            addJob(){
-                this.show_add_text=false;
-                if (this.parts.length > 1){
-                    this.add_jobcard=true;
-                    this.show_add_text=true;
-                }
             },
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)

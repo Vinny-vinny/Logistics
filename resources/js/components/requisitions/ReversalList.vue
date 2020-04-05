@@ -30,7 +30,7 @@
                             <td>{{rq.person_requested}}</td>
                             <td>{{rq.project}}</td>
                             <td>
-                               <button class="btn btn-info btn-sm" @click="editRequisition(rq)"><i class="fa fa-eye"></i></button>
+                               <button class="btn btn-info btn-sm" @click="editRequisition(rq)" v-if="pricelists.length > 1"><i class="fa fa-eye"></i></button>
                             </td>
                         </tr>
                         </tbody>
@@ -93,13 +93,9 @@
             editRequisition(rq){
                 this.$store.dispatch('updateRequisition',rq)
                     .then(() =>{
-                        if (this.pricelists.length > 1 && this.parts.length > 1){
-
                             this.editing=true;
                             this.add_requisition=true;
-                        }
-
-                    })
+                      })
             },
             listen(){
                 eventBus.$on('listReqs',(rq) =>{
