@@ -72,6 +72,9 @@
              this.getAllDetails();
              this.listen();
             },
+        mounted() {
+           this.initDatable();
+        },
         computed:{
         ...mapGetters({
             tableData:'all_fuels',
@@ -89,9 +92,7 @@
                  this.$store.dispatch('my_jobcards');
                  this.$store.dispatch('my_projects');
                  this.$store.dispatch('my_stk_groups');
-                this.$store.dispatch('my_fuels').then(() =>{
-                    this.initDatable();
-                });
+                this.$store.dispatch('my_fuels')
             } ,
             addFuel(){
              this.show_add_text = true;
