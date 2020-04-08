@@ -72,10 +72,11 @@
        },
         methods:{
             getPriceLists(){
-                this.$store.dispatch('my_pricelists').then(() => {
+                this.$store.dispatch('my_pricelists').then((res) => {
+                    console.log(this.$store.state.all_my_pricelists)
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
-                            console.log(this.$store.getters.all_pricelists)
+                            //console.log(this.$store.getters.all_pricelists)
                             this.getItems();
                         }, 5000);
                     }else {
