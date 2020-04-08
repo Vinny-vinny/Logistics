@@ -77,7 +77,7 @@
                         setTimeout(() => {
                             console.log(this.$store.getters.all_pricelists)
                             this.getItems();
-                        }, 3000);
+                        }, 5000);
                     }else {
                       this.getItems();
                     }
