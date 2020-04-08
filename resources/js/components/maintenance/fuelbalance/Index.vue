@@ -1,131 +1,104 @@
 <template>
     <div>
-        <fuel-balance v-if="add_fuel" :edit="editing"></fuel-balance>
-        <!-- Main content -->
-        <section class="content" v-if="!add_fuel">
+        <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Fuel Balance</h3>
-                    <button class="btn btn-primary pull-right" @click="add_fuel=true">Add Fuel Balance</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Litres</th>
-                            <th style="display:none">Litres</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="fuel in tableData">
-                            <td>{{fuel.id}}</td>
-                            <td>{{fuel.litres}}</td>
-                            <td style="display:none">{{fuel.litres}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editFuelBalance(fuel)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteFuelBalance(fuel.id)"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                All Items
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editItem(item)">mdi-plus</v-icon>
+                                    </v-btn>
+                                    <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small>mdi-delete</v-icon>
+                                    </v-btn>
+                                    <v-btn class="mx-1 my-1" fab dark color="cyan" small>
+                                        <v-icon dark small>mdi-eye</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
     </div>
 </template>
 <script>
-    import FuelBalance from "./FuelBalance";
+
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../../mixins/datatable";
+
     export default {
-        data(){
+        mixins: [datatable],
+        data() {
             return {
-                tableData: [],
-                add_fuel: false,
-                editing: false
+                items: [],
+                loading: true,
+                singleSelect: false,
+                selected: [],
+                headers: FieldDefs
             }
         },
-        created(){
-            this.listen();
-            this.getFuels();
-        },
-        mounted(){
-            this.initDatable();
-        },
-        methods:{
-            getFuels(){
-                axios.get('fuel-balance')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
-            },
-            editFuelBalance(fuel){
-                this.$store.dispatch('updateFuelBalance',fuel)
-                    .then(() =>{
-                        this.editing=true;
-                        this.add_fuel=true;
-                    })
-            },
-            deleteFuelBalance(id){
-                axios.delete(`fuel-balance/${id}`)
-                    .then(res => {
-                        console.log(res.data)
-                        for (let i=0;i<this.tableData.length;i++){
-                            if (this.tableData[i].id == res.data){
-                                this.tableData.splice(i,1);
-                            }
-                        }
-                    })
-                    .catch(error => Exception.handle(error))
-            },
-            listen(){
-                eventBus.$on('listFuelBalance',(fuel) =>{
-                    this.tableData.unshift(fuel);
-                    this.add_fuel =false;
-                    this.initDatable();
-                });
-                eventBus.$on('cancel',()=>{
-                    this.add_fuel = false;
-                    this.editing = false;
-                    this.initDatable();
-                });
-                eventBus.$on('updateFuelBalance',(fuel)=>{
-                    this.add_fuel = false;
-                    this.editing = false;
-                    for (let i=0;i<this.tableData.length;i++){
-                        if (this.tableData[i].id == fuel.id){
-                            this.tableData.splice(i,1);
-                        }
-                    }
-                    this.tableData.unshift(fuel);
-                    this.initDatable();
-                });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
 
-                    });
-                },1000)
-            },
+        computed: {
+            tableData() {
+                return this.$store.state.all_my_vehicles;
+            }
         },
-        components:{
-            FuelBalance
+
+        methods:{
+            editItem(item){
+               console.log(item)
+            },
+            deleteItem(item){
+                console.log(item)
+            }
         }
+
     }
 </script>
 
-<style scoped>
+<style>
+    .v-btn--fab.v-size--small{
+        height:22px !important;
+        width:22px !important;
+    }
+    .pagination {
+        margin-top: 1rem;
+    }
 
+    .vuetable-head-wrapper table.vuetable th.sortable {
+        cursor: pointer
+    }
 </style>

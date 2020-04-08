@@ -5,32 +5,49 @@
         <section class="content" v-if="!add_category">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Categories</h3>
-                    <button class="btn btn-primary pull-right" @click="add_category=true">Add Category</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th style="display: none">Name</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="category in tableData">
-                            <td>{{category.id}}</td>
-                            <td>{{category.name}}</td>
-                            <td style="display: none">{{category.name}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editCategory(category)"><i class="fa fa-edit"></i></button>
-<!--                                <button class="btn btn-danger btn-sm" @click="deleteCategory(category.id)"><i class="fa fa-trash"></i></button>-->
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Categories
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_category=true">Add Category</v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editCategory(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -39,27 +56,30 @@
 <script>
 
     import Category from "./Category";
+    import datatable from "../../mixins/datatable";
+    import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_category: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs,
             }
         },
         created(){
+            this.$store.dispatch('my_categories').then(()=>{
+                console.log('wahh')
+            });
             this.listen();
-            this.getCategories();
         },
-        mounted(){
-            this.initDatable();
+        computed:{
+          ...mapGetters({
+              tableData:'all_categories'
+          })
         },
         methods:{
-            getCategories(){
-                axios.get('categories')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
-            },
             editCategory(category){
                 this.$store.dispatch('updateCategory',category)
                     .then(() =>{
@@ -80,14 +100,12 @@
             },
             listen(){
                 eventBus.$on('listCategory',(category) =>{
-                    this.tableData.unshift(category);
+                    this.getItems();
                     this.add_category =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_category = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateCategory',(category)=>{
                     this.add_category = false;
@@ -98,27 +116,9 @@
                         }
                     }
                     this.tableData.unshift(category);
-                    this.initDatable();
                 });
             },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
 
-                    });
-                },1000)
-            },
         },
         components:{
             Category

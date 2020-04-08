@@ -7,38 +7,61 @@
         <section class="content" v-if="!add_jobcard && !show_form && !show_reversal">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Job Card</h3>
-                    <button class="btn btn-success pull-right" @click="show_form=true" v-if="parts.length">Print Job Card Form</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_jobcard=true" v-if="parts.length > 1">Add Job Card</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Machine</th>
-                            <th>Driver</th>
-                            <th>Project</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="job in tableData">
-                            <td>{{job.card_no}}</td>
-                            <td>{{job.machine}}</td>
-                            <td>{{job.driver}}</td>
-                            <td>{{job.project}}</td>
-                              <td>
-                             <span v-if="parts.length">
-                                <button class="btn btn-success btn-sm" @click="editJobcard(job)"><i class="fa fa-edit"></i></button>
-                                <router-link :to="{path:'/job-card/'+job.id}" class="btn btn-info btn-sm"><i class=" fa fa-eye"></i></router-link>
-                                 <button v-if="!job.reversal_ref && job.invoiced==1" class="btn btn-danger btn-sm" @click="reverseJob(job)"><i class="fa fa-undo" aria-hidden="true"></i></button>
-                             </span>
-                                 </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Job Card
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="show_form=true">Print Job Card Form
+                                </v-btn>
+                                <v-btn small color="indigo" dark @click="add_user=true" class="mr">Add Job Card
+                                </v-btn>
+
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editJobcard(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                    <router-link :to="{path:'/job-card/'+item.id}">
+                                        <v-btn class="mx-1 my-1" fab dark color="cyan" small>
+                                            <v-icon dark small>mdi-eye</v-icon>
+                                        </v-btn>
+                                    </router-link>
+                                    <v-btn class="mx-1 my-1" fab dark color="pink" small v-if="!item.reversal_ref && item.invoiced==1">
+                                        <v-icon dark small @click="reverseJob(item)">mdi-undo</v-icon>
+                                    </v-btn>
+
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -49,7 +72,10 @@
     import JobForm from "./JobForm";
     import Reversal from "./Reversal";
     import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../../mixins/datatable";
     export default {
+        mixins:[datatable],
         data(){
             return {
                 add_jobcard: false,
@@ -58,10 +84,12 @@
                 show_reversal:false,
                 check_customers:false,
                 check_parts:false,
-                show_add_text:false
+                show_add_text:false,
+                headers: FieldDefs
             }
         },
         created(){
+            this.getJobs();
             this.getAllDetails();
             this.listen();
         },
@@ -70,10 +98,19 @@
                tableData:'all_jobs',
                parts:'all_parts',
                machines:'all_vehicles'
-
            })
         },
         methods:{
+            getJobs(){
+                this.$store.dispatch('my_jobcards').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 1000);
+                    }
+                })
+            },
            getAllDetails(){
                this.$store.dispatch('my_parts');
                this.$store.dispatch('my_customers');
@@ -88,9 +125,6 @@
                this.$store.dispatch('my_categories');
                this.$store.dispatch('my_mechanics');
                this.$store.dispatch('my_reqs');
-               this.$store.dispatch('my_jobcards').then(() =>{
-                   this.initDatable();
-               });
            } ,
             reverseJob(rq){
             this.$store.dispatch('updateJobcard',rq)
@@ -127,14 +161,12 @@
                     this.tableData.unshift(job);
                     this.add_jobcard =false;
                     this.show_add_text=false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_jobcard = false;
                     this.editing = false;
                     this.show_reversal = false;
                     this.show_add_text=false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateJobcard',(job)=>{
                     this.add_jobcard = false;
@@ -147,34 +179,13 @@
                         }
                     }
                     this.tableData.unshift(job);
-                    this.initDatable();
                 });
                 eventBus.$on('close_form',() => {
                     this.show_form = false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel_job',() =>{
                     this.show_form = false;
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
             },
         },
         components:{

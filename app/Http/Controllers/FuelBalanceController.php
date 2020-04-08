@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\FuelBalance;
 use Illuminate\Http\Request;
+use App\Machine;
 
 class FuelBalanceController extends Controller
 {
@@ -14,7 +15,9 @@ class FuelBalanceController extends Controller
      */
     public function index()
     {
-        return response()->json(FuelBalance::all());
+        $machines = Machine::get();
+
+        return response()->json($machines);
     }
 
 

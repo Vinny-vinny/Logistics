@@ -4,7 +4,7 @@ import Login from "../components/auth/Login";
 import Register from "../components/auth/Register";
 import ServiceTypes from "../components/maintenance/servicetypes/Index";
 import TrackBy from "../components/maintenance/trackby/Index";
-import FuelBalance from "../components/maintenance/fuelbalance/FuelBalance";
+import FuelBalance from "../components/maintenance/fuelbalance/Index";
 import Machines from "../components/maintenance/machines/Index";
 import JobCard from "../components/maintenance/jobcard/Index";
 import Fuel from "../components/fuels/Index";

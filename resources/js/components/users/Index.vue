@@ -5,36 +5,54 @@
         <section class="content" v-if="!add_user">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Users</h3>
-                    <button class="btn btn-primary pull-right" @click="add_user=true">Add User</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Code</th>
-                            <th>Join Date</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="user in tableData">
-                            <td>{{user.id}}</td>
-                            <td>{{user.name}}</td>
-                            <td>{{user.email}}</td>
-                            <td>{{user.code_no}}</td>
-                            <td>{{user.join_date}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editUser(user)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteUser(user.id)"  :class="{hide_user:user.id==1 || user.id==2}"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Users
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_user=true">Add User
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editUser(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                    <span :class="{hide_user:item.id==1 || item.id==2}">
+                                     <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small @click="deleteUser(item.id)">mdi-delete</v-icon>
+                                    </v-btn>
+                                    </span>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -42,26 +60,37 @@
 </template>
 <script>
     import Users from "./Users";
+    import datatable from "../../mixins/datatable";
+    import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_user: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
             this.getUsers();
         },
-        mounted(){
-            this.initDatable();
+        computed:{
+          ...mapGetters({
+              tableData:'all_users'
+          })
         },
         methods:{
             getUsers(){
-                axios.get('users')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_users').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 1000);
+                    }
+                })
             },
             editUser(user){
                 this.$store.dispatch('updateUser',user)
@@ -83,14 +112,12 @@
             },
             listen(){
                 eventBus.$on('listUsers',(user) =>{
-                    this.tableData.unshift(user);
+                    this.getItems();
                     this.add_user =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_user = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateUser',(user)=>{
                     this.add_user = false;
@@ -101,27 +128,9 @@
                         }
                     }
                     this.tableData.unshift(user);
-                    this.initDatable();
                 });
             },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
 
-                    });
-                },1000)
-            },
         },
         components:{
             Users

@@ -4,30 +4,45 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Ledgers</h3>
-                    <button class="btn btn-success pull-right" @click="importAccounts()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
-                </div>
-                <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Account</th>                          
-                            <th>master Sub Account</th>
-                            <th>Description</th>
-
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="account in tableData">
-                            <td>{{account.id}}</td>                         
-                            <td>{{account.account}}</td>
-                             <td>{{account.sub_account}}</td>
-                            <td>{{account.description}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                  <div class="box-body">
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Ledgers
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="cyan"  @click="importAccounts()" :disabled="importing">
+                                    {{importing ? 'Importing...' : 'Import from Sage'}}
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -35,26 +50,36 @@
 </template>
 <script>
 
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../mixins/datatable";
+    import {mapGetters} from "vuex";
+
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
-               importing:false,
-
-
+                importing:false,
+                headers: FieldDefs
             }
         },
         created(){
             this.getAccounts();
         },
-       
+        computed:{
+          ...mapGetters({
+             tableData:'all_accounts'
+          })
+        },
         methods:{
             getAccounts(){
-                axios.get('accounts')
-                    .then(res => {
-                      this.tableData = res.data
-                      this.initDatable();
-                    })
+                this.$store.dispatch('my_accounts').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 1000);
+                    }
+                })
             },
             importAccounts(){
                 this.importing = true;
@@ -66,24 +91,6 @@
                     })
             },
 
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
         },
 
     }

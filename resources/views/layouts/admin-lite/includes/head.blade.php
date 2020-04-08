@@ -11,7 +11,7 @@
 
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/css/bootstrap-toggle.min.css')}}">  
+    <link rel="stylesheet" href="{{asset('assets/css/bootstrap-toggle.min.css')}}">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{asset('assets/fonts/font-awesome.min.css')}}">
@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="{{asset('assets/css/lib/print.css')}}">
     <link rel="stylesheet" href="{{asset('assets/css/jquery.timepicker.css')}}">
     <link rel="stylesheet" href="{{asset('assets/css/lib/bootstrap-datepicker.css')}}">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
     <!-- Google Font -->
     <link rel="stylesheet"
           href="{{asset('assets/css/css.css')}}">

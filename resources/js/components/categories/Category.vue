@@ -46,7 +46,9 @@
                 delete this.form.id;
                 axios.post('categories',this.form)
                     .then(res => {
-                        eventBus.$emit('listCategory',res.data)
+                       this.$store.state.all_my_categories.unshift(res.data);
+                       eventBus.$emit('listCategory',res.data)
+
                     })
                     .catch(error => error.response)
             },

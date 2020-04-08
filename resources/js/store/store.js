@@ -57,18 +57,32 @@ export default new Vuex.Store({
         all_my_job_categories:{},
         all_my_service_types:{},
         all_my_tracks:{},
-        all_my_categories:{},
+        all_my_categories:[],
         all_my_mechanics:{},
         get_users:{},
         all_my_stk_groups:{},
         all_my_expenses:{},
-        p_lists:{}
+        p_lists:{},
+        loading:false,
+        pagination: {
+            descending: true,
+            page: 1,
+            rowsPerPage: 5,
+            sortBy: 'id',
+            totalItems: 0,
+            rowsPerPageItems: [1, 2, 4, 8, 16]
+        },
+        items:[]
     },
 
     mutations:{
      pathTo(state, to) {
      state.path_to = to;
      },
+        _setItems (state, { items, totalItems }) {
+            state.items = items
+            Vue.set(state.pagination, 'totalItems', totalItems)
+        },
         getAllUsers(state,data){
             state.get_users = data;
         },
@@ -236,9 +250,18 @@ export default new Vuex.Store({
         },
         my_expenses(state,data){
          state.all_my_expenses = data;
-        },
+        }
     },
     getters:{
+        loading (state) {
+            return state.loading
+        },
+        pagination (state) {
+            return state.pagination
+        },
+        items (state) {
+            return state.items
+        },
       all_parts(state){
       return state.all_my_parts;
       },
@@ -302,6 +325,7 @@ export default new Vuex.Store({
     pathTo({commit},to){
      commit('pathTo',to);
     },
+
         updateServiceType({commit},service){
         commit('updateServiceType',service);
         },
@@ -530,7 +554,7 @@ export default new Vuex.Store({
         },
         my_expenses({commit},data){
         commit('my_expenses',data);
-        },
+        }
 
     }
 })

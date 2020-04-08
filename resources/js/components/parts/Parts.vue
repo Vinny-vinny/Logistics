@@ -55,7 +55,10 @@
             save(){
                 delete this.form.id;
                 axios.post('parts',this.form)
-                    .then(res => eventBus.$emit('listParts',res.data))
+                    .then(res =>{
+                        this.$store.state.all_my_parts.unshift(res.data);
+                        eventBus.$emit('listParts',res.data)
+                    })
                     .catch(error => error.response)
             },
             update(){

@@ -4,8 +4,14 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import CustomActions from "./components/maintenance/fuelbalance/CustomActions";
+
 window.Vue = require('vue');
+import Vuetify from 'vuetify';
+import "vuetify/dist/vuetify.min.css";
 import VueToastr from 'vue-toastr';
+
+Vue.use(Vuetify);
 Vue.use(VueToastr);
 import moment from 'moment'
 import JsonExcel from 'vue-json-excel'
@@ -33,6 +39,11 @@ Vue.filter('formatDate', function(value) {
         return moment(String(value)).format('MM/DD/YYYY hh:mm')
     }
 });
+import VueEvents from 'vue-events'
+Vue.use(VueEvents)
+
+Vue.component('custom-actions', CustomActions);
+Vue.component('filter-bar', FilterBar);
 
 import User from './helpers/User';
 window.User = User;
@@ -56,10 +67,12 @@ window.Exception = Exception;
 
 import 'vue-search-select/dist/VueSearchSelect.css';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
+import '@mdi/font/css/materialdesignicons.css'
 
 
 import router from './routes/router';
 import store from "./store/store";
+import FilterBar from "./components/filters/FilterBar";
 
 router.beforeEach((to, from, next) => {
     store.dispatch('pathTo',to.path);
@@ -95,6 +108,7 @@ Vue.component('app-top-nav', require('./components/layouts/AppTopNav').default);
 const app = new Vue({
     el: '#app',
     router,
-    store
+    store,
+    vuetify: new Vuetify()
 
 });

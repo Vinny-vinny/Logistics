@@ -5,34 +5,53 @@
         <section class="content" v-if="!add_part">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Parts</h3>
-                    <button class="btn btn-primary pull-right" @click="add_part=true">Add Part</button>
-                    <button class="btn btn-success pull-right mr" @click="importParts()">{{importing ? 'Importing...':'Import from Sage'}}</button>                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Code</th>
-                            <th>Description</th>
-                            <th>Cost</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="part in tableData">
-                            <td>{{part.id}}</td>
-                            <td>{{part.code}}</td>
-                            <td>{{part.description}}</td>
-                            <td>{{part.cost}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editPart(part)"><i class="fa fa-edit"></i></button>
-<!--<button class="btn btn-danger btn-sm" @click="deletePart(part.id)"><i class="fa fa-trash"></i></button>-->
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Parts
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="cyan"  @click="importParts()" :disabled="importing">
+                                    {{importing ? 'Importing...' : 'Import from Sage'}}
+                                </v-btn>
+                                <v-btn small color="indigo" dark @click="add_part=true" class="mr">Add Part
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editPart(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -40,23 +59,31 @@
 </template>
 <script>
     import Parts from "./Parts";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../mixins/datatable";
+    import {mapGetters} from "vuex";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_part: false,
                 editing: false,
-                importing:false,              
+                importing:false,
                 warehouse:'',
-                show_warehouse:false
+                show_warehouse:false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
-            this.getParts();         
+            this.getParts();
         },
-      
-        methods:{           
+       computed:{
+         ...mapGetters({
+             tableData:'all_parts'
+         })
+       },
+        methods:{
             importParts(){
                 this.importing = true;
                 axios.get(`import-parts`)
@@ -67,12 +94,14 @@
                     })
             },
             getParts(){
-                axios.get('parts')
-                    .then(res =>{
-                     this.tableData = res.data
-                     this.initDatable();
-                     })
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_parts').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 1000);
+                    }
+                })
             },
             editPart(part){
                 this.$store.dispatch('updatePart',part)
@@ -94,14 +123,12 @@
             },
             listen(){
                 eventBus.$on('listParts',(part) =>{
-                    this.tableData.unshift(part);
+                    this.getItems();
                     this.add_part =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_part = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateParts',(part)=>{
                     this.add_part = false;
@@ -112,27 +139,9 @@
                         }
                     }
                     this.tableData.unshift(part);
-                    this.initDatable();
                 });
             },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
 
-                    });
-                },500)
-            },
         },
         components:{
             Parts

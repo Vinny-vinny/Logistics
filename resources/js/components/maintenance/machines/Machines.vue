@@ -109,11 +109,11 @@
                                     <datepicker v-model="form.warranty"></datepicker>
                                 </div>
                                 <div class="form-group">
-                                    <label>Assign To</label>                                  
+                                    <label>Assign To</label>
                                      <model-select :options="users"
-                                        v-model="form.assign_to"                      
+                                        v-model="form.assign_to"
                                         required>
-                                        </model-select>  
+                                        </model-select>
                                  </div>
                                 <div class="form-group">
                                     <label>Fuel Type</label>
@@ -135,8 +135,8 @@
 </template>
 <script>
     import datepicker from 'vuejs-datepicker';
-    import Multiselect from 'vue-multiselect';    
-    import { ModelSelect } from 'vue-search-select'; 
+    import Multiselect from 'vue-multiselect';
+    import { ModelSelect } from 'vue-search-select';
     export default {
         props: ['edit'],
         data() {
@@ -290,6 +290,7 @@
                  delete this.form.id;
                 axios.post('machines', formData,config)
                     .then(res =>{
+                       this.$store.state.all_my_vehicles.unshift(res.data);
                        this.$toastr.s('Asset created Successfully.');
                        eventBus.$emit('listMachines', res.data)
                     })
@@ -369,7 +370,7 @@
                                 'value': u.id,
                                 'text': u.name
                             })
-                        })                        
+                        })
                     });
             },
             listen() {

@@ -74,7 +74,10 @@
                     return this.$toastr.e('Password field cannot be empty.');
                 }
                 axios.post('users',this.form)
-                    .then(res => eventBus.$emit('listUsers',res.data))
+                    .then(res =>{
+                        this.$store.state.all_my_users.unshift(res.data);
+                        eventBus.$emit('listUsers',res.data)
+                    })
                     .catch(error => error.response)
             },
             update(){

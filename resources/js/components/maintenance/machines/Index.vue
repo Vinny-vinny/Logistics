@@ -5,37 +5,53 @@
         <section class="content" v-if="!add_machine">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Machines</h3>
-                    <button  style="display:none" class="btn btn-success pull-right" @click="importMachines()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
-                    <button style="display:none" class="btn btn-primary pull-right mr" @click="add_machine=true">Add Machine</button>
-                    </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Make</th>
-                            <th>Chasis #</th>
-                            <th>Assigned To</th>
-                            <th>Track By</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="machine in tableData">
-                            <td>{{machine.code}}</td>
-                            <td>{{machine.make}}</td>
-                            <td>{{machine.chasis_no}}</td>
-                            <td>{{machine.assign_to_id}}</td>
-                            <td>{{machine.track_name}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editMachine(machine)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteMachine(machine.id)" style="display:none"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Machines
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="importMachines()" :disabled="importing" style="display: none">
+                                    {{importing ? 'Importing...' : 'Import from Sage'}}
+                                </v-btn>
+                                <v-btn small color="indigo" dark @click="add_machine=true" class="mr" style="display: none">Add Machine
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editMachine(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -43,110 +59,100 @@
 </template>
 <script>
     import Machines from "./Machines";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../../mixins/datatable";
+    import {mapGetters} from "vuex";
+
     export default {
-        data(){
+        mixins: [datatable],
+        data() {
             return {
-                tableData: [],
                 add_machine: false,
                 editing: false,
-                importing: false
+                importing: false,
+                headers: FieldDefs,
             }
         },
-        created(){
+        created() {
+            this.getDetails();
             this.listen();
-            this.getMachines();
         },
-        methods:{
-            getMachines(){
-                axios.get('machines')
-                    .then(res => {
-                        this.tableData = res.data;
-                        this.initDatable();
-                    })
-                    .catch(error => Exception.handle(error))
+        computed: {
+            ...mapGetters({
+                tableData: 'all_vehicles'
+            })
+        },
+        methods: {
+            getDetails() {
+                this.$store.dispatch('my_vehicles').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 1000);
+                    }
+                })
             },
-            editMachine(machine){
-                this.$store.dispatch('updateMachine',machine)
-                    .then(() =>{
-                        this.editing=true;
-                        this.add_machine=true;
+            editMachine(machine) {
+                this.$store.dispatch('updateMachine', machine)
+                    .then(() => {
+                        this.editing = true;
+                        this.add_machine = true;
                     })
             },
-            deleteMachine(id){
+            deleteMachine(id) {
                 axios.delete(`machines/${id}`)
                     .then(res => {
-                        for (let i=0;i<this.tableData.length;i++){
-                            if (this.tableData[i].id == res.data){
-                                this.tableData.splice(i,1);
+                        for (let i = 0; i < this.tableData.length; i++) {
+                            if (this.tableData[i].id == res.data) {
+                                this.tableData.splice(i, 1);
                             }
                         }
                     })
                     .catch(error => Exception.handle(error))
             },
-            importMachines(){
+            importMachines() {
                 this.importing = true;
-            axios.get('import-machines')
-                .then(machines => {
-                    if (machines.data.length){
-                        this.$toastr.s('Machines imported successfully.');
+                axios.get('import-machines')
+                    .then(machines => {
+                        if (machines.data.length) {
+                            this.$toastr.s('Machines imported successfully.');
 
-                    }
-                    this.importing = false;
-                    this.$router.go();
+                        }
+                        this.importing = false;
+                        this.$router.go();
 
-                })
+                    })
             },
-            listen(){
-                eventBus.$on('listMachines',(machine) =>{
-                    this.tableData.unshift(machine);
-                    this.add_machine =false;
-                    this.initDatable();
+            listen() {
+                eventBus.$on('listMachines', (machine) => {
+                    this.getItems();
+                    this.add_machine = false;
                 });
-                eventBus.$on('cancel',()=>{
+                eventBus.$on('cancel', () => {
                     this.add_machine = false;
                     this.editing = false;
-                    this.initDatable();
-                    this.getMachines();
                 });
-                eventBus.$on('updateMachine',(machine)=>{
+                eventBus.$on('updateMachine', (machine) => {
                     this.add_machine = false;
                     this.editing = false;
-                    for (let i=0;i<this.tableData.length;i++){
-                        if (this.tableData[i].id == machine.id){
-                            this.tableData.splice(i,1);
+                    for (let i = 0; i < this.tableData.length; i++) {
+                        if (this.tableData[i].id == machine.id) {
+                            this.tableData.splice(i, 1);
                         }
                     }
                     this.tableData.unshift(machine);
-                    this.initDatable();
                 });
             },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
         },
-        components:{
+        components: {
             Machines
         }
     }
 </script>
 
 <style>
-.mr{
-    margin-right: 10px;
-}
+    .mr {
+        margin-left: 10px;
+    }
 </style>
