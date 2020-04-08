@@ -75,8 +75,9 @@
                 this.$store.dispatch('my_pricelists').then(() => {
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
+                            console.log(this.$store.getters.all_pricelists)
                             this.getItems();
-                        }, 2000);
+                        }, 3000);
                     }else {
                       this.getItems();
                     }
