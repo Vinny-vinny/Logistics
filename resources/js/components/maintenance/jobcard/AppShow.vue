@@ -335,6 +335,8 @@
 </template>
 
 <script>
+    import {mapGetters} from "vuex";
+
     export default {
         data(){
             return {
@@ -359,41 +361,34 @@
                 items:[],
                 hours_spent:0,
                 customer:{},
-                requisitions:{},
                 cost:0,
                 cost_at:0,
                 track_by:''
             }
         },
         created() {
-
           this.getJob();
-          this.getRequisitions();
         },
         computed:{
+            ...mapGetters({
+                requisitions:'all_reqs',
+                jobs:'all_jobs',
+                customers:'all_customers',
+                parts:'all_parts',
+                job_types:'all_job_types',
+                fuels:'all_fuels'
+            }),
           workshop(){
              return this.category ==='workshop';
           }
         },
         methods:{
-            getRequisitions(){
-              axios.get('requisitions')
-              .then(res => {
-                  this.requisitions = res.data.requisitions;
-              })
-            },
             getJob(){
-              axios.get('job-card')
-              .then(res => {
-                  this.job = res.data.jobcards.find(j => j.id == this.$route.params['id']);
-                  console.log(this.job)
+                  this.job = this.jobs.find(j => j.id == this.$route.params['id']);
                   this.cost_at = this.job.current_readings;
                   this.track_by = this.job.track_name;
-                  axios.get('customers')
-                  .then(res => {
-                     this.customer = res.data.find(c => c.id == this.job.customer_id);
-                     console.log(this.customer);
-                  });
+                  this.customer = this.customers.find(c => c.id == this.job.customer_id);                  ;
+
                   this.category = this.job.category.toLowerCase().trim();
                   //checklist configuration
                   if (this.category == 'workshop'){
@@ -423,9 +418,7 @@
                     }
                   }
                    if (this.job.requisition_id){
-                       axios.get('requisitions')
-                       .then(res => {
-                        let req = res.data.requisitions.find(r => r.id == this.job.requisition_id);
+                        let req = this.requisitions.find(r => r.id == this.job.requisition_id);
                         this.requisition = req;
                         if (req.type =='Internal'){
                             this.requisition_type = 'Internal';
@@ -452,15 +445,13 @@
                            if (req.type =='External'){
                                this.requisition_type = 'External';
                                this.requisitions_external = req.inventory_items_external;
-                               axios.get('parts')
-                                   .then(res => {
                                     let total =0;
                                        this.requisitions_external.forEach(item => {
-                                           for (let i=0;i<res.data.length;i++){
-                                               if (res.data[i]['id'] == item.part){
+                                           for (let i=0;i<this.parts.length;i++){
+                                               if (this.parts[i]['id'] == item.part){
                                                 total+=(item.unit_price*item.quantity);
                                                    this.items.push({
-                                                       'item':res.data[i]['description'],
+                                                       'item':this.parts[i]['description'],
                                                        'qty':item.quantity,
                                                        'unit_price':item.unit_price,
                                                        'total_value':item.total_price,
@@ -469,9 +460,7 @@
                                            }
                                        })
                                      this.cost = total;
-                                   })
                                 }
-                       })
                    }
                   //Labour calculation = hrs* job type
                   if (this.job.actual_date && this.job.completion_date) {
@@ -485,20 +474,15 @@
                       let time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
                       this.hours_spent = Math.ceil(time_in_minutes/60);
                       if (this.job.job_type_id !== '') {
-                          axios.get('job-types')
-                              .then(res => {
-                                  this.job_types = res.data;
+
                                   let cost = this.job_types.find(type => type.id == this.job.job_type_id).hourly_rate;
                                   this.project_cost = Math.abs(time_in_minutes / 60 * cost);
-                              })
 
                       }
                   }
                  if (this.job.fuel){
                    this.has_fuel = true;
-                    axios.get('fuel')
-                    .then(res => {
-                        this.fuel_docket = res.data.fuels.find(f => f.id == this.job.fuel);
+                        this.fuel_docket = this.fuels.find(f => f.id == this.job.fuel);
                         if (this.fuel_docket.expense_id){
                             this.has_othercharges = true;
                             axios.get('expense')
@@ -506,9 +490,8 @@
                                     this.other_charges = res.data.find(charge => charge.id ==this.fuel_docket.expense_id);
                                 })
                         }
-                    })
                  }
-              })
+
             },
             print(){
                 window.print();
