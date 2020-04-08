@@ -97,11 +97,10 @@
                 this.$store.dispatch('my_parts').then(() => {
                     this.getItems();
                     if (this.tableData.length == undefined) {
-                        axios.get('parts')
-                            .then(res => {
-                                this.$store.commit('my_parts',res.data);
-                                this.getItems();
-                            }).catch(e => console.log(e))
+                        setTimeout(() => {
+                            console.log(this.$store.all_my_parts)
+                            this.getItems();
+                        }, 10000);
                     }
                 })
             },
