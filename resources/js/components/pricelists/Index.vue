@@ -76,9 +76,7 @@
                     console.log(this.$store.state.all_my_pricelists)
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
-                            console.log('++++++++++++++')
-                            console.log(this.$store.state.all_my_pricelists)
-                            console.log('---------------------')
+
                             //console.log(this.$store.getters.all_pricelists)
                             this.getItems();
                         }, 5000);
@@ -86,6 +84,9 @@
                       this.getItems();
                     }
                 })
+                console.log('++++++++++++++')
+                console.log(this.$store.state.all_my_pricelists)
+                console.log('---------------------')
             },
             importPrices(){
                 this.importing = true;
