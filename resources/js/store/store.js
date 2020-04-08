@@ -457,7 +457,6 @@ export default new Vuex.Store({
             .then(res => {
               commit('my_pricelists',res.data);
               console.log(state.all_my_pricelists)
-
             }).catch(e => console.log(e))
         },
         my_reqs({commit}){

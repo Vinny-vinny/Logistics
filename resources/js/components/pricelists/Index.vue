@@ -73,12 +73,15 @@
         methods:{
             getPriceLists(){
                 this.$store.dispatch('my_pricelists').then((res) => {
-                   console.log(this.$store.state.all_my_pricelists)  ();
                     if (this.tableData.length == undefined) {
-                        setTimeout(() => {
-                            //console.log(this.$store.getters.all_pricelists)
+                        axios.get('price-list')
+                            .then(res => {
+                           this.$store.commit('my_pricelists',res.data);
                             this.getItems();
-                        }, 5000);
+                            console.log('-----------')
+                             console.log(res.data)
+                                console.log('=======')
+                            }).catch(e => console.log(e))
                     }else {
                       this.getItems();
                     }
