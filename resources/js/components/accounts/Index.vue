@@ -77,7 +77,7 @@
                     if (this.tableData.length == undefined) {
                         axios.get('accounts')
                             .then(res => {
-                                this.$store.commit('my_pricelists',res.data);
+                                this.$store.commit('my_accounts',res.data);
                                 this.getItems();
                             }).catch(e => console.log(e))
                     }
