@@ -100,7 +100,7 @@
                         setTimeout(() => {
                             console.log(this.$store.all_my_parts)
                             this.getItems();
-                        }, 2000);
+                        }, 5000);
                     }
                 })
             },
