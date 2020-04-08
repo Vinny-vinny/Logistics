@@ -74,14 +74,11 @@
             getPriceLists(){
                 this.$store.dispatch('my_pricelists').then((res) => {
                     if (this.tableData.length == undefined) {
-                        axios.get('price-list')
-                            .then(res => {
-                           this.$store.commit('my_pricelists',res.data);
-                            this.getItems();
-                            console.log('-----------')
-                             console.log(res.data)
-                                console.log('=======')
-                            }).catch(e => console.log(e))
+                    axios.get('price-list')
+                        .then(res => {
+                       this.$store.commit('my_pricelists',res.data);
+                        this.getItems();
+                        }).catch(e => console.log(e))
                     }else {
                       this.getItems();
                     }

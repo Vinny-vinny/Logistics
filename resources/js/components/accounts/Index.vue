@@ -75,9 +75,11 @@
                 this.$store.dispatch('my_accounts').then(() => {
                     this.getItems();
                     if (this.tableData.length == undefined) {
-                        setTimeout(() => {
-                            this.getItems();
-                        }, 3000);
+                        axios.get('accounts')
+                            .then(res => {
+                                this.$store.commit('my_pricelists',res.data);
+                                this.getItems();
+                            }).catch(e => console.log(e))
                     }
                 })
             },
