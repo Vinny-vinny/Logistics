@@ -87,7 +87,6 @@
                 this.$store.dispatch('my_vehicles').then(() => {
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
-                            console.log(this.$store.state.all_my_vehicles)
                             this.getItems();
                         }, 2000);
                     }else {

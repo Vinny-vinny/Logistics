@@ -73,11 +73,12 @@
         methods:{
             getPriceLists(){
                 this.$store.dispatch('my_pricelists').then(() => {
-                    this.getItems();
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
                             this.getItems();
-                        }, 3000);
+                        }, 2000);
+                    }else {
+                      this.getItems();
                     }
                 })
             },
