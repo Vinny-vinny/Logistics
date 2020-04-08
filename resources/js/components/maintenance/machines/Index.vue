@@ -89,7 +89,7 @@
                         setTimeout(() => {
                             console.log(this.$store.state.all_my_vehicles)
                             this.getItems();
-                        }, 3000);
+                        }, 2000);
                     }else {
                         this.getItems();
                     }
