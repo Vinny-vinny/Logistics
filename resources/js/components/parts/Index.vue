@@ -98,8 +98,9 @@
                     this.getItems();
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
+                            console.log(this.$store.all_my_parts)
                             this.getItems();
-                        }, 1000);
+                        }, 2000);
                     }
                 })
             },
