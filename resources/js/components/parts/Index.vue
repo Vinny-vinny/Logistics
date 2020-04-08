@@ -98,7 +98,7 @@
                     this.getItems();
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
-                            console.log(this.$store.all_my_parts)
+                            console.log(this.$store.state.all_my_parts)
                             this.getItems();
                         }, 10000);
                     }
