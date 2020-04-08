@@ -453,7 +453,7 @@ export default new Vuex.Store({
             })
         },
         my_pricelists({commit,state}){
-        return axios.get('price-list')
+        axios.get('price-list')
             .then(res => {
               commit('my_pricelists',res.data);
               console.log(state.all_my_pricelists)
