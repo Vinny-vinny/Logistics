@@ -85,11 +85,13 @@
         methods: {
             getDetails() {
                 this.$store.dispatch('my_vehicles').then(() => {
-                    this.getItems();
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
+                            console.log(this.$store.state.all_my_vehicles)
                             this.getItems();
                         }, 3000);
+                    }else {
+                        this.getItems();
                     }
                 })
             },
