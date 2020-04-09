@@ -308,10 +308,7 @@
                 reverse_text:false,
                 inventory_items_reversal:[],
                 edit_jobcard: this.edit,
-                machines: {},
-                tracks: {},
                 service_types: {},
-                services: {},
                 balances: {},
                 internal: false,
                 external: false,
@@ -319,42 +316,32 @@
                 show_track_by: false,
                 make: '',
                 driver: '',
-                users: {},
                 previous_readings: 0,
                 actual_readings: 0,
                 service_after: 0,
                 next_computed_readings: 0,
                 show_next_readings: true,
-                parts: {},
                 categories: [],
                 status: 1,
                 projects: [],
-                job_categories: {},
                 mechanics: [],
-                job_types: {},
                 customer_type: '',
-                customers: {},
                 filtered_customers: [],
                 show_customers: false,
                 part_qty: '',
                 part_id: '',
                 exp_qty: '',
                 exp_id: '',
-                requisitions: {},
                 show_inventory: false,
                 filtered_items_internal: [],
                 filtered_items_external: [],
                 disable_rq: false,
                 filtered_rq: '',
-                customer_types: {},
                 rqs:[],
                 subprojects:[],
                 transactions:{},
                 stk_items:[],
                 show_rqs:false,
-                all_mechanics:{},
-                all_projects:{},
-                all_categories:{},
                 inventory_items_external: [{part: '', uom:'',quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''}],
 
             }
@@ -362,16 +349,13 @@
         watch: {
             labours(){
             if (this.form.hours_spent > 0 && this.form.job_type_id) {
-                       axios.get('job-types')
-                        .then(res => {
                             let total =0;
-                            this.job_types = res.data;
                             if (this.form.job_type_id) {
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
                              total += this.form.hours_spent * cost;
                             }
                            this.form.labour_cost =  total.toFixed(2);
-                        })
+
             }
             },
             getCost() {
@@ -423,16 +407,13 @@
                     let time_in_minutes = datetimeB.diff(datetimeA, 'minutes');
 
                     if (this.form.job_type_id !== '') {
-                     axios.get('job-types')
-                        .then(res => {
                             let total =0;
-                            this.job_types = res.data;
                             if (this.form.job_type_id) {
                               let cost = this.job_types.find(type => type.id == this.form.job_type_id).hourly_rate;
                              total += time_in_minutes / 60 * cost;
                             }
                            // this.form.labour_cost =  total;
-                        })
+
 
                     }
 

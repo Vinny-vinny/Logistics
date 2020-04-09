@@ -39,8 +39,8 @@
                               }"
                             >
                                 <template v-slot:item.actions="{ item }">
-                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
-                                        <v-icon dark small @click="editJobcard(item)" v-if="parts.length > 1">mdi-pencil</v-icon>
+                                    <v-btn class="mx-1 my-1" fab dark color="cyan" small>
+                                        <v-icon dark small @click="editJobcard(item)" v-if="parts.length > 1">mdi-eye</v-icon>
                                     </v-btn>
 
                                 </template>

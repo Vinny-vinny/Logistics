@@ -535,8 +535,7 @@
         if (this.form.group_name){
             this.form.credit_account_id = this.all_stk_groups.find(g => g.name == this.form.group_name).account_link;
         }
-
-            },
+        },
             getGroups(){
                 this.all_stk_groups.forEach(stk => {
                         this.stk_groups.push({

@@ -161,11 +161,12 @@
             },
             listen(){
                 eventBus.$on('listJobcards',(job) =>{
-                    this.tableData.unshift(job);
+                    this.getItems();
                     this.add_jobcard =false;
                     this.show_add_text=false;
                 });
                 eventBus.$on('cancel',()=>{
+                    this.getItems();
                     this.add_jobcard = false;
                     this.editing = false;
                     this.show_reversal = false;
