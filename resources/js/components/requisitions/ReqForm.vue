@@ -92,7 +92,7 @@
         computed:{
           ...mapGetters({
             all_customers:'all_customers',
-            machines:'all_machines',
+            machines:'all_vehicles',
             all_projects:'all_projects'
           })
         },
@@ -132,8 +132,8 @@
                 }
                 axios.post('generate-requisition',this.form)
                     .then(res => {
-                        this.$store.dispatch('reqFormData',res.data);
-                        eventBus.$emit('close_req_form');
+                       // this.$store.dispatch('reqFormData',res.data);
+                        eventBus.$emit('updateRequisition',res.data);
                     })
                     .catch(err => console.log(err))
             },

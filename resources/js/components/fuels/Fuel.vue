@@ -313,7 +313,7 @@
         this.issue_text = true;
         axios.post(`issue-fuel`,this.form)
         .then(res => {
-        eventBus.$emit('listFuels', res.data)
+        eventBus.$emit('updateFuel', res.data)
         })
         },
             resetCustomerType(){
@@ -432,7 +432,10 @@
 
                 this.form.authorized_by = User.id();
                 axios.post('fuel', this.form)
-                    .then(res => eventBus.$emit('listFuels', res.data))
+                    .then(res =>{
+                        this.$store.state.all_my_fuels.unshift(res.data);
+                        eventBus.$emit('listFuels', res.data)
+                    })
                     .catch(error => error.response)
             },
             update() {

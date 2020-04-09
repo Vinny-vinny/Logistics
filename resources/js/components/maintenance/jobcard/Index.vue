@@ -46,8 +46,8 @@
                               }"
                             >
                                 <template v-slot:item.actions="{ item }">
-                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
-                                        <v-icon dark small @click="editJobcard(item)" v-if="parts.length > 1">mdi-pencil</v-icon>
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small v-if="parts.length > 1">
+                                        <v-icon dark small @click="editJobcard(item)">mdi-pencil</v-icon>
                                     </v-btn>
                                     <router-link :to="{path:'/job-card/'+item.id}" v-if="parts.length > 1">
                                         <v-btn class="mx-1 my-1" fab dark color="cyan" small>
@@ -166,7 +166,6 @@
                     this.show_add_text=false;
                 });
                 eventBus.$on('cancel',()=>{
-                    this.getItems();
                     this.add_jobcard = false;
                     this.editing = false;
                     this.show_reversal = false;

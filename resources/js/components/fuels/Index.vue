@@ -51,7 +51,7 @@
                                         <v-btn class="mx-1 my-1" fab dark color="cyan" small>
                                             <v-icon dark small @click="showPrint(item)">mdi-eye</v-icon>
                                         </v-btn>
-                                    <v-btn class="mx-1 my-1" fab dark color="pink" small  v-if="!item.reversal_ref && item.fuel_category_id=='stock_issue' && item.status !=0">
+                                    <v-btn style="display: none" class="mx-1 my-1" fab dark color="pink" small  v-if="!item.reversal_ref && item.fuel_category_id=='stock_issue' && item.status !=0">
                                         <v-icon dark small @click="reverseFuel(item)">mdi-undo</v-icon>
                                     </v-btn>
 
@@ -156,7 +156,7 @@
             },
             listen() {
                 eventBus.$on('listFuels', (fuel) => {
-                    this.tableData.unshift(fuel);
+                    this.getItems();
                     this.add_fuel = false;
                     this.add_fuel_other = false;
                     this.show_add_text = false;

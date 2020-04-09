@@ -149,7 +149,8 @@ class JobcardController extends Controller
     public function reverseJob(Request $request){
         $request['inventory_items_reversal'] = json_encode($request->get('inventory_items_reversal'));
          $request['reversal_ref'] = 'REV00'.$request->get('id');
-         Jobcard::find($request->get('id'))->update($request->all());
+         $job = Jobcard::find($request->get('id'));
+         $job->update($request->all());
         $ref=$request['reversal_ref'];
         $date = Carbon::now()->format('Y-m-d');
         $job_details = Jobcard::find($request->id);
@@ -185,7 +186,7 @@ class JobcardController extends Controller
         $invoice_reversal = WizPostTx::CREATE(['XMLText' => $reverse_xml]);
          $details = WizPostTx::CREATE(['XMLText' => $reverse_items_details]);
          DB::connection('sqlsrv2')->statement('exec WIZ_PostTx_With_XML @SNo_Hdr= "'.$invoice_reversal->SNo.'",@SNo_Det = "'.$details->SNo.'"');
-        return response()->json(['rverseral he== '=>$reverse_xml,'details == '=>$reverse_items_details]);
+        return response()->json($job);
     }
     /**
      * Update the specified resource in storage.

@@ -22,7 +22,7 @@
                                     hide-details
                                 ></v-text-field>
                                 <v-spacer></v-spacer>
-                                <v-btn small color="indigo" dark @click="show_req_form=true" v-if="machines.length > 1">Print Requisition Card Form
+                                <v-btn small color="indigo" dark @click="show_req_form=true" v-if="machines.length > 1">Print Requisition Form
                                 </v-btn>
                                 <v-btn small color="indigo" dark @click="add_requisition=true" class="mr" v-if="pricelists.length > 1">Add Requisition
                                 </v-btn>
@@ -132,9 +132,6 @@
                 this.$store.dispatch('my_stk_groups');
                 this.$store.dispatch('my_users');
                 this.$store.dispatch('my_projects');
-                this.$store.dispatch('my_reqs').then(() =>{
-                    this.initDatable();
-                });
             },
             reverseRequisition(rq){
             this.$store.dispatch('updateRequisition',rq)
@@ -170,19 +167,17 @@
             },
             listen(){
                 eventBus.$on('listReqs',(rq) =>{
-                    this.tableData.unshift(rq);
+                    this.getItems();
                     this.add_requisition =false;
                     this.show_add_txt = false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
+                    this.getItems();
                     this.add_requisition = false;
                     this.editing = false;
                     this.reversing = false;
                     this.show_reversal = false;
                     this.show_add_txt = false;
-                    //this.getRequisitions();
-                    this.initDatable();
                 });
                 eventBus.$on('close_req_form',(req) => {
                   this.show_req_form = false
@@ -193,37 +188,19 @@
                     this.editing = false;
                     this.show_reversal = false;
                     this.show_add_txt = false;
+                    this.show_req_form = false
                     for (let i=0;i<this.tableData.length;i++){
                         if (this.tableData[i].id == rq.id){
                             this.tableData.splice(i,1);
                         }
                     }
                     this.tableData.unshift(rq);
-                    this.initDatable();
                 });
                 eventBus.$on('hide_form',() =>{
                 this.show_form = false;
-              //  this.getRequisitions();
                 })
             },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
 
-                    });
-                },2000)
-            },
         },
         components:{
             Requisition,

@@ -200,7 +200,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary" v-if="form && form.used !=1">{{edit_requisition ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-                          <button type="button" class="btn btn-info" @click="issueStock(form.id)" v-if="edit_requisition && internalType && form.used !=1" :disabled="issue_text">{{issue_text ? 'Please Wait' :'Issue Stock'}}</button>
+                          <button type="button" class="btn btn-info" @click="issueStock(form.id)" v-if="edit_requisition && internalType && form.used !=1 && (form.inventory_items_internal[0]['part'] !==null || form.inventory_items_external[0]['part'] !==null)" :disabled="issue_text">{{issue_text ? 'Please Wait' :'Issue Stock'}}</button>
                     </form>
                 </div>
             </div>
@@ -434,7 +434,7 @@
           this.issue_text = true;
           axios.get(`issue-reqs/${req_id}`)
           .then(res => {
-           eventBus.$emit('cancel')
+           eventBus.$emit('updateRequisition',res.data)
           })
           },
            subProject(){
@@ -618,6 +618,7 @@
                 this.form.requested_by = User.id();
                 axios.post('requisitions',this.form)
                     .then(res =>{
+                        this.$store.state.all_my_reqs.unshift(res.data);
                       eventBus.$emit('listReqs',res.data)
                     })
                     .catch(error => error.response)

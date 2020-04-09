@@ -78,7 +78,6 @@
                             >
                             </model-select>
                                </div>
-{{form.credit_account_id}}
                          <div class="form-group">
                             <label>Debit Account</label>
                              <model-select :options="accountsd"
@@ -631,10 +630,11 @@
                   this.show_text = true;
                 axios.post(`rev-reqs`,{'inventory_items_reversal':this.inventory_items_reversal,'id':this.form.id,'credit_account_id':this.form.credit_account_id})
                     .then(res => {
+                        eventBus.$emit('updateRequisition',res.data);
                          this.show_reversal = false;
                          this.reverse_req = false;
                         this.edit_requisition = false;
-                         eventBus.$emit('updateRequisition',res.data);
+
                     })
                     .catch(error => error.response)
             },

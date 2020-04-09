@@ -313,7 +313,9 @@
     import datepicker from 'vuejs-datepicker';
      import { ModelSelect } from 'vue-search-select';
     import {mapGetters} from "vuex";
+    import datecovert from "../../../mixins/datepicker";
     export default {
+        mixins:[datecovert],
         props: ['edit'],
         data() {
             return {
@@ -515,7 +517,7 @@
              this.invoice_text = true;
             axios.post(`invoice-job-card`,this.form)
             .then(res => {
-              eventBus.$emit('cancel')
+              eventBus.$emit('updateJobcard',res.data)
             })
             },
             getJobDetails(){
@@ -723,17 +725,11 @@
                 this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : ''
                 this.form.actual_date !== '' ? this.form.actual_date = this.convertDate(this.form.actual_date) : ''
                 axios.post('job-card', this.form).then(res => {
-                     console.log('cooll')
-                    this.$toastr.s('Jobcard created Successfully.');
+                   this.$store.state.all_my_jobcards.unshift(res.data);
+                   this.$toastr.s('Jobcard created Successfully.');
                     eventBus.$emit('listJobcards', res.data)
                 })
                     .catch(error => error.response)
-            },
-            convertDate(str) {
-                var date = new Date(str),
-                    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-                    day = ("0" + date.getDate()).slice(-2);
-                return [date.getFullYear(), mnth, day].join("-");
             },
             update() {
                 this.form.next_service_date !== null && this.form.next_service_date !== '' ? this.form.next_service_date = this.convertDate(this.form.next_service_date) : '';
@@ -784,6 +780,7 @@
             },
 
             ServiceTypes() {
+
                         for (let i = 0; i < this.service_types.length; i++) {
                             if (this.service_types[i]['id'] === this.form.service_type_id) {
                                 this.service_after = this.service_types[i]['service_after'];

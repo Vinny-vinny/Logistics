@@ -1,7 +1,6 @@
 <template>
     <div>
         <requisition v-if="add_requisition && !show_form" :edit="editing"></requisition>
-
         <!-- Main content -->
         <section class="content" v-if="!add_requisition && !show_form && !show_reversal">
             <!-- Default box -->
@@ -20,7 +19,6 @@
                                     hide-details
                                 ></v-text-field>
                                 <v-spacer></v-spacer>
-
                             </v-card-title>
                             <v-data-table
                                 v-model="selected"
@@ -41,8 +39,8 @@
                               }"
                             >
                                 <template v-slot:item.actions="{ item }">
-                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
-                                        <v-icon dark small @click="editRequisition(item)" v-if="pricelists.length > 1">mdi-eye</v-icon>
+                                    <v-btn class="mx-1 my-1" fab dark color="cyan" small>
+                                     <v-icon dark small @click="editRequisition(item)" v-if="pricelists.length > 1">mdi-eye</v-icon>
                                     </v-btn>
                                 </template>
                             </v-data-table>
@@ -113,9 +111,6 @@
                 this.$store.dispatch('my_stk_groups');
                 this.$store.dispatch('my_users');
                 this.$store.dispatch('my_projects');
-                this.$store.dispatch('my_reqs').then(() => {
-                this.initDatable();
-                })
 
                 },
 
@@ -136,7 +131,6 @@
                     this.editing = false;
                     this.reversing = false;
                     this.show_reversal = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateRequisition',(rq)=>{
                     this.add_requisition = false;
@@ -147,31 +141,12 @@
                         }
                     }
                     this.tableData.unshift(rq);
-                    this.initDatable();
                 });
                 eventBus.$on('hide_form',() =>{
                 this.show_form = false;
 
                 })
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },2000)
-            },
+            }
         },
         components:{
             Requisition,
