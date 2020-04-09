@@ -47,14 +47,14 @@
                             >
                                 <template v-slot:item.actions="{ item }">
                                     <v-btn class="mx-1 my-1" fab dark color="indigo" small>
-                                        <v-icon dark small @click="editJobcard(item)">mdi-pencil</v-icon>
+                                        <v-icon dark small @click="editJobcard(item)" v-if="parts.length > 1">mdi-pencil</v-icon>
                                     </v-btn>
-                                    <router-link :to="{path:'/job-card/'+item.id}">
+                                    <router-link :to="{path:'/job-card/'+item.id}" v-if="parts.length > 1">
                                         <v-btn class="mx-1 my-1" fab dark color="cyan" small>
                                             <v-icon dark small>mdi-eye</v-icon>
                                         </v-btn>
                                     </router-link>
-                                    <v-btn class="mx-1 my-1" fab dark color="pink" small v-if="!item.reversal_ref && item.invoiced==1">
+                                    <v-btn class="mx-1 my-1" fab dark color="pink" small v-if="!item.reversal_ref && item.invoiced==1 && parts.length > 1">
                                         <v-icon dark small @click="reverseJob(item)">mdi-undo</v-icon>
                                     </v-btn>
 
