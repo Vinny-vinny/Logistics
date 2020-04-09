@@ -20,6 +20,15 @@ export default {
         }
     },
     methods: {
+        initDate() {
+            var vm = this;
+            $('.time_in').timepicker({'scrollDefault': 'now'}).on('changeTime', function () {
+                vm.form.time_in = $('.time_in').val();
+            })
+            $('.time_out').timepicker({'scrollDefault': 'now'}).on('changeTime', function () {
+                vm.form.time_out = $('.time_out').val();
+            })
+        },
         getItems(){
             if (this.tableData.length > 0 ) {
                 this.getDataFromApi()

@@ -383,6 +383,9 @@
 
             }
         },
+        mounted() {
+          this.initDate();
+        },
         watch: {
             labours(){
             if (this.form.hours_spent > 0 && this.form.job_type_id) {
@@ -928,5 +931,8 @@
 .bf{
     width:100%
 }
+    [type=number] {
+        width: 100% !important;
+    }
 
 </style>
