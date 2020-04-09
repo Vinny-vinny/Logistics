@@ -9,43 +9,56 @@
         <section class="content" v-if="!add_fuel && !add_fuel_other && !show_reversal && !show_print">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Fueling</h3>
-                    <button class="btn btn-primary pull-right" @click="add_fuel_other=true" style="display:none">Add Other Fuel</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_fuel=true" v-if="parts.length > 1">Add Fuel</button>
-
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Vehicle</th>
-                            <th>Litres</th>
-                            <th>Fuel Type</th>
-                            <th>Pump Price</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="fuel in tableData">
-                            <td>{{fuel.fuel_no}}</td>
-                            <td>{{fuel.vehicle}}</td>
-                            <td>{{fuel.litres}}</td>
-                            <td>{{fuel.fuel_type}}</td>
-                            <td>{{fuel.rate}}</td>
-                            <td>
-                               <span v-if="parts.length > 1">
-                                  <button class="btn btn-success btn-sm" @click="editFuel(fuel)"><i
-                                      class="fa fa-edit"></i></button>
-                                <button class="btn btn-info btn-sm" @click="showPrint(fuel)"><i class="fa fa-eye"></i></button>
-                                   <!--                                <router-link :to="{path: '/fuel/'+fuel.id}" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></router-link>-->
-                                <button v-if="!fuel.reversal_ref && fuel.fuel_category_id=='stock_issue' && fuel.status !=0" class="btn btn-danger btn-sm" @click="reverseFuel(fuel)"><i class="fa fa-undo" aria-hidden="true"></i></button>
-                               </span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Fueling
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_fuel=true" v-if="parts.length > 1">Add Fuel
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editFuel(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                        <v-btn class="mx-1 my-1" fab dark color="cyan" small>
+                                            <v-icon dark small @click="showPrint(item)">mdi-eye</v-icon>
+                                        </v-btn>
+                                    <v-btn class="mx-1 my-1" fab dark color="pink" small  v-if="!item.reversal_ref && item.fuel_category_id=='stock_issue' && item.status !=0">
+                                        <v-icon dark small @click="reverseFuel(item)">mdi-undo</v-icon>
+                                    </v-btn>
+
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -56,7 +69,10 @@
     import Reversal from "./Reversal";
     import ShowFuel from "./ShowFuel";
     import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../mixins/datatable";
     export default {
+        mixins:[datatable],
         data() {
             return {
                 add_fuel: false,
@@ -67,21 +83,31 @@
                 show_add_text:false,
                 check_customers:false,
                 check_accounts:false,
-                check_parts:false
+                check_parts:false,
+                headers: FieldDefs
             }
         },
         created() {
+         this.getFuels;
          this.getAllDetails();
          this.listen();
             },
-        mounted() {
-           this.initDatable();
-        },
         computed:{
         ...mapGetters({
             tableData:'all_fuels',
             parts:'all_parts'
-        })
+        }),
+            getFuels(){
+                this.$store.dispatch('my_fuels').then(() => {
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }else {
+                        this.getItems();
+                    }
+                })
+            },
         },
         methods: {
             getAllDetails(){
@@ -94,7 +120,6 @@
                  this.$store.dispatch('my_jobcards');
                  this.$store.dispatch('my_projects');
                  this.$store.dispatch('my_stk_groups');
-                this.$store.dispatch('my_fuels')
             } ,
             reverseFuel(fuel){
              this.$store.dispatch('updateFuel',fuel)
@@ -104,7 +129,7 @@
                         })
             },
             showPrint(fuel){
-             this.$store.dispatch('updateCustomer',this.$store.state.all_my_customers.find(c => c.id === fuel.customer_id));
+             //this.$store.dispatch('updateCustomer',this.$store.state.all_my_customers.find(c => c.id === fuel.customer_id));
              this.$store.dispatch('updateFuel',fuel)
                 .then(() =>{
                  this.show_print = true;
@@ -135,7 +160,6 @@
                     this.add_fuel = false;
                     this.add_fuel_other = false;
                     this.show_add_text = false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel', () => {
                     this.add_fuel = false;
@@ -144,7 +168,6 @@
                     this.show_reversal = false;
                     this.show_print = false;
                     this.show_add_text = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateFuel', (fuel) => {
                     this.add_fuel = false;
@@ -158,26 +181,7 @@
                         }
                     }
                     this.tableData.unshift(fuel);
-                    this.initDatable();
                 });
-            },
-            initDatable() {
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
             },
         },
         components: {

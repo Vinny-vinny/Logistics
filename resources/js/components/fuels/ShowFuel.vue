@@ -92,6 +92,8 @@
 
 
 <script>
+    import {mapGetters} from "vuex";
+
     export default {
         data(){
             return {
@@ -105,13 +107,23 @@
         created(){
          this.getAllDeatils();
         },
+        computed:{
+          ...mapGetters({
+              customers:'all_customers'
+          })
+        },
         methods:{
             back(){
               eventBus.$emit('cancel');
             },
             getAllDeatils(){
               this.fuel = this.$store.state.fuels;
-              this.customer = this.$store.state.customers;
+              if (this.fuel !==undefined){
+              if (this.fuel.customer_id !=='' && this.fuel.customer_id !==null){
+                 this.customer = this.customers.find(c => c.id === this.customer_id);
+              }
+              }
+
             },
             checkCustomer(){
               return  this.customer !==undefined;

@@ -49,6 +49,7 @@
                                         <v-icon dark small @click="editPart(item)">mdi-pencil</v-icon>
                                     </v-btn>
                                 </template>
+
                             </v-data-table>
                         </v-card>
                     </v-app>
@@ -76,12 +77,23 @@
         },
         created(){
             this.listen();
-            this.getParts();
+            this.getParts;
         },
        computed:{
          ...mapGetters({
              tableData:'all_parts'
-         })
+         }),
+           getParts(){
+               this.$store.dispatch('my_parts').then(() => {
+                   if (this.tableData.length == undefined) {
+                       setTimeout(() => {
+                           this.getItems();
+                       }, 2000);
+                   }else {
+                       this.getItems();
+                   }
+               })
+           },
        },
         methods:{
             importParts(){
@@ -93,16 +105,9 @@
                         this.$router.go();
                     })
             },
-            getParts(){
-                this.$store.dispatch('my_parts').then(() => {
-                    this.getItems();
-                    if (this.tableData.length == undefined) {
-                        setTimeout(() => {
-                            console.log(this.$store.state.all_my_parts)
-                            this.getItems();
-                        }, 10000);
-                    }
-                })
+
+            onPageChange() {
+                this.getUsers();
             },
             editPart(part){
                 this.$store.dispatch('updatePart',part)

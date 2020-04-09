@@ -21,7 +21,7 @@ export default {
     },
     methods: {
         getItems(){
-            if (this.tableData.length > 1 ) {
+            if (this.tableData.length > 0 ) {
                 this.getDataFromApi()
                     .then(data => {
                         this.items = data.items

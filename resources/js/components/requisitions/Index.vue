@@ -8,45 +8,61 @@
         <section class="content" v-if="!add_requisition && !show_form && !show_reversal && !show_req_form">
             <!-- Default box -->
             <div class="box">
-
-                <div class="box-header with-border">
-                    <h3 class="box-title">Requisitions</h3>
-                      <button class="btn btn-success pull-right" @click="show_req_form =true" v-if="machines.length > 1">Print Requisition Form</button>
-                    <template>
-                        <button class="btn btn-primary pull-right mr" @click="add_requisition=true" v-if="pricelists.length > 1">Add Requisition</button>
-                    </template>
-
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>Req #</th>
-                            <th>Description</th>
-                            <th>Requested On</th>
-                            <th>Requested By</th>
-                            <th>Project</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="rq in tableData">
-                            <td>{{rq.req_no}}</td>
-                            <td>{{rq.description}}</td>
-                            <td>{{rq.date_requested}}</td>
-                            <td>{{rq.person_requested}}</td>
-                            <td>{{rq.project}}</td>
-                            <td>
-                           <span v-if="pricelists.length > 1">
-                              <button class="btn btn-success btn-sm fz" @click="editRequisition(rq)"><i class="fa fa-edit"></i></button>
-                               <router-link :to="{path:'/requisition/'+rq.id}" class="btn btn-success btn-info btn-sm fz"><i class="fa fa-eye"></i></router-link>
-                                <button class="btn btn-danger btn-sm fz" @click="reverseRequisition(rq)" v-if="!rq.reversal_ref && rq.type=='Internal' && rq.used==1"><i class="fa fa-undo" aria-hidden="true"></i></button>
-                               <!--                            <button class="btn btn-danger btn-sm" @click="deleteRequisition(rq.id)"><i class="fa fa-trash"></i></button>-->
-                           </span>
-                           </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                       <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Requisitions
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="show_req_form=true" v-if="machines.length > 1">Print Requisition Card Form
+                                </v-btn>
+                                <v-btn small color="indigo" dark @click="add_requisition=true" class="mr" v-if="pricelists.length > 1">Add Requisition
+                                </v-btn>
+
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editRequisition(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                    <router-link :to="{path:'/requisition/'+item.id}">
+                                        <v-btn class="mx-1 my-1" fab dark color="cyan" small>
+                                            <v-icon dark small>mdi-eye</v-icon>
+                                        </v-btn>
+                                    </router-link>
+                                    <v-btn class="mx-1 my-1" fab dark color="pink" small v-if="!item.reversal_ref && item.type=='Internal' && item.used==1">
+                                        <v-icon dark small @click="reverseRequisition(item)">mdi-undo</v-icon>
+                                    </v-btn>
+
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -58,7 +74,10 @@
     import Reversal from "./Reversal";
     import ReqForm from "./ReqForm";
     import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../mixins/datatable";
     export default {
+        mixins:[datatable],
         data(){
             return {
                 add_requisition: false,
@@ -73,12 +92,15 @@
                 check_accounts:false,
                 check_prices:false,
                 check_parts:false,
-                show_add_txt:false
+                show_add_txt:false,
+                headers: FieldDefs
             }
         },
         created(){
+            this.getReqs;
             this.getAllDetails();
             this.listen();
+
             },
         computed:{
             ...mapGetters({
@@ -86,7 +108,18 @@
                 pricelists:'all_pricelists',
                 tableData:'all_reqs',
                 machines:'all_vehicles'
-            })
+            }),
+            getReqs(){
+                this.$store.dispatch('my_reqs').then(() => {
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }else {
+                        this.getItems();
+                    }
+                })
+            },
         },
         methods:{
             getAllDetails(){

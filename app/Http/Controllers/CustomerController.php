@@ -147,7 +147,7 @@ class CustomerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {    $request['type'] = 'Internal';
+    {   // $request['type'] = 'Internal';
          $customers = Customer::create($request->all());
          return response()->json($customers);
     }

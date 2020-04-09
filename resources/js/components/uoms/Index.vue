@@ -4,30 +4,44 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Unit of Measures</h3>
-                    <button class="btn btn-success pull-right" @click="importUoms()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Code</th>                          
-                            <th>Description</th>
-                            <th></th>
-
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="uom in tableData">
-                            <td>{{uom.id}}</td>                         
-                            <td>{{uom.code}}</td>
-                             <td>{{uom.description}}</td>
-                            <td></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Unit of Measures
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="cyan"  @click="importUoms()" :disabled="importing">
+                                    {{importing ? 'Importing...' : 'Import from Sage'}}
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            ></v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -35,27 +49,39 @@
 </template>
 <script>
 
+    import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../mixins/datatable";
+
     export default {
+        mixins:[datatable],
         data(){
             return {
-               tableData: [],
                importing:false,
-
-
+               headers: FieldDefs
             }
         },
         created(){
-            this.getUoms();
+            this.getUoms;
         },
-       
-        methods:{
+        computed:{
+            ...mapGetters({
+               tableData:'all_units'
+            }),
             getUoms(){
-                axios.get('uom')
-                    .then(res => {
-                      this.tableData = res.data
-                      this.initDatable();
-                    })
+                this.$store.dispatch('my_uoms').then(() => {
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }else {
+                        this.getItems();
+                    }
+                })
             },
+        },
+
+        methods:{
             importUoms(){
                 this.importing = true;
                     axios.get(`import-uom`)
@@ -64,25 +90,6 @@
                         this.$toastr.s('Uoms successfully imported.');
                         this.$router.go();
                     })
-            },
-
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
             },
         },
 

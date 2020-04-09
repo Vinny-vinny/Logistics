@@ -21,9 +21,9 @@
                                     hide-details
                                 ></v-text-field>
                                 <v-spacer></v-spacer>
-                                <v-btn small color="indigo" dark @click="show_form=true">Print Job Card Form
+                                <v-btn small color="indigo" dark @click="show_form=true" v-if="parts.length > 1">Print Job Card Form
                                 </v-btn>
-                                <v-btn small color="indigo" dark @click="add_user=true" class="mr">Add Job Card
+                                <v-btn small color="indigo" dark @click="add_jobcard=true" class="mr" v-if="parts.length > 1">Add Job Card
                                 </v-btn>
 
                             </v-card-title>
@@ -89,7 +89,7 @@
             }
         },
         created(){
-            this.getJobs();
+            this.getJobs;
             this.getAllDetails();
             this.listen();
         },
@@ -98,20 +98,23 @@
                tableData:'all_jobs',
                parts:'all_parts',
                machines:'all_vehicles'
-           })
-        },
-        methods:{
+           }),
             getJobs(){
-                this.$store.dispatch('my_jobcards').then(() => {
-                    this.getItems();
+                this.$store.dispatch('my_vehicles').then(() => {
                     if (this.tableData.length == undefined) {
                         setTimeout(() => {
                             this.getItems();
-                        }, 1000);
+                        }, 2000);
+                    }else {
+                        this.getItems();
                     }
                 })
             },
+
+        },
+        methods:{
            getAllDetails(){
+               this.$store.dispatch('my_jobcards');
                this.$store.dispatch('my_parts');
                this.$store.dispatch('my_customers');
                this.$store.dispatch('my_vehicles');
@@ -129,7 +132,7 @@
             reverseJob(rq){
             this.$store.dispatch('updateJobcard',rq)
                     .then(() =>{
-                        if (this.parts.length > 1) {
+                        if (this.parts !==undefined) {
                             this.show_reversal = true;
                             this.add_jobcard = false;
                         }
@@ -138,7 +141,7 @@
             editJobcard(job){
                 this.$store.dispatch('updateJobcard',job)
                     .then(() =>{
-                        if (this.parts.length > 1){
+                        if (this.parts !==undefined){
                                 this.editing=true;
                                 this.add_jobcard=true;
                             }

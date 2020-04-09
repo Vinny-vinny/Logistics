@@ -6,35 +6,48 @@
         <section class="content" v-if="!add_requisition && !show_form && !show_reversal">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Reversed Requisitions</h3>
-
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt" style="width:100%">
-                        <thead>
-                        <tr>
-                            <th>Reversal Ref</th>
-                            <th>Description</th>
-                            <th>Requested On</th>
-                            <th>Requested By</th>
-                            <th>Project</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="rq in tableData">
-                            <td>{{rq.reversal_ref}}</td>
-                            <td>{{rq.description}}</td>
-                            <td>{{rq.date_requested}}</td>
-                            <td>{{rq.person_requested}}</td>
-                            <td>{{rq.project}}</td>
-                            <td>
-                               <button class="btn btn-info btn-sm" @click="editRequisition(rq)" v-if="pricelists.length > 1"><i class="fa fa-eye"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Reversed Requisitions
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editRequisition(item)" v-if="pricelists.length > 1">mdi-eye</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -43,7 +56,10 @@
 <script>
     import Requisition from "./ShowReversal";
     import {mapGetters} from "vuex";
+    import RevFieldDefs from "./RevFieldDefs";
+    import datatable from "../../mixins/datatable";
     export default {
+        mixins:[datatable],
         data(){
             return {
                 add_requisition: false,
@@ -54,10 +70,12 @@
                 check_accounts:false,
                 check_prices:false,
                 check_parts:false,
-                show_add_txt:false
+                show_add_txt:false,
+                headers: RevFieldDefs
             }
         },
         created(){
+            this.getReqs;
             this.getAllDetails();
             this.listen();
             },
@@ -67,8 +85,19 @@
                 parts:'all_parts',
                 reqs:'all_reqs'
             }),
+            getReqs(){
+                this.$store.dispatch('my_reqs').then(() => {
+                    if (this.reqs.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }else {
+                        this.getItems();
+                    }
+                })
+            },
             tableData(){
-                if (this.reqs.length > 1){
+                if (this.reqs.length > 0){
                  return  this.reqs.filter(req => req.reversal_ref !=='' && req.reversal_ref !==null);
                 }
             }

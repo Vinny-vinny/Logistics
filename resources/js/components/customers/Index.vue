@@ -5,36 +5,54 @@
         <section class="content" v-if="!add_customer">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Customers</h3>
-                    <button class="btn btn-success pull-right" @click="importCustomers()" :disabled="importing">{{importing ? 'Importing...' : 'Import from Sage'}}</button>
-                    <button class="btn btn-primary pull-right mr" @click="add_customer=true">Add Customer</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Account</th>
-                            <th>Contact Person</th>
-                            <th>Actions</th>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Customers
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="cyan"  @click="importCustomers()" :disabled="importing">
+                                    {{importing ? 'Importing...' : 'Import from Sage'}}
+                                </v-btn>
+                                <v-btn small color="indigo" dark @click="add_customer=true" class="mr">Add Customer
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editCustomer(item)">mdi-pencil</v-icon>
+                                    </v-btn>
 
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="customer in tableData">
-                            <td>{{customer.id}}</td>
-                            <td>{{customer.name}}</td>
-                            <td>{{customer.account}}</td>
-                            <td>{{customer.contact_person}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editCustomer(customer)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteCustomer(customer.id)" style="display:none"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                                </template>
+
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -42,29 +60,40 @@
 </template>
 <script>
     import Customers from "./Customers";
+    import datatable from "../../mixins/datatable";
+    import FieldDefs from "./FieldDefs";
+    import {mapGetters} from 'vuex';
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 importing:false,
                 add_customer:false,
                 editing: false,
-
+                headers: FieldDefs
             }
         },
         created(){
-            this.getCustomers();
+            this.getCustomers;
             this.listen();
         },
-
-        methods:{
+        computed:{
+            ...mapGetters({
+               tableData:'all_customers'
+            }),
             getCustomers(){
-                axios.get('customers')
-                    .then(res => {
-                        this.tableData = res.data
-                        this.initDatable();
-                    })
+                this.$store.dispatch('my_customers').then(() => {
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }else {
+                        this.getItems();
+                    }
+                })
             },
+        },
+        methods:{
             editCustomer(customer){
                 this.$store.dispatch('updateCustomer',customer)
                     .then(() =>{
@@ -94,14 +123,12 @@
             },
             listen(){
                 eventBus.$on('listCustomers',(customer) =>{
-                    this.tableData.unshift(customer);
+                    this.getItems();
                     this.add_customer =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_customer = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateCustomer',(customer)=>{
                     this.add_customer = false;
@@ -112,26 +139,7 @@
                         }
                     }
                     this.tableData.unshift(customer);
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },500)
             },
         },
     components:{

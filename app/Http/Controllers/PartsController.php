@@ -22,7 +22,8 @@ class PartsController extends Controller
          $parts = Cache::get('parts');
         }
         else{
-           $parts =  DB::table('parts')->get();
+          // $parts =  DB::table('parts')->get();
+           $parts = Part::get();
            Cache::put('parts',$parts,3600);
         }
         return response()->json($parts);

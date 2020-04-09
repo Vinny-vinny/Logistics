@@ -5,34 +5,48 @@
         <section class="content" v-if="!add_jobcard && !show_form && !show_reversal">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Reversed Job Cards</h3>
-                   </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>Reverse Ref#</th>
-                            <th>Card#</th>
-                            <th>Machine</th>
-                            <th>Driver</th>
-                            <th>Project</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="job in tableData">
-                            <td>{{job.reversal_ref}}</td>
-                            <td>{{job.card_no}}</td>
-                            <td>{{job.machine}}</td>
-                            <td>{{job.driver}}</td>
-                            <td>{{job.project}}</td>
-                              <td>
-                                <button class="btn btn-info btn-sm" @click="editJobcard(job)" v-if="parts.length > 1"><i class="fa fa-eye"></i></button>
-                                </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Reversed Job Cards
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editJobcard(item)" v-if="parts.length > 1">mdi-pencil</v-icon>
+                                    </v-btn>
+
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -41,29 +55,47 @@
 <script>
     import ShowReversal from "./ShowReversal";
     import {mapGetters} from "vuex";
+    import datatable from "../../../mixins/datatable";
+    import RevFieldDefs from "./RevFieldDefs";
+
     export default {
+        mixins:[datatable],
         data(){
             return {
                 add_jobcard: false,
                 editing: false,
                 show_form:false,
-                show_reversal:false
+                show_reversal:false,
+                headers: RevFieldDefs
             }
         },
         created(){
         this.getAllDetails();
         this.listen();
+        this.getJobs;
         },
         computed:{
           ...mapGetters({
               jobs:'all_jobs',
               parts:'all_parts'
           }),
+            getJobs(){
+                this.$store.dispatch('my_vehicles').then(() => {
+                    if (this.jobs.length == undefined) {
+                          setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }else {
+                        this.getItems();
+                    }
+                })
+            },
             tableData(){
-              if (this.jobs.length !==undefined){
-               return this.jobs.filter(job => job.reversal_ref !=='' && job.reversal_ref !==null);
+              if (this.jobs.length > 0){
+                return this.jobs.filter(job => job.reversal_ref !=='' && job.reversal_ref !==null);
               }
-            }
+            },
+
         },
         methods:{
             getAllDetails(){
@@ -80,9 +112,7 @@
                 this.$store.dispatch('my_categories');
                 this.$store.dispatch('my_mechanics');
                 this.$store.dispatch('my_reqs');
-                this.$store.dispatch('my_jobcards').then(() =>{
-                 this.initDatable();
-                });
+                this.$store.dispatch('my_jobcards');
             } ,
 
             editJobcard(job){
@@ -92,7 +122,6 @@
                             this.add_jobcard = false;
                             this.show_reversal = true;
 
-
                     })
 
             },
@@ -101,14 +130,12 @@
                 eventBus.$on('listJobcards',(job) =>{
                     this.tableData.unshift(job);
                     this.add_jobcard =false;
-                    this.initDatable();
 
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_jobcard = false;
                     this.editing = false;
                     this.show_reversal = false;
-                    this.initDatable();
 
                 });
                 eventBus.$on('updateJobcard',(job)=>{
@@ -120,34 +147,14 @@
                         }
                     }
                     this.tableData.unshift(job);
-                    this.initDatable();
+
                 });
                 eventBus.$on('close_form',() => {
                     this.show_form = false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel_job',() =>{
                     this.show_form = false;
-                    this.initDatable();
-                });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
+                  });
             },
         },
         components:{

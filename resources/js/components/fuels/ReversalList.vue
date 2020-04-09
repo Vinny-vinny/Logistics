@@ -5,36 +5,48 @@
         <section class="content" v-if="!show_reversal">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Fuel Reversals</h3>
-
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>Reversal Ref#</th>
-                            <th>Vehicle</th>
-                            <th>Litres</th>
-                            <th>Fuel Type</th>
-                            <th>Pump Price</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="fuel in tableData">
-                            <td>{{fuel.reversal_ref}}</td>
-                            <td>{{fuel.vehicle}}</td>
-                            <td>{{fuel.reversal_litres}}</td>
-                            <td>{{fuel.fuel_type}}</td>
-                            <td>{{fuel.reversal_rate}}</td>
-                            <td>
-                                <button class="btn btn-info btn-sm" @click="editFuel(fuel)" v-if="parts.length"><i
-                                    class="fa fa-eye"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Fuel Reversals
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editFuel(item)" v-if="parts.length > 1">mdi-eye</v-icon>
+                                    </v-btn>
+
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -43,8 +55,11 @@
 <script>
     import ShowReversal from "./ShowReversal";
     import {mapGetters} from "vuex";
+    import RevDefFields from "./RevDefFields";
+    import datatable from "../../mixins/datatable";
 
     export default {
+        mixins:[datatable],
         data() {
             return {
                 add_fuel: false,
@@ -53,10 +68,12 @@
                 show_reversal:false,
                 check_customers:false,
                 check_accounts:false,
-                check_parts:false
+                check_parts:false,
+                headers: RevDefFields
             }
         },
         created() {
+            this.getFuels
             this.getAllDetails();
            },
         mounted() {
@@ -69,7 +86,18 @@
             }),
             tableData(){
              return this.all_fuels.filter(f => f.reversal_ref !=='' && f.reversal_ref !==null);
-            }
+            },
+            getFuels(){
+            this.$store.dispatch('my_fuels').then(() => {
+                if (this.all_fuels.length == undefined) {
+                    setTimeout(() => {
+                        this.getItems();
+                    }, 2000);
+                }else {
+                    this.getItems();
+                }
+            })
+        },
         },
         methods: {
             getAllDetails(){
