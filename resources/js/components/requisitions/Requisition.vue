@@ -559,7 +559,7 @@
 
             },
             removeItemExternal(i) {
-             this.form.inventory_items_internal.splice(i, 1);
+             this.form.inventory_items_external.splice(i, 1);
             },
             addItemExternal() {
                 this.form.inventory_items_external.push({part: '',uom:'', quantity: '',unit_price:'',total_price:'',total_price_inclusive:'',qty_available:''});

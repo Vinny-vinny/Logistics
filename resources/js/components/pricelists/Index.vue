@@ -8,7 +8,7 @@
                     <v-app id="inspire">
                         <v-card>
                             <v-card-title>
-                                Ledgers
+                                Price Lists
                                 <v-spacer></v-spacer>
                                 <v-text-field
                                     v-model="search"
