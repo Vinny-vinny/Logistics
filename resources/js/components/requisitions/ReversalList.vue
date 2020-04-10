@@ -97,6 +97,8 @@
             tableData(){
                 if (this.reqs.length > 0){
                  return  this.reqs.filter(req => req.reversal_ref !=='' && req.reversal_ref !==null);
+                }else {
+                    return [];
                 }
             }
         },

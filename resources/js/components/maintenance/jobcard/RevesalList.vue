@@ -93,6 +93,8 @@
             tableData(){
               if (this.jobs.length > 0){
                 return this.jobs.filter(job => job.reversal_ref !=='' && job.reversal_ref !==null);
+              }else {
+                  return [];
               }
             },
 
