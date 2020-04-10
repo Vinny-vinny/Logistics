@@ -295,12 +295,12 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" v-if="status ==1">{{edit_jobcard ? 'Update' :
+                        <button type="submit" class="btn btn-primary">{{edit_jobcard ? 'Update' :
                             'Save'}}
                         </button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
-                        <button type="button" class="btn btn-info" @click="sendInvoice()" v-if="edit && form.requisition_id && form.invoiced==0" :disabled="invoice_text">{{invoice_text ? 'Please Wait' :'Send Invoice'}}</button>
-                        <button type="button" class="btn btn-warning" @click="close" v-if="edit_jobcard && status==1">
+                        <button type="button" class="btn btn-info" @click="sendInvoice()" v-if="edit && form.requisition_id && form.invoiced !==1" :disabled="invoice_text">{{invoice_text ? 'Please Wait' :'Send Invoice'}}</button>
+                        <button type="button" class="btn btn-warning" @click="close" v-if="edit_jobcard && form.status==1">
                             Close Jobcard
                         </button>
                     </form>
