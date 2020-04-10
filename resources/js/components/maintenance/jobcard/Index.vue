@@ -11,7 +11,7 @@
                     <v-app id="inspire">
                         <v-card>
                             <v-card-title>
-                                Job Card
+                                Job Cards
                                 <v-spacer></v-spacer>
                                 <v-text-field
                                     v-model="search"
@@ -176,6 +176,8 @@
                     this.editing = false;
                     this.show_reversal = false;
                     this.show_add_text=false;
+                    this.show_form = false;
+                    console.log('cool')
                     for (let i=0;i<this.tableData.length;i++){
                         if (this.tableData[i].id == job.id){
                             this.tableData.splice(i,1);

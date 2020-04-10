@@ -1,6 +1,6 @@
 <template>
     <div>
-
+       <job-card-form v-if="show_print" :job="job_details"></job-card-form>
         <!-- Main content -->
         <section class="content" v-if="!show_print">
 
@@ -44,6 +44,7 @@
 <script>
     import { ModelSelect } from 'vue-search-select';
     import {mapGetters} from "vuex";
+    import JobCardForm from "./JobCardForm";
     export default {
         props:['printJob'],
         data(){
@@ -55,13 +56,13 @@
                     maintenance: [{category: '', description: '', root_cause: ''}],
                 },
                 show_print:false,
-                machines:{},
                 projects:[],
-                subprojects:[]
+                subprojects:[],
+                job_details:{}
             }
         },
         created() {
-        this.getMachines();
+        this.listen();
         this.getProjects();
             },
         computed:{
@@ -94,18 +95,27 @@
             generateJob(){
                 axios.post('generate-job',this.form)
                     .then(res => {
-                       // console.log(res.data)
-                        this.$router.push({path:`/jobcard-form/${res.data.id}`});
-                        eventBus.$emit('close_form');
+                       this.job_details = res.data;
+                       this.show_print = true;
                     })
                 .catch(err => console.log(err))
             },
             cancel(){
                 eventBus.$emit('cancel_job');
+            },
+            listen(){
+                eventBus.$on('updatePrint',(response) =>{
+                    eventBus.$emit('updateJobcard',response);
+                    console.log('walla');
+                    this.show_print = false;
+
+                })
             }
         },
   components:{
-      ModelSelect
+      ModelSelect,
+      JobCardForm
+
   }
     }
 </script>

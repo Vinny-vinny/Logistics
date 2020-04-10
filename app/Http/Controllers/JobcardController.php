@@ -78,7 +78,7 @@ class JobcardController extends Controller
         $jobcard_no = Jobcard::count()+1;
         $request['card_no'] = substr('LEWA-' . $jobcard_no . '-' . Machine::where('project_link',$request->machine_id)->first()->code, 0, 20);
            $card = Jobcard::create($request->all());
-        return response()->json($card);
+        return response()->json(new JobcardResource($card));
     }
     /**
      * Display the specified resource.
