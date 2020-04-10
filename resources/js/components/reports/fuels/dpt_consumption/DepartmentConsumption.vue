@@ -18,7 +18,7 @@
                             <label>To</label>
                             <datepicker v-model="form.to" required></datepicker>
                         </div>
-                        <button type="submit" class="btn btn-primary">Generate</button>
+                        <button type="submit" class="btn btn-primary" v-if="departments.length > 0">Generate</button>
                     </form>
                 </div>
             </div>
@@ -30,6 +30,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
     import Index from '../../../reports/fuels/dpt_consumption/Index';
+    import {mapGetters} from "vuex";
     export default {
         data(){
             return {
@@ -37,20 +38,23 @@
                     from:'',
                     to:''
                 },
-                show_fuel: false,
-                departments:{}
+                show_fuel: false
             }
         },
         created(){
             this.listen();
-            this.getDepartments();
+            this.$store.dispatch('my_projects');
+        },
+        computed:{
+          ...mapGetters({
+              departments:'all_projects'
+          })
         },
         methods:{
-            getDepartments(){
-             axios.get('asset-category')
-             .then(res => this.departments = res.data);
-            },
             fuel(){
+                if(this.form.from ==='' || this.form.to ===''){
+                    return this.$toastr.e('All fields are required.')
+                }
                 this.form.from = moment(this.form.from).format('YYYY-MM-DD');
                 this.form.to = moment(this.form.to).format('YYYY-MM-DD');
                 if (this.form.from > this.form.to){

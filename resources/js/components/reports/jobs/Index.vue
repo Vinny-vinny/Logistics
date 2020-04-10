@@ -4,48 +4,55 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Stock Issue</h3>
-                    <download-excel
-                        :data   = "requistions"
-                        :title = "title"
-                        v-if="requistions.length"
-                        name="STOCK_ISSUE.xlsx"
-                        class="btn btn-primary pull-right"
-                         >
-                      <i class="fa fa-file-excel-o"></i> Export Excel
-                    </download-excel>
-
-                   <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Item Code</th>
-                            <th>Item Description</th>
-                            <th>Reference</th>
-                            <th>Quantity</th>
-                            <th>Unit Cost</th>
-                            <th>Amount</th>
-                            <th>Project</th>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Stock Issue
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <download-excel
+                                    :data   = "requistions"
+                                    :title = "title"
+                                    v-if="requistions.length"
+                                    name="STOCK_ISSUE.xlsx"
+                                    class="btn btn-primary pull-right"
+                                >
+                                    <i class="fa fa-file-excel-o"></i> Export Excel
+                                </download-excel>
+                                <v-btn normal color="warning" outlined  @click="back()" class="mr">Back
 
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="job in jobs">
-                            <td>{{job.date}}</td>
-                            <td>{{job.code}}</td>
-                            <td>{{job.description}}</td>
-                            <td>{{job.reference}}</td>
-                            <td>{{job.quantity}}</td>
-                            <td>{{job.unit_cost}}</td>
-                            <td>{{job.amount}}</td>
-                            <td>{{job.project}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -53,25 +60,39 @@
 </template>
 <script>
     import JobcardReport from "./JobcardReport";
-    import XLSX from 'xlsx'
+    import {mapGetters} from "vuex";
+    import datatable from "../../../mixins/datatable";
+    import FieldDefs from "./FieldDefs";
     export default {
+        mixins:[datatable],
         data(){
             return {
                 requistions:[],
-                parts:{},
-                projects:{},
-                title: ''
-
+                title: '',
+                headers:FieldDefs,
+                tableData:[]
             }
         },
        mounted(){
-            this.initDatable();
+           this.tableData = this.jobs;
             this.itemsIssued();
-            this.getParts();
-            this.getProjects();
-
+            this.getDetails;
         },
         computed:{
+            ...mapGetters({
+                parts:'all_parts',
+                projects:'all_projects'
+            }),
+            getDetails(){
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }else {
+                        this.getItems();
+                    }
+
+            },
             jobs(){
           return this.$store.state.jobs;
             },
@@ -85,7 +106,6 @@
            let total_qty=0;
            let total_unit_cost = 0;
            let total_amount = 0;
-          setTimeout(()=>{
             for(let i=0;i<this.jobs.length;i++){
                 total_qty+=parseInt(this.jobs[i]['quantity']);
                 total_unit_cost += parseFloat(this.jobs[i]['unit_cost']);
@@ -104,41 +124,10 @@
             }
               this.requistions.push({Date:'Total',Quantity:total_qty,UnitCost:total_unit_cost,Amount:total_amount})
               this.title = "STOCK ISSUE AS FROM "+this.dates.from+" TO "+ this.dates.to
-          },1000)
           },
-            getParts(){
-             axios.get('parts')
-             .then(res => {
-                this.parts = res.data;
-             })
-            },
-            getProjects(){
-             axios.get('asset-category')
-             .then(res => {
-                this.projects = res.data;
-             })
-            },
             back(){
               eventBus.$emit('back');
-            },
-                 initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
+            }
         },
         components:{
             JobcardReport

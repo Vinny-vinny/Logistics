@@ -18,7 +18,7 @@
                             <label>To</label>
                             <datepicker v-model="form.to" required></datepicker>
                         </div>
-                        <button type="submit" class="btn btn-primary">Generate</button>
+                        <button type="submit" class="btn btn-primary" v-if="parts.length > 0">Generate</button>
                         </form>
                 </div>
             </div>
@@ -30,6 +30,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
    import Index from '../../reports/jobs/Index';
+    import {mapGetters} from "vuex";
     export default {
            data(){
             return {
@@ -39,28 +40,27 @@
                     },
                 show_job: false,
                 requisitions:[],
-                parts:{},
-                projects:{}
             }
         },
         created(){
           this.listen();
-          this.getParts();
-          this.getProjects();
+          this.getDetails();
+        },
+        computed:{
+          ...mapGetters({
+             parts:'all_parts',
+             projects:'all_projects'
+          })
         },
            methods:{
-            getParts(){
-           axios.get('parts')
-           .then(res => {
-            this.parts = res.data
-
-        })
-            },
-            getProjects(){
-             axios.get('asset-category')
-             .then(res => this.projects = res.data)
+           getDetails(){
+           this.$store.dispatch('my_parts');
+           this.$store.dispatch('my_projects');
             },
             jobCards(){
+               if(this.form.from ==='' || this.form.to ===''){
+                   return this.$toastr.e('All fields are required.')
+               }
                 this.form.from = moment(this.form.from).format('YYYY-MM-DD');
                 this.form.to = moment(this.form.to).format('YYYY-MM-DD');
                 if (this.form.from > this.form.to){
@@ -84,7 +84,6 @@
                   let int_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_internal']);
 
                   for(let k=0;k<int_reqs.length;k++){
-
                        requistions.push({
                             'date': jobs[p]['start_date'],
                             'code': this.parts.find(pa => pa.id ==int_reqs[k]['part']).code,
@@ -95,15 +94,11 @@
                             'amount': int_reqs[k]['total_cost'],
                             'project': this.projects.find(pro => jobs[p]['requisitions']['project_id'] == pro.id).name,
                         })
-
                   }
-
                 }
-  console.log('dddd')
                 if (jobs[p]['requisitions']['type'] =='External') {
                   let ex_reqs = JSON.parse(jobs[p]['requisitions']['inventory_items_external']);
                   for(let k=0;k<ex_reqs.length;k++){
-                      console.log(ex_reqs[k])
                        requistions.push({
                             'date': jobs[p]['start_date'],
                             'code': this.parts.find(pa => pa.id ==ex_reqs[k]['part']).code,
@@ -119,13 +114,11 @@
 
                 }
               }
-  console.log('lll')
             }
-            console.log('walla')
+
                  this.$store.dispatch('listJobReports',requistions)
                  this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})
                  this.show_job = true;
-
 
                   })
                     .catch(error => error.response)

@@ -88,7 +88,7 @@
                    if (this.tableData.length == undefined) {
                        setTimeout(() => {
                            this.getItems();
-                       }, 10000);
+                       }, 2000);
                    }else {
                        this.getItems();
                    }

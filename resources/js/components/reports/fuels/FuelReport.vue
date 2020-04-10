@@ -45,19 +45,19 @@
         },
         methods:{
             fuel(){
+                if(this.form.from ==='' || this.form.to ===''){
+                    return this.$toastr.e('All fields are required.')
+                }
                 this.form.from = moment(this.form.from).format('YYYY-MM-DD');
                 this.form.to = moment(this.form.to).format('YYYY-MM-DD');
                 if (this.form.from > this.form.to){
                  return this.$toastr.e('Date from cannot be greater than Date to.')
                 }
-                 if (this.form.from =='' || this.form.to ==''){
-                  return this.$toastr.e('Date from and Date to cannot be empty.');
-                }
                 axios.post('fuel-report',this.form)
-                    .then(res =>{                      
+                    .then(res =>{
                         this.show_fuel = true;
                         this.$store.dispatch('listFuelReports',res.data)
-                        this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")}) 
+                        this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})
                     })
                     .catch(error => error.response)
             },

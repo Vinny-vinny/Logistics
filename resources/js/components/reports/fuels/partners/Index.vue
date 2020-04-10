@@ -4,60 +4,86 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Partner Reports</h3>
-                    <download-excel
-                        :data = "results"
-                        :title = "title"
-                        v-if="results.length"
-                        name="PARTNER_REPORTS.xlsx"
-                        class="btn btn-primary pull-right">
-                        <i class="fa fa-file-excel-o"></i> Export Excel
-                    </download-excel>
-                   <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>Reg. No</th>
-                            <th>Start Odometer</th>
-                            <th>End Odometer</th>
-                            <th>Distance</th>
-                            <th>Fuel Used(Ltr)</th>
-                            <th>LTRS/Hr & KM/LTR</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="fuel in fuels">
-                            <td>{{fuel.reg_no}}</td>
-                            <td>{{fuel.start_odo}}</td>
-                            <td>{{fuel.end_odo}}</td>
-                            <td>{{fuel.distance}}</td>
-                            <td>{{fuel.fuel_used}}</td>
-                            <td>{{fuel.km_per_ltrs}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Partner Reports
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <download-excel
+                                    :data = "fuels"
+                                    :title = "title"
+                                    v-if="fuels.length"
+                                    name="PARTNER_REPORTS.xlsx"
+                                    class="btn btn-primary pull-right">
+                                    <i class="fa fa-file-excel-o"></i> Export Excel
+                                </download-excel>
+                                <v-btn normal color="warning" outlined  @click="back()" class="mr">Back
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
     </div>
 </template>
 <script>
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../../../mixins/datatable";
 
     export default {
+        mixins:[datatable],
         data(){
          return {
+            tableData:[],
             results:[],
-             title:''
+            title:'',
+            headers: FieldDefs
          }
         },
         mounted(){
-            this.initDatable();
-            this.partners();
+           this.tableData = this.fuels;
+           this.partners();
+           this.getDetails;
         },
         computed:{
+            getDetails(){
+                if (this.tableData.length == undefined) {
+                    setTimeout(() => {
+                        this.getItems();
+                    }, 2000);
+                }else {
+                    this.getItems();
+                }
+            },
             fuels(){
                 return this.$store.state.partners;
             },
@@ -69,7 +95,7 @@
         methods:{
               partners(){
                 let results = [];
-               setTimeout(()=>{
+             //  setTimeout(()=>{
                    let total_distance=0;
                    let total_fuel_used = 0;
                    let total_km = 0;
@@ -89,29 +115,11 @@
                          }
                    this.results.push({Reg:'Total',Distance:total_distance,FuelUsed:total_fuel_used,KMPerLTR:total_km})
                    this.title = "PARTNERS REPORTS AS FROM "+this.dates.from+" TO "+ this.dates.to
-               },1000)
+             //  },1000)
             },
             back(){
                 eventBus.$emit('back');
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
+            }
         }
     }
 </script>

@@ -4,66 +4,87 @@
         <section class="content">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Daily Fuel Issue</h3>
-                    <download-excel
-                        :data   = "daily_issues"
-                        :title = "title"
-                        v-if="daily_issues.length"
-                        name="DAILY_FUEL_ISSUE.xlsx"
-                        class="btn btn-primary pull-right"
-                    >
-                        <i class="fa fa-file-excel-o"></i> Export Excel
-                    </download-excel>
-                    <button class="btn btn-outline-danger pull-right mr" @click="back()">Back</button>
-                </div>
-                <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Item Code</th>
-                            <th>Item Description</th>
-                            <th>Reference</th>
-                            <th>Quantity</th>
-                            <th>Unit Cost</th>
-                            <th>Amount</th>
-                            <th>Project</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="fuel in fuels">
-                            <td>{{fuel.date}}</td>
-                            <td>{{fuel.item_code}}</td>
-                            <td>{{fuel.description}}</td>
-                            <td>{{fuel.reference}}</td>
-                            <td>{{fuel.quantity}}</td>
-                            <td>{{fuel.unit_cost}}</td>
-                            <td>{{fuel.amount}}</td>
-                            <td>{{fuel.project}}</td>
-
-                        </tr>
-                        </tbody>
-                    </table>
+                   <div class="box-body">
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Daily Fuel Issue
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <download-excel
+                                    :data   = "daily_issues"
+                                    :title = "title"
+                                    v-if="daily_issues.length"
+                                    name="DAILY_FUEL_ISSUE.xlsx"
+                                    class="btn btn-primary pull-right"
+                                >
+                                    <i class="fa fa-file-excel-o"></i> Export Excel
+                                </download-excel>
+                                <v-btn normal color="warning" outlined  @click="back()" class="mr">Back
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
     </div>
 </template>
 <script>
-   import XLSX from 'xlsx'
+    import datatable from "../../../mixins/datatable";
+    import FieldDefs from "./FieldDefs";
+
     export default {
+        mixins:[datatable],
         data(){
         return {
             daily_issues:[],
-            title:''
+            title:'',
+            tableData:[],
+            headers:FieldDefs
         }
         },
         mounted(){
-            this.initDatable();
+            this.tableData = this.fuels;
             this.dailyIssue();
+            this.getDetails;
         },
         computed:{
+            getDetails(){
+                if (this.tableData.length == undefined) {
+                    setTimeout(() => {
+                        this.getItems();
+                    }, 2000);
+                }else {
+                    this.getItems();
+                }
+            },
             fuels(){
                 return this.$store.state.fuel_reports;
             },
@@ -76,7 +97,7 @@
                 let total_qty=0;
                 let total_unit_cost = 0;
                 let total_amount = 0;
-            setTimeout(()=>{
+          //  setTimeout(()=>{
              for(let i=0;i<this.fuels.length;i++){
                  total_qty+=parseInt(this.fuels[i]['quantity']);
                  total_unit_cost += parseFloat(this.fuels[i]['unit_cost']);
@@ -94,28 +115,10 @@
              }
                 this.daily_issues.push({Date:'Total',Quantity:total_qty,UnitCost:total_unit_cost,Amount:total_amount})
                 this.title = "DAILY FUEL ISSUE AS FROM "+this.dates.from+" TO "+ this.dates.to
-            },1000)
+           // },1000)
             },
             back(){
                 eventBus.$emit('back');
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
             },
         }
     }

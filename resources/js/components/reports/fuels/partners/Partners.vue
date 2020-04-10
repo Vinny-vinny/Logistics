@@ -11,14 +11,14 @@
                 <div class="box-body">
                     <form @submit.prevent="fuel()">
                         <div class="form-group">
-                            <label>From</label>
-                            <datepicker v-model="form.from" required></datepicker>
+                         <label>From</label>
+                         <datepicker v-model="form.from" required></datepicker>
                         </div>
                         <div class="form-group">
                             <label>To</label>
                             <datepicker v-model="form.to" required></datepicker>
                         </div>
-                        <button type="submit" class="btn btn-primary">Generate</button>
+                        <button type="submit" class="btn btn-primary" v-if="customers.length > 1">Generate</button>
                     </form>
                 </div>
             </div>
@@ -30,6 +30,7 @@
 <script>
     import datepicker from 'vuejs-datepicker';
     import Index from '../../../reports/fuels/partners/Index';
+    import {mapGetters} from "vuex";
     export default {
         data(){
             return {
@@ -37,33 +38,30 @@
                     from:'',
                     to:''
                 },
-                show_fuel: false,
-                customers:{},
-                customer_types:{},
-                machines:{},
-
+                show_fuel: false
             }
         },
         created(){
             this.listen();
-            this.getCustomers();
-            this.getCustomerTypes();
-            this.getMachines();
+            this.getDetails();
+        },
+        computed:{
+           ...mapGetters({
+               customers:'all_customers',
+               customer_types:'all_customer_types',
+               machines:'all_vehicles',
+           })
         },
         methods:{
-            getCustomers(){
-             axios.get('customers')
-             .then(res => this.customers = res.data);
-            },
-            getCustomerTypes(){
-            axios.get('customer-types')
-            .then(res => this.customer_types = res.data);
-            },
-            getMachines(){
-             axios.get('machines')
-             .then(res => this.machines = res.data);
+            getDetails(){
+            this.$store.dispatch('my_customers');
+            this.$store.dispatch('my_customer_types');
+            this.$store.dispatch('my_vehicles');
             },
             fuel(){
+                if(this.form.from ==='' || this.form.to ===''){
+                    return this.$toastr.e('All fields are required.')
+                }
                 this.form.from = moment(this.form.from).format('YYYY-MM-DD');
                 this.form.to = moment(this.form.to).format('YYYY-MM-DD');
                 if (this.form.from > this.form.to){
@@ -127,6 +125,7 @@
                       }
 
                     }
+                       console.log(result)
                      this.show_fuel = true;
                      this.$store.dispatch('listPartnersReports',result);
                      this.$store.dispatch('getPeriod',{from: moment(this.form.from).format("DD-MM-YYYY"),to:moment(this.form.to).format("DD-MM-YYYY")})
