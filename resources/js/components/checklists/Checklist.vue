@@ -66,7 +66,11 @@
 
 <script>
 
+    import {mapGetters} from "vuex";
+    import datepicker from "../../mixins/datepicker";
+
     export default {
+        mixins:[datepicker],
         props: ['edit'],
         data() {
             return {
@@ -78,25 +82,21 @@
                     id: ''
                 },
                 edit_checklist: this.edit,
-                expiry_types: {},
                 duration_type: '',
                 show_duration: false,
-                tools:{}
 
             }
         },
         created() {
             this.listen();
-            this.getExpiryTypes();
-            this.getTools();
+        },
+        computed:{
+            ...mapGetters({
+              tools:'all_checklist_tools',
+              expiry_types:'all_expiry_types'
+            })
         },
         methods: {
-            getTools(){
-                axios.get('checklist-tool')
-                .then(res => {
-                    this.tools =res.data
-                })
-            },
             removeChecklist(i) {
                 this.form.checklists.splice(i, 1);
             },
@@ -111,12 +111,6 @@
                         return;
                     }
                 })
-            },
-            getExpiryTypes() {
-                axios.get('expiry-types')
-                    .then(expiry => {
-                        this.expiry_types = expiry.data;
-                    })
             },
                 saveChecklist() {
                     if (Object.values(this.form.checklists[0])[0] === '' || Object.values(this.form.checklists[0])[1] === '' || Object.values(this.form.checklists[0])[2] === '') {
@@ -133,7 +127,10 @@
                 this.form.checklists = JSON.stringify(this.form.checklists);
                 delete this.form.id;
                 axios.post('checklists',this.form)
-                    .then(res => eventBus.$emit('listChecklists', res.data))
+                    .then(res => {
+                        this.$store.state.all_my_checklists.unshift(res.data);
+                        eventBus.$emit('listChecklists', res.data)
+                    })
                     .catch(error => error.response)
             },
             update() {
@@ -153,12 +150,6 @@
                            eventBus.$emit('updateChecklist', res.data);
                     })
                     .catch(error => error.response)
-            },
-            convertDate(str) {
-                var date = new Date(str),
-                    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-                    day = ("0" + date.getDate()).slice(-2);
-                return [date.getFullYear(), mnth, day].join("-");
             },
             cancel() {
                 eventBus.$emit('cancel')

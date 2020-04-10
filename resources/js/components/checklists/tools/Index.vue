@@ -5,32 +5,54 @@
         <section class="content" v-if="!add_tool">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Checklist Tools</h3>
-                    <button class="btn btn-primary pull-right" @click="add_tool=true">Add Checklist Tool</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th style="display: none">Name</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="tool in tableData">
-                            <td>{{tool.id}}</td>
-                            <td>{{tool.name}}</td>
-                            <td style="display: none">{{tool.name}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editTool(tool)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteTool(tool.id)" style="display: none"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Checklist Tools
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_tool=true">Add Checklist Tool
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editTool(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                    <span style="display: none">
+                                     <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small @click="deleteTool(item.id)">mdi-delete</v-icon>
+                                    </v-btn>
+                                    </span>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -38,26 +60,37 @@
 </template>
 <script>
     import Tool from "./Tool";
+    import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../../mixins/datatable";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_tool: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
             this.getTools();
         },
-        mounted(){
-            this.initDatable();
-        },
+       computed:{
+         ...mapGetters({
+            tableData:'all_checklist_tools'
+         })
+       },
         methods:{
             getTools(){
-                axios.get('checklist-tool')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_checklist_tools').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }
+                })
             },
             editTool(tool){
                 this.$store.dispatch('updateTool',tool)
@@ -79,14 +112,12 @@
             },
             listen(){
                 eventBus.$on('listTools',(tool) =>{
-                    this.tableData.unshift(tool);
+                    this.getItems();
                     this.add_tool =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_tool = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateTool',(tool)=>{
                     this.add_tool = false;
@@ -94,27 +125,8 @@
                     const index = this.tableData.map(t => t.id).indexOf(tool.id);
                     this.tableData.splice(index,1);
                     this.tableData.unshift(tool);
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
+            }
         },
         components:{
             Tool

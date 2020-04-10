@@ -5,35 +5,52 @@
         <section class="content" v-if="!add_checklist">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Checklists</h3>
-                    <button class="btn btn-primary pull-right" @click="add_checklist=true">Add Checklist</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Expiry Type</th>
-                            <th>Duration #</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="checklist in tableData">
-                            <td>{{checklist.id}}</td>
-                            <td>{{checklist.name}}</td>
-                            <td>{{checklist.expiry_type}}</td>
-                            <td>{{checklist.duration_no}}</td>
-                               <td>
-                                <button class="btn btn-success btn-sm" @click="editChecklist(checklist)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteChecklist(checklist.id)"><i class="fa fa-trash"></i></button>
-<!--                                <button class="btn btn-info btn-sm" @click="downloadFile(checklist.checklist_file)"><i class="fa fa-download"></i></button>-->
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Checklists
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_checklist=true"  v-if="tools.length > 0">Add Checklist
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small v-if="tools.length">
+                                        <v-icon dark small @click="editChecklist(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                     <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small @click="deleteChecklist(item.id)">mdi-delete</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -41,22 +58,34 @@
 </template>
 <script>
    import Checklist from "./Checklist";
+   import FieldDefs from "./FieldDefs";
+   import datatable from "../../mixins/datatable";
+   import {mapGetters} from "vuex";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_checklist: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
             this.getChecklists();
+            this.getDetails();
         },
-        mounted(){
-            this.initDatable();
+        computed:{
+          ...mapGetters({
+              tableData:'all_checklists',
+              tools:'all_checklist_tools'
+          })
         },
         methods:{
+            getDetails(){
+              this.$store.dispatch('my_checklist_tools');
+              this.$store.dispatch('my_expiry_types');
+            },
             //download File function
                 downloadFile(file) {
                     return console.log(file.split('.').pop());
@@ -76,9 +105,14 @@
             },
 
             getChecklists(){
-                axios.get('checklists')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_checklists').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }
+                })
             },
             editChecklist(checklist){
                       this.$store.dispatch('updateChecklist',checklist)
@@ -100,15 +134,12 @@
             },
             listen(){
                 eventBus.$on('listChecklists',(checklist) =>{
-                    this.tableData.unshift(checklist);
+                    this.getItems();
                     this.add_checklist =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_checklist = false;
                     this.editing = false;
-                    this.initDatable();
-                    this.getChecklists();
                 });
                 eventBus.$on('updateChecklist',(checklist)=>{
                     this.add_checklist = false;
@@ -119,27 +150,8 @@
                         }
                     }
                     this.tableData.unshift(checklist);
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
+            }
         },
         components:{
             Checklist

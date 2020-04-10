@@ -5,36 +5,52 @@
         <section class="content" v-if="!add_mechanic">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Mechanics</h3>
-                    <button class="btn btn-primary pull-right" @click="add_mechanic=true">Add Mechanic</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Address</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="mechanic in tableData">
-                            <td>{{mechanic.id}}</td>
-                            <td>{{mechanic.name}}</td>
-                            <td>{{mechanic.email}}</td>
-                            <td>{{mechanic.phone}}</td>
-                            <td>{{mechanic.address}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editMechanic(mechanic)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteMechanic(mechanic.id)" style="display:none"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Mechanics
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_mechanic=true">Add Mechanic
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editMechanic(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                     <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small @click="deleteMechanic(item.id)">mdi-delete</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -42,26 +58,37 @@
 </template>
 <script>
     import Mechanics from "./Mechanics";
+    import datatable from "../../mixins/datatable";
+    import FieldDefs from "./FieldDefs";
+    import {mapGetters} from "vuex";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_mechanic: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
             this.getMechanics();
         },
-        mounted(){
-            this.initDatable();
+        computed:{
+          ...mapGetters({
+              tableData:'all_mechanics'
+          })
         },
         methods:{
             getMechanics(){
-                axios.get('mechanics')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_mechanics').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }
+                })
             },
             editMechanic(mechanic){
                 this.$store.dispatch('updateMechanic',mechanic)
@@ -83,14 +110,12 @@
             },
             listen(){
                 eventBus.$on('listMechanics',(mechanic) =>{
-                    this.tableData.unshift(mechanic);
+                    this.getItems();
                     this.add_mechanic =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_mechanic = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateMechanic',(mechanic)=>{
                     this.add_mechanic = false;
@@ -101,26 +126,7 @@
                         }
                     }
                     this.tableData.unshift(mechanic);
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
             },
         },
         components:{

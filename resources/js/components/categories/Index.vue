@@ -69,10 +69,8 @@
             }
         },
         created(){
-            this.$store.dispatch('my_categories').then(()=>{
-                console.log('wahh')
-            });
             this.listen();
+            this.getCategories();
         },
         computed:{
           ...mapGetters({
@@ -80,6 +78,18 @@
           })
         },
         methods:{
+           getCategories(){
+               this.$store.dispatch('my_categories').then(() => {
+                   if (this.tableData.length < 1) {
+                       console.log(this.tableData.length)
+                       setTimeout(() => {
+                           this.getItems();
+                       }, 2000);
+                   }else{
+                      this.getItems();
+                   }
+               })
+           },
             editCategory(category){
                 this.$store.dispatch('updateCategory',category)
                     .then(() =>{

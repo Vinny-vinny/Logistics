@@ -35,6 +35,7 @@
 
 <script>
     import { ModelSelect } from 'vue-search-select';
+    import {mapGetters} from 'vuex';
     export default {
         props:['edit'],
         data(){
@@ -52,18 +53,20 @@
             this.listen();
             this.getItems();
         },
+        computed:{
+         ...mapGetters({
+             all_parts:'all_parts'
+         })
+        },
         methods:{
             getItems(){
-                axios.get('parts')
-                    .then(res => {
-                        let items = res.data.filter(p => p.service_item==1);
-                        items.forEach(p => {
-                            this.parts.push({
-                                'value':p.stock_link,
-                                'text': p.description
-                            })
-                        })
-                    })
+            let items = this.all_parts.filter(p => p.service_item==1);
+            items.forEach(p => {
+                this.parts.push({
+                    'value':p.stock_link,
+                    'text': p.description
+                })
+            })
             },
             saveCharge(){
                 this.edit_charge ? this.update() : this.save();
@@ -72,6 +75,7 @@
                 delete this.form.id;
                 axios.post('charges',this.form)
                     .then(res => {
+                        this.$store.state.all_my_charges.unshift(res.data);
                         eventBus.$emit('listCharges',res.data)
                     })
                     .catch(error => error.response)

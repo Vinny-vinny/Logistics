@@ -45,7 +45,10 @@
             save(){
                 delete this.form.id;
                 axios.post('checklist-tool',this.form)
-                    .then(res => eventBus.$emit('listTools',res.data))
+                    .then(res =>{
+                        this.$store.state.all_my_checklists_tools.unshift(res.data);
+                        eventBus.$emit('listTools',res.data)
+                    })
                     .catch(error => error.response)
             },
             update(){

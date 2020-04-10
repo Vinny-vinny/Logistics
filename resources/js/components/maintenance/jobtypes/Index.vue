@@ -5,34 +5,54 @@
         <section class="content" v-if="!add_job_type">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Job Types</h3>
-                    <button class="btn btn-primary pull-right" @click="add_job_type=true">Add Job Type</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Hourly Rate</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="rate in tableData">
-                            <td>{{rate.id}}</td>
-                            <td>{{rate.name}}</td>
-                            <td>{{rate.description}}</td>
-                            <td>{{rate.currency}} {{rate.hourly_rate}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editJobType(rate)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteJobType(rate.id)" style="display:none"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Job Types
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_job_type=true">Add Job Type
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                        <v-icon dark small @click="editJobType(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                    <span style="display:none">
+                                     <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small @click="deleteJobType(item.id)">mdi-delete</v-icon>
+                                    </v-btn>
+                                    </span>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -40,26 +60,37 @@
 </template>
 <script>
     import JobType from "./JobType";
+    import {mapGetters} from "vuex";
+    import datatable from "../../../mixins/datatable";
+    import FieldDefs from "./FieldDefs";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_job_type: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
             this.getJobTypes();
         },
-        mounted(){
-            this.initDatable();
-        },
+       computed:{
+         ...mapGetters({
+             tableData:'all_job_types'
+         })
+       },
         methods:{
             getJobTypes(){
-                axios.get('job-types')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_job_types').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }
+                })
             },
             editJobType(job){
                 this.$store.dispatch('updateJobType',job)
@@ -81,14 +112,12 @@
             },
             listen(){
                 eventBus.$on('listJobTypes',(job) =>{
-                    this.tableData.unshift(job);
+                    this.getItems();
                     this.add_job_type =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_job_type = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateJobType',(job)=>{
                     this.add_job_type = false;
@@ -99,27 +128,8 @@
                         }
                     }
                     this.tableData.unshift(job);
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
+            }
         },
         components:{
             JobType

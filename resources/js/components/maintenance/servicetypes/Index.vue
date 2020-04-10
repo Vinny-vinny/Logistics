@@ -5,34 +5,54 @@
        <section class="content" v-if="!add_service">
            <!-- Default box -->
            <div class="box">
-               <div class="box-header with-border">
-                   <h3 class="box-title">Service Types</h3>
-                   <button class="btn btn-primary pull-right" @click="add_service=true">Add Service Type</button>
-               </div>
                <div class="box-body">
-                   <table class="table table-striped dt">
-                       <thead>
-                       <tr>
-                           <th>#</th>
-                           <th>Name</th>
-                           <th>Description</th>
-                            <th>Service After</th>
-                           <th>Actions</th>
-                       </tr>
-                       </thead>
-                       <tbody>
-                       <tr v-for="service in tableData">
-                           <td>{{service.id}}</td>
-                           <td>{{service.name}}</td>
-                           <td>{{service.description}}</td>
-                           <td>{{service.service_after}} {{service.track_name}}</td>
-                           <td>
-                               <button class="btn btn-success btn-sm" @click="editService(service)"><i class="fa fa-edit"></i></button>
-                               <button class="btn btn-danger btn-sm" @click="deleteService(service.id)" style="display:none"><i class="fa fa-trash"></i></button>
-                           </td>
-                       </tr>
-                       </tbody>
-                   </table>
+                   <v-app id="inspire">
+                       <v-card>
+                           <v-card-title>
+                               Service Types
+                               <v-spacer></v-spacer>
+                               <v-text-field
+                                   v-model="search"
+                                   append-icon="mdi-magnify"
+                                   label="Search"
+                                   single-line
+                                   hide-details
+                               ></v-text-field>
+                               <v-spacer></v-spacer>
+                               <v-btn small color="indigo" dark @click="add_service=true">Add Service Type
+                               </v-btn>
+                           </v-card-title>
+                           <v-data-table
+                               v-model="selected"
+                               :headers="headers"
+                               :items="items"
+                               :single-select="singleSelect"
+                               :sort-by.sync="sortBy"
+                               :sort-desc.sync="sortDesc"
+                               :search="search"
+                               item-key="name"
+                               class="elevation-1"
+                               :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                           >
+                               <template v-slot:item.actions="{ item }">
+                                   <v-btn class="mx-1 my-1" fab dark color="indigo" small>
+                                       <v-icon dark small @click="editService(item)">mdi-pencil</v-icon>
+                                   </v-btn>
+                                   <span style="display: none">
+                                     <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small @click="deleteService(item.id)">mdi-delete</v-icon>
+                                    </v-btn>
+                                    </span>
+                               </template>
+                           </v-data-table>
+                       </v-card>
+                   </v-app>
                </div>
                </div>
            </section>
@@ -40,26 +60,37 @@
 </template>
 <script>
     import ServiceType from "./ServiceType";
+    import {mapGetters} from "vuex";
+    import FieldDefs from "./FieldDefs";
+    import datatable from "../../../mixins/datatable";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_service: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
             this.getServices();
         },
-        mounted(){
-            this.initDatable();
-        },
+       computed:{
+         ...mapGetters({
+             tableData:'all_service_types'
+         })
+       },
         methods:{
             getServices(){
-                axios.get('service-types')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_service_types').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }
+                })
             },
             editService(service){
                 this.$store.dispatch('updateServiceType',service)
@@ -81,14 +112,12 @@
             },
             listen(){
                 eventBus.$on('listServiceTypes',(service) =>{
-                    this.tableData.unshift(service);
+                    this.getItems();
                     this.add_service =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_service = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateServiceType',(service)=>{
                     this.add_service = false;
@@ -99,27 +128,8 @@
                         }
                     }
                     this.tableData.unshift(service);
-                    this.initDatable();
                 });
                 },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
         },
         components:{
             ServiceType

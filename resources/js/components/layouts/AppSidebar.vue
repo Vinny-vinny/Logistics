@@ -96,7 +96,7 @@
                         <li style="display:none"><router-link to="/fuel-types" class="fa fa-circle-o"> Fuel Types</router-link></li>
                         <li><router-link to="/track-by" class="fa fa-circle-o"> Track By</router-link></li>
                         <li><router-link to="/service-types" class="fa fa-circle-o"> Service Types</router-link></li>
-                        <li><router-link to="/expense" class="fa fa-circle-o"> Other Charges</router-link></li>
+                        <li><router-link to="/expense" class="fa fa-circle-o" style="display: none"> Other Charges</router-link></li>
                         <li><router-link to="/parts" class="fa fa-circle-o"> Parts</router-link></li>
                         <li><router-link to="/accounts" class="fa fa-circle-o"> Ledgers</router-link></li>
                         <li><router-link to="/uoms" class="fa fa-circle-o"> Uoms</router-link></li>

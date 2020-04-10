@@ -45,7 +45,10 @@
             save(){
                 delete this.form.id;
                 axios.post('track-by',this.form)
-                    .then(res => eventBus.$emit('listTracks',res.data))
+                    .then(res =>{
+                        this.$store.state.all_my_tracks.unshift(res.data);
+                        eventBus.$emit('listTracks',res.data)
+                    })
                     .catch(error => error.response)
             },
             update(){

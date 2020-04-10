@@ -62,7 +62,11 @@ export default new Vuex.Store({
         get_users:{},
         all_my_stk_groups:{},
         all_my_expenses:{},
-        p_lists:{},
+        all_my_transactions:{},
+        all_my_checklists_tools:{},
+        all_my_checklists:{},
+        all_my_expiry_types:{},
+        all_my_assign_checklists:{},
         loading:false,
         pagination: {
             descending: true,
@@ -250,15 +254,24 @@ export default new Vuex.Store({
         },
         my_expenses(state,data){
          state.all_my_expenses = data;
+        },
+        my_transactions(state,data){
+         state.all_my_transactions =data;
+        },
+        my_checklist_tools(state,data){
+         state.all_my_checklists_tools = data;
+        },
+        my_checklists(state,data){
+         state.all_my_checklists = data;
+        },
+        my_expiry_types(state,data){
+         state.all_my_expiry_types = data;
+        },
+        assign_checklists(state,data){
+         state.all_my_assign_checklists = data;
         }
     },
     getters:{
-        loading (state) {
-            return state.loading
-        },
-        pagination (state) {
-            return state.pagination
-        },
         items (state) {
             return state.items
         },
@@ -318,8 +331,25 @@ export default new Vuex.Store({
         },
         all_fuels(state){
             return state.all_my_fuels;
+        },
+        all_transactions(state){
+            return state.all_my_transactions;
+        },
+        all_charges(state){
+            return state.all_my_charges;
+        },
+        all_checklist_tools(state){
+           return state.all_my_checklists_tools;
+        },
+        all_checklists(state){
+            return state.all_my_checklists;
+        },
+        all_expiry_types(state){
+            return state.all_my_expiry_types;
+        },
+        all_assign_checklists(state){
+            return state.all_my_assign_checklists;
         }
-
     },
     actions:{
     pathTo({commit},to){
@@ -329,6 +359,7 @@ export default new Vuex.Store({
         updateServiceType({commit},service){
         commit('updateServiceType',service);
         },
+
         updateTrack({commit},track){
         commit('updateTrack',track);
         },
@@ -478,8 +509,11 @@ export default new Vuex.Store({
                 commit('my_jobcards',res.data);
             })
         },
-        my_charges({commit},data){
-        commit('my_charges',data);
+        my_charges({commit}){
+        axios.get('charges')
+            .then(res => {
+              commit('my_charges',res.data);
+            })
         },
         my_users({commit}){
         axios.get('users')
@@ -532,6 +566,13 @@ export default new Vuex.Store({
             })
             .catch(error => Exception.handle(error))
         },
+        my_transactions({commit}){
+            axios.get('transactions')
+                .then(res => {
+                    commit('my_transactions',res.data);
+                })
+                .catch(error => Exception.handle(error))
+        },
         my_categories({commit}){
         axios.get('categories')
             .then(res => {
@@ -554,7 +595,32 @@ export default new Vuex.Store({
         },
         my_expenses({commit},data){
         commit('my_expenses',data);
+        },
+        my_checklist_tools({commit}){
+        axios.get('checklist-tool')
+            .then(res => {
+                commit('my_checklist_tools',res.data);
+            })
+        },
+        my_checklists({commit}){
+            axios.get('checklists')
+                .then(res => {
+                    commit('my_checklists',res.data);
+                })
+        },
+        my_expiry_types({commit}){
+            axios.get('expiry-types')
+                .then(res => {
+                    commit('my_expiry_types',res.data);
+                })
+        },
+        assign_checklists({commit}){
+            axios.get('assign-checklist')
+                .then(res => {
+                commit('assign_checklists',res.data);
+             })
         }
+
 
     }
 })

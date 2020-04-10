@@ -40,8 +40,11 @@
 </template>
 
 <script>
-    import datepicker from 'vuejs-datepicker';
+   import datepicker from 'vuejs-datepicker';
+    import {mapGetters} from "vuex";
+   import dateConvert from "../../../mixins/datepicker";
     export default {
+        mixins:[dateConvert],
         props:['edit'],
            data(){
             return {
@@ -52,9 +55,6 @@
                     checklist_id:'',
                     id:''
                 },
-                vehicles:{},
-                checklists:{},
-                expiry_types:{},
                 date_type:'',
                 show_expiry_duration:false,
                 edit_checklist: this.edit,
@@ -64,21 +64,23 @@
         },
         created(){
             this.listen();
-            this.getVehicles();
-            this.getChecklists();
-            this.getExpiryTypes();
             this.getJobs();
+        },
+        computed:{
+          ...mapGetters({
+              vehicles:'all_vehicles',
+              expiry_types:'all_expiry_types',
+              checklists:'all_checklists',
+              jobs:'all_jobs'
+          })
         },
         methods:{
             getJobs(){
-               axios.get('job-card')
-                   .then(res => {
-                   for (let i=0; i<res.data.length; i++){
-                       if (res.data[i]['category'].toLowerCase() === 'workshop' && res.data[i]['checklist_assigned'] ===0){
-                           this.jobcards.push(res.data[i]);
-                       }
-                   }
-                   });
+           for (let i=0; i<this.jobs.length; i++){
+               if (this.jobs[i]['category'].toLowerCase() === 'workshop' && this.jobs[i]['checklist_assigned'] ===0){
+                   this.jobcards.push(this.jobs[i]);
+               }
+           }
             },
 
             getDuration(){
@@ -95,42 +97,18 @@
               }
            });
             },
-            getChecklists(){
-                axios.get('checklists')
-                    .then(checklist => {
-                        this.checklists = checklist.data;
-                    })
-            },
-            getExpiryTypes(){
-                axios.get('expiry-types')
-                    .then(expiry => {
-                        this.expiry_types = expiry.data;
-                    })
-            },
-            getVehicles(){
-              axios.get('machines')
-                  .then(vehicle => {
-                     this.vehicles = vehicle.data
-                  })
-            },
             assignChecklist(){
-                //     if (parseInt(this.form.reminder_before) > parseInt(this.counter)){
-                //     return this.$toastr.e(`Duration cannot be greater than ${this.counter} ${this.date_type}`)
-                // }
                 this.form.start_date = this.convertDate(this.form.start_date);
                 this.edit_checklist ? this.update() : this.save();
 
             },
-             convertDate(str) {
-                var date = new Date(str),
-                    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
-                    day = ("0" + date.getDate()).slice(-2);
-                return [date.getFullYear(), mnth, day].join("-");
-            },
             save(){
                  delete this.form.id;
                 axios.post('assign-checklist',this.form)
-                    .then(res => eventBus.$emit('listAssignChecklists',res.data))
+                    .then(res => {
+                        this.$store.state.all_my_assign_checklists.unshift(res.data);
+                        eventBus.$emit('listAssignChecklists',res.data)
+                    })
                     .catch(error => error.response)
             },
             update(){
@@ -155,17 +133,14 @@
                 }
             },
             getJobsEdited(){
-                axios.get('job-card')
-                    .then(res => {
-                        for (let i=0; i<res.data.length; i++){
-                            if (res.data[i]['category'].toLowerCase() === 'workshop'){
-                                this.jobcards.push(res.data[i]);
-                                if (res.data[i]['id'] === this.form.jobcard_id){
-                                    //this.jobcards.splice(res.data[i],1);
-                                }
-                            }
-                        }
-                    });
+            for (let i=0; i<this.jobs.length; i++){
+                if (this.jobs[i]['category'].toLowerCase() === 'workshop'){
+                    this.jobcards.push(this.jobs[i]);
+                    if (this.jobs[i]['id'] === this.form.jobcard_id){
+                        //this.jobcards.splice(res.data[i],1);
+                    }
+                }
+            }
             },
         },
         components:{

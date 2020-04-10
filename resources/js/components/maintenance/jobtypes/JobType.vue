@@ -64,7 +64,10 @@
             save(){
                 delete this.form.id;
                 axios.post('job-types',this.form)
-                    .then(res => eventBus.$emit('listJobTypes',res.data))
+                    .then(res => {
+                       this.$store.state.all_my_job_types.push(res.data);
+                       eventBus.$emit('listJobTypes',res.data)
+                    })
                     .catch(error => error.response)
             },
             update(){

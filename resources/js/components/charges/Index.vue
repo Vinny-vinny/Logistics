@@ -5,32 +5,49 @@
         <section class="content" v-if="!add_charge">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Charges</h3>
-                    <button class="btn btn-primary pull-right" @click="add_charge=true" v-if="tableData.length < 2">Add New</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Item Description</th>
-                            <th>Type</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="item in tableData">
-                            <td>{{item.id}}</td>
-                            <td>{{item.description}}</td>
-                            <td>{{item.name}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editCharge(item)"><i class="fa fa-edit"></i></button>
-                                <!--                                <button class="btn btn-danger btn-sm" @click="deleteCategory(category.id)"><i class="fa fa-trash"></i></button>-->
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Charges
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_charge=true" v-if="tableData.length < 2 && parts.length > 0">Add New
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small v-if="parts.length > 0">
+                                        <v-icon dark small @click="editCharge(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -39,29 +56,39 @@
 <script>
 
     import Charge from "./Charge";
+    import datatable from "../../mixins/datatable";
+    import FieldDefs from "./FieldDefs";
+    import {mapGetters} from "vuex";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_charge: false,
-                editing: false
+                editing: false,
+                headers: FieldDefs
             }
         },
         created(){
             this.listen();
             this.getCharges();
-
+            this.$store.dispatch('my_parts');
         },
-        mounted(){
-            this.initDatable();
+        computed:{
+          ...mapGetters({
+              tableData:'all_charges',
+              parts:'all_parts'
+          })
         },
         methods:{
             getCharges(){
-                axios.get('charges')
-                    .then(res => {
-                        this.tableData = res.data
-                    })
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_charges').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }
+                })
             },
             editCharge(charge){
                 this.$store.dispatch('updateCharges',charge)
@@ -83,14 +110,12 @@
             },
             listen(){
                 eventBus.$on('listCharges',(charge) =>{
-                    this.tableData.unshift(charge);
+                    this.getItems();
                     this.add_charge =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_charge = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateCharges',(charge)=>{
                     this.add_charge = false;
@@ -101,27 +126,8 @@
                         }
                     }
                     this.tableData.unshift(charge);
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
+            }
         },
         components:{
             Charge

@@ -5,32 +5,54 @@
         <section class="content" v-if="!add_category">
             <!-- Default box -->
             <div class="box">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Jobcard Categories</h3>
-                    <button class="btn btn-primary pull-right" @click="add_category=true">Add Category</button>
-                </div>
                 <div class="box-body">
-                    <table class="table table-striped dt">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th style="display: none">Name</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="category in tableData">
-                            <td>{{category.id}}</td>
-                            <td>{{category.name}}</td>
-                            <td style="display: none">{{category.name}}</td>
-                            <td>
-                                <button class="btn btn-success btn-sm" @click="editCategory(category)"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" @click="deleteCategory(category.id)" style="display:none"><i class="fa fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <v-app id="inspire">
+                        <v-card>
+                            <v-card-title>
+                                Jobcard Categories
+                                <v-spacer></v-spacer>
+                                <v-text-field
+                                    v-model="search"
+                                    append-icon="mdi-magnify"
+                                    label="Search"
+                                    single-line
+                                    hide-details
+                                ></v-text-field>
+                                <v-spacer></v-spacer>
+                                <v-btn small color="indigo" dark @click="add_category=true" v-if="transactions.length > 0">Add Category
+                                </v-btn>
+                            </v-card-title>
+                            <v-data-table
+                                v-model="selected"
+                                :headers="headers"
+                                :items="items"
+                                :single-select="singleSelect"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search="search"
+                                item-key="name"
+                                class="elevation-1"
+                                :footer-props="{
+                              showFirstLastPage: true,
+                              firstIcon: 'mdi-arrow-collapse-left',
+                              lastIcon: 'mdi-arrow-collapse-right',
+                              prevIcon: 'mdi-minus',
+                              nextIcon: 'mdi-plus'
+                              }"
+                            >
+                                <template v-slot:item.actions="{ item }">
+                                    <v-btn class="mx-1 my-1" fab dark color="indigo" small v-if="transactions.length > 0">
+                                        <v-icon dark small @click="editCategory(item)">mdi-pencil</v-icon>
+                                    </v-btn>
+                                    <span style="display: none">
+                                     <v-btn class="mx-1 my-1" fab dark color="pink" small>
+                                        <v-icon dark small @click="deleteCategory(item.id)">mdi-delete</v-icon>
+                                    </v-btn>
+                                    </span>
+                                </template>
+                            </v-data-table>
+                        </v-card>
+                    </v-app>
                 </div>
             </div>
         </section>
@@ -38,26 +60,39 @@
 </template>
 <script>
    import Category from "./Category";
+   import FieldDefs from "./FieldDefs";
+   import datatable from "../../../../mixins/datatable";
+   import {mapGetters} from "vuex";
     export default {
+        mixins:[datatable],
         data(){
             return {
-                tableData: [],
                 add_category: false,
-                editing: false
+                editing: false,
+                headers:FieldDefs
             }
         },
         created(){
             this.listen();
             this.getCategories();
+            this.$store.dispatch('my_transactions');
         },
-        mounted(){
-            this.initDatable();
-        },
+       computed:{
+         ...mapGetters({
+           tableData:'all_job_categories',
+           transactions:'all_transactions'
+         })
+       },
         methods:{
             getCategories(){
-                axios.get('jobcard-category')
-                    .then(res => this.tableData = res.data)
-                    .catch(error => Exception.handle(error))
+                this.$store.dispatch('my_job_categories').then(() => {
+                    this.getItems();
+                    if (this.tableData.length == undefined) {
+                        setTimeout(() => {
+                            this.getItems();
+                        }, 2000);
+                    }
+                })
             },
             editCategory(category){
                 this.$store.dispatch('updateJobcardCategory',category)
@@ -79,14 +114,12 @@
             },
             listen(){
                 eventBus.$on('listJobcardCategories',(category) =>{
-                    this.tableData.unshift(category);
+                    this.getItems();
                     this.add_category =false;
-                    this.initDatable();
                 });
                 eventBus.$on('cancel',()=>{
                     this.add_category = false;
                     this.editing = false;
-                    this.initDatable();
                 });
                 eventBus.$on('updateJobcardCategory',(category)=>{
                     this.add_category = false;
@@ -97,27 +130,8 @@
                         }
                     }
                     this.tableData.unshift(category);
-                    this.initDatable();
                 });
-            },
-            initDatable(){
-                setTimeout(()=>{
-                    $('.dt').DataTable({
-                        "pagingType": "full_numbers",
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        order: [[ 0, 'asc' ], [ 3, 'desc' ]],
-                        responsive: true,
-                        destroy: true,
-                        retrieve:true,
-                        autoFill: true,
-                        colReorder: true,
-
-                    });
-                },1000)
-            },
+            }
         },
         components:{
             Category

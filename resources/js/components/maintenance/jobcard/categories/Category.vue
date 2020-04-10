@@ -12,23 +12,23 @@
                         <div class="form-group">
                             <label>Name</label>
                             <input type="text" class="form-control" v-model="form.name" required>
-                        </div>    
+                        </div>
                             <div class="form-group">
                                     <label>INV TR Code</label>
                                    <model-select :options="inv_transactions"
                                         v-model="form.inv_tr_id"
-                                        @input="filterInvTR()"                           
+                                        @input="filterInvTR()"
                                         >
                                    </model-select>
-                                </div>                 
+                                </div>
                                   <div class="form-group">
-                                    <label>Stock TR Code</label> 
+                                    <label>Stock TR Code</label>
                                     <model-select :options="stk_transactions"
                                         v-model="form.stk_tr_id"
-                                        @input="filterStkTR()"                           
+                                        @input="filterStkTR()"
                                         >
-                                   </model-select>                                   
-                                </div>  
+                                   </model-select>
+                                </div>
 
                         <button type="submit" class="btn btn-primary">{{edit_category ? 'Update' : 'Save'}}</button>
                         <button type="button" class="btn btn-outline-danger" @click="cancel">Cancel</button>
@@ -42,70 +42,71 @@
 
 <script>
 import { ModelSelect } from 'vue-search-select';
+import {mapGetters} from "vuex";
 
     export default {
         props:['edit'],
         data(){
             return {
                 form:{
-                    name:'',             
+                    name:'',
                     inv_tr_id:'',
                     stk_tr_id:'',
                     id:''
                 },
                 edit_category: this.edit,
-                transactions:{},             
                 inv_transactions:[],
                 stk_transactions:[]
             }
         },
         created(){
             this.listen();
-            this.getTransactions();            
+            this.getTransactions();
         },
-        methods:{           
+        computed:{
+          ...mapGetters({
+              transactions:'all_transactions'
+          })
+        },
+        methods:{
             getTransactions(){
-               axios.get('transactions')
-               .then(res => {
-                this.transactions = res.data; 
-
-                  res.data.forEach(t => {
+                this.transactions.forEach(t => {
                   this.inv_transactions.push({
                         'value':t.transaction_id,
                         'text': `${t.code}-${t.description}`
                     })
                 })
-                 res.data.forEach(t => {
+                this.transactions.forEach(t => {
                     this.stk_transactions.push({
                         'value':t.transaction_id,
                         'text': `${t.code}-${t.description}`
                     })
-                })                      
-              
-            })
+                })
+
+
            },
               filterInvTR(){
                     let transactions = this.transactions.filter(t => t.transaction_id !==this.form.inv_tr_id);
-                    this.stk_transactions = [];                     
-                      transactions.forEach(t => {                 
+                    this.stk_transactions = [];
+                      transactions.forEach(t => {
                       this.stk_transactions.push({
                         'value': t.transaction_id,
                         'text': `${t.code}-${t.description}`
-                      })  
-                   
+                      })
+
                 })
-                      
+
                 },
-              filterStkTR(){                     
+              filterStkTR(){
                  let transactions = this.transactions.filter(t => t.transaction_id !== this.form.stk_tr_id);
-                 this.inv_transactions = []; 
+                 this.inv_transactions = [];
                     transactions.forEach(t => {
                     this.inv_transactions.push({
                         'value': t.transaction_id,
                         'text': `${t.code}-${t.description}`
                     })
                 })
-                
+
               },
             saveCategory(){
                 this.edit_category ? this.update() : this.save();
@@ -113,7 +114,8 @@ import { ModelSelect } from 'vue-search-select';
             save(){
                 delete this.form.id;
                 axios.post('jobcard-category',this.form)
-                    .then(res => {                       
+                    .then(res => {
+                        this.$store.state.all_my_job_categories.unshift(res.data);
                        eventBus.$emit('listJobcardCategories',res.data)
                     })
                     .catch(error => error.response)
@@ -132,11 +134,9 @@ import { ModelSelect } from 'vue-search-select';
             listen(){
                 if (this.edit){
                     this.form = this.$store.state.jobcard_categories;
-
-                    setTimeout(()=>{
                     this.filterInvTR();
                     this.filterStkTR();
-                    },3000)                          
+
                 }
             },
 
@@ -144,7 +144,7 @@ import { ModelSelect } from 'vue-search-select';
         components:{
             ModelSelect
         }
-    
+
     }
 </script>
 
