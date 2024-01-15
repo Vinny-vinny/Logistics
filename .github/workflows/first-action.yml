@@ -1,0 +1,11 @@
+name: First Workflow
+on: workflow_dispatch
+jobs:
+ first_action:
+  runs-on: ubuntu-latest
+  steps:
+   - name: Print Greeting
+     run: echo "Hello World"
+   - name: Deploy App
+     run: echo "deploying the app..."
+   
